@@ -1,0 +1,66 @@
+{
+    "baseInfo": {
+        "bg": "bluegrey",
+        "isShowKeyWord": true,
+        "isFixed": true,
+        "top": 0,
+        "bottom": 0
+    },
+    "tabs": [
+        {
+            "tabTitle": "首页",
+            "tabUrl": "/",
+            "tabContent": {
+                "isShowSelect": false
+            }
+        },
+        {
+            "tabTitle": "产品中心",
+            "tabUrl": "/products",
+            "tabContent": {
+                "isShowSelect": true,
+                "recommendType": "1",
+                "items": [
+                    {
+                        "title": "云服务器 ECS",
+                        "url": "/ecs"
+                    },
+                    {
+                        "title": "对象存储 OBS",
+                        "url": "/obs"
+                    },
+                    {
+                        "title": "云数据库 RDS",
+                        "url": "/rds"
+                    }
+                ]
+            }
+        },
+        {
+            "tabTitle": "开发者资讯",
+            "tabUrl": "/dev",
+            "tabContent": {
+                "isShowSelect": true,
+                "recommendType": "2",
+                "article": {
+                    "source": "1",
+                    "type": "23",
+                    "sampleSize": 5
+                }
+            }
+        },
+        {
+            "tabTitle": "帮助文档",
+            "tabUrl": "/help",
+            "tabContent": {
+                "isShowSelect": true,
+                "recommendType": "2",
+                "article": {
+                    "source": "3",
+                    "guideType": "1",
+                    "sampleSize": 6
+                }
+            }
+        }
+    ]
+}

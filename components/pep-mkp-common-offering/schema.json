@@ -1,0 +1,91 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "title": {
+            "type": "string",
+            "description": "Floor title, optional"
+        },
+        "isTitleCentered": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether the floor title is centered"
+        },
+        "floorBackgroundColor": {
+            "type": "string",
+            "format": "color",
+            "description": "Background color of the floor"
+        },
+        "cardBackgroundColor": {
+            "type": "string",
+            "format": "color",
+            "description": "Background color of the cards"
+        },
+        "marginTop": {
+            "type": "boolean",
+            "default": false,
+            "description": "Show top margin"
+        },
+        "marginBottom": {
+            "type": "boolean",
+            "default": false,
+            "description": "Show bottom margin"
+        },
+        "tabs": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "description": "Tab title"
+                    },
+                    "cardsPerRow": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 4,
+                        "default": 2,
+                        "description": "Number of cards per row (1-4)"
+                    },
+                    "contentId": {
+                        "type": "string"
+                    },
+                    "showDescription": {
+                        "type": "boolean"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "showInquiry": {
+                        "type": "boolean"
+                    },
+                    "priceSymbol": {
+                        "type": "string"
+                    },
+                    "price": {
+                        "type": "number"
+                    },
+                    "unit": {
+                        "type": "string"
+                    },
+                    "linkUrl": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    },
+    "required": [
+        "title",
+        "cards"
+    ]
+}
+}
+}
+}

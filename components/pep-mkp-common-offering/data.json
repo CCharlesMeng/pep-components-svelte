@@ -1,0 +1,75 @@
+{
+    "title": "Featured Products 333",
+    "isTitleCentered": false,
+    "floorBackgroundColor": "#f5f5f5",
+    "cardBackgroundColor": "#ffffff",
+    "marginTop": true,
+    "marginBottom": true,
+    "tabs": [
+        {
+            "title": "Best Sellers",
+            "cardsPerRow": 2,
+            "cards": [
+                {
+                    "showImage": false,
+                    "imageUrl": "https://via.placeholder.com/150",
+                    "showTitle": true,
+                    "title": "Wireless Headphones",
+                    "contentId": "WH-001",
+                    "showDescription": true,
+                    "description": "High quality noise cancelling headphones.",
+                    "tags": [
+                        "Electronics",
+                        "Audio"
+                    ],
+                    "showInquiry": false,
+                    "priceSymbol": "$",
+                    "price": 199.99,
+                    "unit": "pcs",
+                    "linkUrl": "/product/wh-001"
+                },
+                {
+                    "showImage": false,
+                    "imageUrl": "https://via.placeholder.com/150",
+                    "showTitle": true,
+                    "title": "Smart Watch",
+                    "contentId": "SW-002",
+                    "showDescription": false,
+                    "tags": [
+                        "Wearable",
+                        "Tech"
+                    ],
+                    "showInquiry": true,
+                    "priceSymbol": "$",
+                    "price": 299.50,
+                    "unit": "pcs",
+                    "linkUrl": "/product/sw-002"
+                }
+            ]
+        },
+        {
+            "title": "New Arrivals",
+            "cardsPerRow": 4,
+            "cards": [
+                {
+                    "showImage": false,
+                    "imageUrl": "https://via.placeholder.com/150",
+                    "showTitle": true,
+                    "title": "Running Shoes",
+                    "contentId": "RS-101",
+                    "showDescription": true,
+                    "description": "Lightweight and comfortable.",
+                    "tags": [
+                        "Sports",
+                        "Footwear"
+                    ],
+                    "showInquiry": false,
+                    "priceSymbol": "$",
+                    "price": 89.00,
+                    "unit": "pair",
+                    "linkUrl": "/product/rs-101"
+                }
+            ]
+        }
+    ]
+}
