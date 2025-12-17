@@ -1,6 +1,0 @@
-{
-	"/": [],
-	"/[...catchall]": [
-		"src/routes/[...catchall]/+page.server.ts"
-	]
-}
