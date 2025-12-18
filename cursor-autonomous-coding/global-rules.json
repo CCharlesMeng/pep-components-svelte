@@ -1,0 +1,186 @@
+{
+  "version": "1.0.0",
+  "description": "Monorepo全局组件开发规则",
+  
+  "component_naming": {
+    "prefix": "pep-",
+    "pattern": "^pep-[a-z]+(-[a-z]+)*$",
+    "examples": ["pep-button", "pep-modal", "pep-table-advanced"],
+    "forbidden": ["button", "component1", "my-component"]
+  },
+  
+  "required_files": {
+    "description": "每个组件必须包含的文件",
+    "files": [
+      "package.json",
+      "README.md",
+      "src/index.ts",
+      "features.json",
+      "DEVELOPMENT.md"
+    ],
+    "optional": [
+      "SPEC.md",
+      "CHANGELOG.md"
+    ]
+  },
+  
+  "code_standards": {
+    "typescript": {
+      "required": true,
+      "strict_mode": true,
+      "no_any": true
+    },
+    "eslint": {
+      "required": true,
+      "extends": "@pep/eslint-config"
+    },
+    "prettier": {
+      "required": true,
+      "config": "@pep/prettier-config"
+    }
+  },
+  
+  "component_interface": {
+    "props": {
+      "naming": "camelCase",
+      "required_docs": true,
+      "type_definitions": "required"
+    },
+    "events": {
+      "naming": "on[EventName]",
+      "examples": ["onClick", "onChange", "onSubmit"],
+      "custom_events": {
+        "naming": "on[ComponentName][Action]",
+        "examples": ["onButtonClick", "onModalClose"]
+      }
+    },
+    "slots": {
+      "naming": "lowercase",
+      "default_slot": "allowed",
+      "named_slots": "camelCase"
+    }
+  },
+  
+  "testing_requirements": {
+    "unit_tests": {
+      "required": true,
+      "min_coverage": 80,
+      "framework": "vitest"
+    },
+    "component_tests": {
+      "required": true,
+      "framework": "@testing-library/svelte"
+    },
+    "test_files": {
+      "pattern": "*.test.ts",
+      "location": "src/"
+    }
+  },
+  
+  "documentation_requirements": {
+    "readme": {
+      "required_sections": [
+        "Installation",
+        "Usage",
+        "Props",
+        "Events",
+        "Slots",
+        "Examples",
+        "Accessibility"
+      ]
+    },
+    "api_docs": {
+      "format": "JSDoc",
+      "required": true
+    },
+    "examples": {
+      "min_count": 3,
+      "basic": "required",
+      "advanced": "required"
+    }
+  },
+  
+  "accessibility_requirements": {
+    "aria_labels": "required",
+    "keyboard_navigation": "required",
+    "focus_management": "required",
+    "screen_reader_support": "required",
+    "color_contrast": {
+      "min_ratio": 4.5,
+      "wcag_level": "AA"
+    }
+  },
+  
+  "feature_requirements": {
+    "min_features": 15,
+    "max_features": 30,
+    "categories": {
+      "required": ["structure", "props", "styling", "testing"],
+      "optional": ["variants", "accessibility", "documentation", "performance"]
+    },
+    "acceptance_criteria": {
+      "min_count": 3,
+      "must_be_testable": true
+    }
+  },
+  
+  "git_requirements": {
+    "branch_naming": {
+      "pattern": "^component/[a-z-]+$",
+      "examples": ["component/pep-button", "component/pep-modal"]
+    },
+    "commit_message": {
+      "format": "conventional-commits",
+      "pattern": "^(feat|fix|docs|style|refactor|test|chore)\\([a-z-]+\\): .+$",
+      "examples": [
+        "feat(pep-button): add primary variant",
+        "fix(pep-modal): correct close animation",
+        "docs(pep-table): update props documentation"
+      ]
+    },
+    "commit_frequency": {
+      "recommendation": "每个功能独立提交"
+    }
+  },
+  
+  "validation_rules": {
+    "pre_commit": {
+      "lint": true,
+      "format": true,
+      "type_check": true
+    },
+    "pre_push": {
+      "test": true,
+      "build": true
+    },
+    "feature_completion": {
+      "all_tests_pass": true,
+      "linter_clean": true,
+      "docs_updated": true,
+      "accessibility_checked": true
+    }
+  },
+  
+  "performance_requirements": {
+    "bundle_size": {
+      "max_kb": 50,
+      "warning_kb": 40
+    },
+    "render_time": {
+      "max_ms": 100,
+      "target_ms": 50
+    }
+  },
+  
+  "custom_rules": {
+    "description": "项目特定的自定义规则",
+    "svelte_version": "^4.0.0",
+    "node_version": ">=18.0.0",
+    "package_manager": "pnpm",
+    "import_style": {
+      "relative": "allowed",
+      "alias": "@pep/*"
+    }
+  }
+}
+
