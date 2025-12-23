@@ -1,0 +1,320 @@
+{
+    "type": "object",
+    "title": "编辑此组件",
+    "properties": {
+        "title": {
+            "title": "楼层标题",
+            "type": "string",
+            "description": "建议不超过1行"
+        },
+        "titleMb": {
+            "title": "移动端楼层标题",
+            "type": "string",
+            "description": "建议不超过1行"
+        },
+        "subtitle": {
+            "title": "楼层副标题",
+            "type": "string",
+            "ui:widget": "richtext",
+            "description": "建议不超过1行"
+        },
+        "subtitleMb": {
+            "title": "移动端楼层副标题",
+            "type": "string",
+            "ui:widget": "richtext",
+            "description": "建议不超过1行"
+        },
+        "more": {
+            "title": "",
+            "type": "object",
+            "properties": {
+                "text": {
+                    "title": "更多链接文本",
+                    "type": "string"
+                },
+                "href": {
+                    "title": "更多链接",
+                    "type": "string",
+                    "ui:options": {
+                        "format": "url"
+                    }
+                }
+            }
+        },
+        "cardType": {
+            "title": "PC端卡片样式",
+            "type": "string",
+            "enum": [
+                "left",
+                "center",
+                "product"
+            ],
+            "enumNames": [
+                "居左",
+                "居中",
+                "产品推荐卡片"
+            ],
+            "default": "center"
+        },
+        "theme": {
+            "title": "背景色",
+            "type": "string",
+            "enum": [
+                "white",
+                "grey"
+            ],
+            "enumNames": [
+                "白色",
+                "灰色"
+            ],
+            "default": "white"
+        },
+        "cardBgColor": {
+            "title": "卡片背景色",
+            "type": "string",
+            "enum": [
+                "white",
+                "gray"
+            ],
+            "enumNames": [
+                "白色",
+                "灰色"
+            ],
+            "default": "gray"
+        },
+        "cardColumn": {
+            "title": "卡片列数",
+            "type": "string",
+            "enum": [
+                "2",
+                "3",
+                "4",
+                "5"
+            ],
+            "enumNames": [
+                "一行2个",
+                "一行3个",
+                "一行4个",
+                "一行5个"
+            ],
+            "default": "3"
+        },
+        "imgHeight": {
+            "title": "图片高度",
+            "type": "string",
+            "enum": [
+                "80px",
+                "60px",
+                "48px"
+            ],
+            "enumNames": [
+                "80px*80px",
+                "60px*60px",
+                "48px*48px"
+            ],
+            "default": "80px"
+        },
+        "isMergeTopSpacing": {
+            "title": "显示楼层顶部间距",
+            "type": "boolean",
+            "ui:widget": "switch",
+            "default": true
+        },
+        "isMergeBottomSpacing": {
+            "title": "显示楼层底部间距",
+            "type": "boolean",
+            "ui:widget": "switch",
+            "default": true
+        },
+        "isShowMb": {
+            "title": "移动端是否展示该楼层，默认不展示",
+            "type": "boolean",
+            "ui:widget": "switch",
+            "default": false
+        },
+        "showCardDesc": {
+            "title": "是否展示卡片描述",
+            "type": "boolean",
+            "ui:widget": "switch",
+            "default": true
+        },
+        "tabList": {
+            "type": "array",
+            "ui:options": {
+                "min": 1
+            },
+            "default": [],
+            "description": "若只有一个，不展示该tab",
+            "items": {
+                "type": "object",
+                "title": "Tab",
+                "properties": {
+                    "title": {
+                        "title": "Tab标题",
+                        "type": "string",
+                        "description": "建议不超过1行"
+                    },
+                    "layoutMb": {
+                        "title": "移动端布局方式",
+                        "type": "string",
+                        "enum": [
+                            "upDownLayout",
+                            "leftRightLayout"
+                        ],
+                        "enumNames": [
+                            "上下布局",
+                            "左右布局"
+                        ],
+                        "default": "leftRightLayout",
+                        "description": "若同倒计时一起使用时/与重点文案一起使用时，建议上下布局！"
+                    },
+                    "cards": {
+                        "type": "object",
+                        "ui:options": {
+                            "hidden": "child-component"
+                        },
+                        "properties": {
+                            "products": {
+                                "type": "array",
+                                "title": "卡片列表",
+                                "ui:options": {
+                                    "min": 1,
+                                    "addBtn": "<i class=\"el-icon-plus\"></i>"
+                                },
+                                "items": {
+                                    "type": "object",
+                                    "title": "卡片",
+                                    "properties": {
+                                        "endTime": {
+                                            "title": "倒计时结束时间",
+                                            "type": "string",
+                                            "description": "有卡片配置倒计时时，会触发整体样式调整，和到期自动隐藏能力；推荐格式：2024/11/11 11:11,2024-11-11 11:11(建议移动端配置上下布局；注意时间若早于当前，会自动隐藏卡片！！！)"
+                                        },
+                                        "icon": {
+                                            "title": "图标",
+                                            "type": "string",
+                                            "ui:widget": "imageSelector",
+                                            "description": "推荐尺寸：180*80px、80px*80px",
+                                            "ui:options": {
+                                                "hidden": ""
+                                            }
+                                        },
+                                        "iconMb": {
+                                            "title": "移动端图标",
+                                            "type": "string",
+                                            "ui:widget": "imageSelector",
+                                            "description": "推荐尺寸：90*40px、40px*40px",
+                                            "ui:options": {
+                                                "hidden": ""
+                                            }
+                                        },
+                                        "title": {
+                                            "title": "卡片标题",
+                                            "type": "string",
+                                            "description": "建议不超过1行"
+                                        },
+                                        "keywords": {
+                                            "title": "卡片重点文案",
+                                            "type": "array",
+                                            "ui:options": {
+                                                "max": 2
+                                            },
+                                            "default": [],
+                                            "items": {
+                                                "type": "object",
+                                                "title": "文案",
+                                                "description": "建议设置两列时启用，支持0-2个",
+                                                "properties": {
+                                                    "keyword": {
+                                                        "title": "重点文案",
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "desc": {
+                                            "title": "卡片描述",
+                                            "type": "string",
+                                            "ui:widget": "richtext",
+                                            "description": "建议不超过2行"
+                                        },
+                                        "tags": {
+                                            "type": "array",
+                                            "ui:widget": "label",
+                                            "title": "标签"
+                                        },
+                                        "btnGroups": {
+                                            "title": "卡片按钮组",
+                                            "type": "array",
+                                            "default": [],
+                                            "ui:options": {
+                                                "max": 2
+                                            },
+                                            "items": {
+                                                "type": "object",
+                                                "title": "卡片按钮",
+                                                "description": "建议设置两列时启用",
+                                                "properties": {
+                                                    "btnType": {
+                                                        "title": "按钮类型",
+                                                        "placeholder": "请选择",
+                                                        "type": "string",
+                                                        "ui:widget": "select",
+                                                        "ui:options": {
+                                                            "options": [
+                                                                {
+                                                                    "label": "黑底白字",
+                                                                    "value": "por-btn-primary"
+                                                                },
+                                                                {
+                                                                    "label": "白底黑字",
+                                                                    "value": "por-btn-secondary"
+                                                                },
+                                                                {
+                                                                    "label": "透明底黑字",
+                                                                    "value": "por-btn-dark"
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    "btnHref": {
+                                                        "title": "按钮链接",
+                                                        "type": "string",
+                                                        "ui:options": {
+                                                            "format": "url"
+                                                        }
+                                                    },
+                                                    "btnLinkText": {
+                                                        "title": "按钮文案",
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "href": {
+                                            "title": "卡片链接",
+                                            "type": "string",
+                                            "ui:options": {
+                                                "format": "url"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "bottomShowMoreText": {
+                        "title": "展开时文案",
+                        "type": "string",
+                        "description": "建议不超过1行"
+                    },
+                    "bottomCollapseText": {
+                        "title": "收起时文案",
+                        "type": "string",
+                        "description": "建议不超过1行"
+                    }
+                }
+            }
+        }
+    }
+}

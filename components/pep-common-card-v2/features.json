@@ -1,0 +1,83 @@
+[
+  {
+    "id": "INIT-001",
+    "category": "setup",
+    "priority": "high",
+    "title": "组件基础结构",
+    "description": "已生成组件骨架，包含 Props 接口、基础结构、样式框架",
+    "status": "completed",
+    "completed_at": "2025-12-23T11:29:57.898148",
+    "estimated_complexity": 1,
+    "actual_complexity": 1
+  },
+  {
+    "id": "FEAT-001",
+    "category": "setup",
+    "priority": "high",
+    "title": "完善 Props 与类型定义",
+    "description": "基于 schema.json 补全 PepCommonCardV2Props 类型，定义 tabList、products 及相关嵌套对象的接口",
+    "status": "completed",
+    "completed_at": "2025-12-23T14:45:00.000Z",
+    "estimated_complexity": 1
+  },
+  {
+    "id": "FEAT-002",
+    "category": "feature",
+    "priority": "high",
+    "title": "实现楼层容器与基础布局",
+    "description": "实现楼层标题、副标题展示，根据 theme (white/grey) 设置背景色，处理顶部/底部间距配置",
+    "status": "completed",
+    "completed_at": "2025-12-23T14:50:00.000Z",
+    "estimated_complexity": 2
+  },
+  {
+    "id": "FEAT-003",
+    "category": "feature",
+    "priority": "high",
+    "title": "实现多页签 (Tab) 导航逻辑",
+    "description": "当 tabList 长度 > 1 时显示导航条，实现 Tab 切换状态管理及内容区联动展示",
+    "status": "completed",
+    "completed_at": "2025-12-23T14:55:00.000Z",
+    "estimated_complexity": 2
+  },
+  {
+    "id": "FEAT-004",
+    "category": "feature",
+    "priority": "high",
+    "title": "实现产品卡片基础渲染 (PC)",
+    "description": "根据 cardType (left/center/product) 渲染卡片基础结构、图标、标题、描述，适配 cardColumn (2-5)",
+    "status": "completed",
+    "completed_at": "2025-12-23T15:00:00.000Z",
+    "estimated_complexity": 3
+  },
+  {
+    "id": "FEAT-005",
+    "category": "feature",
+    "priority": "medium",
+    "title": "实现卡片增强功能 (倒计时/标签/按钮组)",
+    "description": "实现 endTime 倒计时逻辑及其过期隐藏能力，渲染卡片标签和按钮组交互",
+    "status": "completed",
+    "completed_at": "2025-12-23T15:10:00.000Z",
+    "estimated_complexity": 2
+  },
+  {
+    "id": "FEAT-006",
+    "category": "feature",
+    "priority": "medium",
+    "title": "移动端适配与布局切换",
+    "description": "实现 isShowMb 控制，并根据 layoutMb 配置切换卡片的上下/左右布局样式",
+    "status": "completed",
+    "completed_at": "2025-12-23T15:20:00.000Z",
+    "estimated_complexity": 2
+  },
+  {
+    "id": "TEST-001",
+    "category": "testing",
+    "priority": "medium",
+    "title": "功能与响应式测试",
+    "description": "验证 Tab 切换、倒计时自动隐藏、PC 端不同列数适配、移动端布局切换是否符合验收标准",
+    "status": "completed",
+    "completed_at": "2025-12-23T15:30:00.000Z",
+    "estimated_complexity": 2
+  }
+]

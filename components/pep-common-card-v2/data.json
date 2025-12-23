@@ -1,0 +1,71 @@
+{
+  "_id": "pep-common-card-v2_1690599463451",
+  "more": {
+    "href": "",
+    "text": ""
+  },
+  "theme": "grey",
+  "title": "<p>您可能感兴趣的产品</p>",
+  "tabList": [
+    {
+      "title": "精选推荐",
+      "cards": {
+        "products": [
+          {
+            "desc": "<p>一站式迁移和现代化平台</p>",
+            "href": "https://www.huaweicloud.com/product/mgc.html",
+            "icon": "https://res-static.hc-cdn.cn/cloudbu-site/public/new-product-icon/Migration/MGC.png",
+            "title": "迁移中心 MgC",
+            "endTime": "2026/12/31 23:59"
+          },
+          {
+            "desc": "<p>高性能甄选，支持200+企业应用场景</p>",
+            "href": "https://www.huaweicloud.com/product/ecs.html",
+            "icon": "https://res-static.hc-cdn.cn/cloudbu-site/public/new-product-icon/Compute/ECS.png",
+            "title": "弹性云服务器 ECS",
+            "tags": [
+              "热门"
+            ]
+          },
+          {
+            "desc": "<p>弹性灵活，即开即用，共享带宽降低使用成本</p>",
+            "href": "https://www.huaweicloud.com/product/eip.html",
+            "icon": "https://res-static.hc-cdn.cn/cloudbu-site/public/new-product-icon/Networking/EIP.png",
+            "title": "弹性公网IP EIP"
+          }
+        ]
+      }
+    },
+    {
+      "title": "最新动态",
+      "cards": {
+        "products": [
+          {
+            "title": "限时促销产品",
+            "desc": "<p>这是一个带倒计时的促销卡片示例</p>",
+            "icon": "https://res-static.hc-cdn.cn/cloudbu-site/public/new-product-icon/Compute/ECS.png",
+            "endTime": "2026/01/01 12:00",
+            "btnGroups": [
+              {
+                "btnType": "por-btn-primary",
+                "btnLinkText": "立即抢购",
+                "btnHref": "#"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "titleMb": "<p>您可能感兴趣的产品</p>",
+  "cardType": "product",
+  "isShowMb": true,
+  "subtitle": "",
+  "imgHeight": "80px",
+  "cardColumn": "3",
+  "subtitleMb": "",
+  "cardBgColor": "white",
+  "showCardDesc": true,
+  "isMergeTopSpacing": false,
+  "isMergeBottomSpacing": true
+}
