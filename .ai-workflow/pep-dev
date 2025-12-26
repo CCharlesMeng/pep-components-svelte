@@ -1,0 +1,228 @@
+#!/usr/bin/env python3
+"""
+PEP Components 开发命令行工具
+==============================
+
+统一的开发命令入口，整合所有开发流程脚本
+"""
+
+import sys
+import subprocess
+from pathlib import Path
+
+# 脚本目录（处理软链接情况）
+SCRIPT_DIR = Path(__file__).resolve().parent / "scripts"
+
+# 命令映射
+COMMANDS = {
+    # === 初始化 ===
+    "init": {
+        "script": "init_component.py",
+        "desc": "初始化新组件（从spec.md生成features.json）",
+        "examples": [
+            "pep-dev init pep-button",
+            "pep-dev init pep-modal --from-spec components/pep-modal/spec.md"
+        ]
+    },
+    
+    # === 任务管理 ===
+    "next": {
+        "script": "next_task.py",
+        "desc": "获取下一个待开发任务",
+        "examples": [
+            "pep-dev next pep-button",
+            "pep-dev next pep-button --save"
+        ]
+    },
+    "done": {
+        "script": "mark_done.py",
+        "desc": "标记当前任务完成并归档",
+        "examples": [
+            "pep-dev done pep-button 1",
+            "pep-dev done pep-button 1 --commit"
+        ]
+    },
+    
+    # === 验证与检查 ===
+    "validate": {
+        "script": "validate.py",
+        "desc": "验证组件的功能清单和代码质量",
+        "examples": [
+            "pep-dev validate pep-button",
+            "pep-dev validate pep-button --fix"
+        ]
+    },
+    "check": {
+        "script": "check_compliance.py",
+        "desc": "检查组件合规性（技术栈、架构、规范）",
+        "examples": [
+            "pep-dev check pep-button",
+            "pep-dev check pep-button --strict"
+        ]
+    },
+    
+    # === 规格管理 ===
+    "spec": {
+        "script": "generate_spec.py",
+        "desc": "从spec.md生成features.json",
+        "examples": [
+            "pep-dev spec pep-button",
+            "pep-dev spec pep-button --regenerate"
+        ]
+    },
+    
+    # === 报告 ===
+    "status": {
+        "script": "report.py",
+        "desc": "查看组件开发进度",
+        "examples": [
+            "pep-dev status pep-button",
+            "pep-dev status pep-button --detailed"
+        ]
+    },
+    "summary": {
+        "script": "monorepo_summary.py",
+        "desc": "查看整个Monorepo的开发进度",
+        "examples": [
+            "pep-dev summary",
+            "pep-dev summary --format json"
+        ]
+    },
+    
+    # === 规则 ===
+    "rules": {
+        "script": "validate_global_rules.py",
+        "desc": "验证全局规则",
+        "examples": [
+            "pep-dev rules pep-button",
+            "pep-dev rules pep-button --fix"
+        ]
+    },
+}
+
+def show_help():
+    """显示帮助信息"""
+    print("""
+╔══════════════════════════════════════════════════════════════╗
+║                    PEP-DEV 开发工具                          ║
+║              Cursor自主编码流程统一命令入口                  ║
+╚══════════════════════════════════════════════════════════════╝
+
+用法:
+  pep-dev <command> <component> [options]
+
+核心命令:
+
+  📝 开发流程
+    init <component>         初始化新组件（从spec.md生成）
+    next <component>         获取下一个任务
+    done <component> <id>    完成任务并归档
+    
+  ✅ 验证检查
+    validate <component>     验证功能清单
+    check <component>        合规性检查（技术栈、架构）
+    rules <component>        全局规则检查
+    
+  📊 进度报告
+    status <component>       组件开发进度
+    summary                  整个Monorepo进度
+    
+  📋 规格管理
+    spec <component>         从spec.md生成features.json
+
+完整工作流示例:
+
+  # 1. 创建组件规格文档
+  vim components/pep-button/spec.md
+  
+  # 2. 初始化组件（生成features.json）
+  pep-dev init pep-button
+  
+  # 3. 获取第一个任务
+  pep-dev next pep-button --save
+  
+  # 4. 在Cursor中开发
+  # ... 使用Cursor AI进行开发 ...
+  
+  # 5. 完成任务并验证
+  pep-dev validate pep-button
+  pep-dev check pep-button
+  pep-dev done pep-button 1 --commit
+  
+  # 6. 继续下一个任务
+  pep-dev next pep-button --save
+
+查看详细帮助:
+  pep-dev <command> --help
+
+文档:
+  cursor-autonomous-coding/docs/README.md
+""")
+
+def run_command(command: str, args: list):
+    """执行命令"""
+    if command not in COMMANDS:
+        print(f"❌ 未知命令: {command}")
+        print(f"运行 'pep-dev help' 查看可用命令")
+        sys.exit(1)
+    
+    cmd_info = COMMANDS[command]
+    script_path = SCRIPT_DIR / cmd_info["script"]
+    
+    if not script_path.exists():
+        print(f"❌ 脚本不存在: {script_path}")
+        sys.exit(1)
+    
+    # 转换参数格式
+    script_args = []
+    
+    # 使用位置参数的命令（新脚本）
+    positional_commands = ["spec", "check"]
+    
+    if command == "summary":
+        # summary 不需要 component 参数
+        script_args = args
+    elif command == "done":
+        # done <component> <id> [options]
+        if len(args) >= 2:
+            script_args = ["--component", args[0], "--feature-id", args[1]] + args[2:]
+        else:
+            script_args = args
+    elif command in positional_commands:
+        # 新脚本使用位置参数: <command> <component> [options]
+        script_args = args
+    else:
+        # 旧脚本使用 --component: <command> <component> [options]
+        if len(args) >= 1 and not args[0].startswith("-"):
+            script_args = ["--component", args[0]] + args[1:]
+        else:
+            script_args = args
+    
+    # 构建完整命令
+    full_cmd = [sys.executable, str(script_path)] + script_args
+    
+    # 执行脚本
+    try:
+        result = subprocess.run(full_cmd, check=False)
+        sys.exit(result.returncode)
+    except KeyboardInterrupt:
+        print("\n⚠️  命令被中断")
+        sys.exit(130)
+    except Exception as e:
+        print(f"❌ 执行失败: {e}")
+        sys.exit(1)
+
+def main():
+    """主函数"""
+    if len(sys.argv) < 2 or sys.argv[1] in ["-h", "--help", "help"]:
+        show_help()
+        sys.exit(0)
+    
+    command = sys.argv[1]
+    args = sys.argv[2:]
+    
+    run_command(command, args)
+
+if __name__ == "__main__":
+    main()
+

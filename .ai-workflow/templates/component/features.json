@@ -1,0 +1,14 @@
+[
+  {
+    "id": "INIT-001",
+    "category": "setup",
+    "priority": "high",
+    "title": "组件基础结构",
+    "description": "已生成组件骨架，包含 Props 接口、基础结构、样式框架",
+    "status": "completed",
+    "completed_at": "{{INIT_DATE}}",
+    "estimated_complexity": 1,
+    "actual_complexity": 1
+  }
+]
+

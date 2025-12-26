@@ -1,0 +1,50 @@
+{
+  "project_name": "pep-components-svelte",
+  "description": "PEP Svelte Components Monorepo",
+  "version": "1.0.0",
+  
+  "tech_stack": {
+    "framework": "Svelte",
+    "language": "TypeScript",
+    "styling": "CSS/SCSS",
+    "testing": "Vitest",
+    "build_tool": "Vite",
+    "package_manager": "pnpm"
+  },
+  
+  "architecture": {
+    "component_pattern": "SFC",
+    "state_management": "Svelte stores",
+    "props_validation": "TypeScript interfaces",
+    "file_structure": "src-based"
+  },
+  
+  "required_files": [
+    "README.md",
+    "spec.md",
+    "features.json",
+    "package.json"
+  ],
+  
+  "naming_conventions": {
+    "component": "^pep-[a-z0-9-]+$",
+    "files": "kebab-case",
+    "exports": "PascalCase",
+    "props": "camelCase"
+  },
+  
+  "quality_standards": {
+    "min_test_coverage": 80,
+    "accessibility": "WCAG 2.1 AA",
+    "documentation": "required",
+    "type_safety": "strict"
+  },
+  
+  "workflow": {
+    "spec_first": true,
+    "auto_archive": true,
+    "require_tests": true,
+    "commit_per_feature": true
+  }
+}
+
