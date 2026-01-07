@@ -1,10 +1,16 @@
 <script lang="ts">
     import type { Config, ArticleItem, Tab } from "../types";
 
-    export let config: Config;
-    export let tabData: Record<number, ArticleItem[]>;
+    let { 
+        config, 
+        tabData 
+    }: { 
+        config: Config; 
+        tabData: Record<number, ArticleItem[]>;
+    } = $props();
 
-    const { baseInfo, tabs } = config;
+    let baseInfo = $derived(config.baseInfo);
+    let tabs = $derived(config.tabs);
 
     // Map schema enum to CSS classes
     const bgClasses: Record<string, string> = {
@@ -14,13 +20,13 @@
         shallowgrey: "theme-shallowgrey",
     };
 
-    const currentBgClass = bgClasses[baseInfo.bg] || "theme-white";
+    let currentBgClass = $derived(bgClasses[baseInfo.bg] || "theme-white");
 
     // Style for top/bottom spacing
-    const containerStyle = `
+    let containerStyle = $derived(`
         padding-top: ${baseInfo.top}px;
         padding-bottom: ${baseInfo.bottom}px;
-    `;
+    `);
 
     function getDropdownItems(tab: Tab, index: number): ArticleItem[] {
         if (!tab.tabContent?.isShowSelect) return [];

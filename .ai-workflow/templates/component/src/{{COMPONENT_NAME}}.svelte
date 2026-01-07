@@ -1,14 +1,23 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import type { {{COMPONENT_NAME_PASCAL}}Props } from './types';
 
-  // Props
-  export let className: string = '';
-  export let title: string = '组件标题';
-  export let description: string = '这是一个示例组件，包含卡片、按钮和响应式状态';
-  export let buttonText: string = '点击增加';
+  let {
+    className = '',
+    title = '组件标题',
+    description = '这是一个示例组件，包含卡片、按钮和响应式状态',
+    buttonText = '点击增加',
+    children
+  }: {
+    className?: string;
+    title?: string;
+    description?: string;
+    buttonText?: string;
+    children?: Snippet;
+  } = $props();
 
   // 响应式状态
-  let count = 0;
+  let count = $state(0);
 
   // 事件处理
   function handleClick() {
@@ -34,16 +43,16 @@
       <!-- 按钮 -->
       <button 
         class="{{COMPONENT_NAME}}__button" 
-        on:click={handleClick}
+        onclick={handleClick}
         type="button"
       >
         {buttonText}
       </button>
     </div>
 
-    <!-- 插槽：支持自定义内容 -->
+    <!-- 内容片段渲染 -->
     <div class="{{COMPONENT_NAME}}__slot">
-      <slot />
+      {@render children?.()}
     </div>
   </div>
 </div>
@@ -145,10 +154,6 @@
     border-top: 1px solid #e5e7eb;
   }
 
-  .{{COMPONENT_NAME}}__slot:empty {
-    display: none;
-  }
-
   /* 响应式设计 */
   @media (max-width: 640px) {
     .{{COMPONENT_NAME}} {
@@ -168,4 +173,3 @@
     }
   }
 </style>
-

@@ -1,25 +1,31 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-
-  export let text: string = '';
-  export let href: string = '';
-  export let btnType: 'por-btn-primary' | 'por-btn-secondary' | 'por-btn-dark' = 'por-btn-primary';
-  export let target: '_blank' | '_self' = '_blank';
-  export let customClass: string = '';
-
-  const dispatch = createEventDispatcher();
+  let { 
+    text = '', 
+    href = '', 
+    btnType = 'por-btn-primary', 
+    target = '_blank', 
+    customClass = '',
+    onclick
+  }: {
+    text?: string;
+    href?: string;
+    btnType?: 'por-btn-primary' | 'por-btn-secondary' | 'por-btn-dark';
+    target?: '_blank' | '_self';
+    customClass?: string;
+    onclick?: (event: MouseEvent) => void;
+  } = $props();
 
   function handleClick(event: MouseEvent) {
     if (href) {
       window.open(href, target);
     }
-    dispatch('click', event);
+    onclick?.(event);
   }
 </script>
 
 <button 
   class="pep-button {btnType} {customClass}"
-  on:click|stopPropagation={handleClick}
+  onclick={handleClick}
 >
   {text}
 </button>
@@ -33,7 +39,7 @@
     cursor: pointer;
     transition: all 0.2s;
     border: 1px solid transparent;
-    max-width: 120px;
+    max-width: 1200px;
     text-align: center;
     display: inline-flex;
     align-items: center;

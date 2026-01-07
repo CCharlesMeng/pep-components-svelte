@@ -7,7 +7,7 @@
         tabData: Record<number, ArticleItem[]>;
     }
 
-    export let data: PageData;
+    let { data }: { data: PageData } = $props();
 </script>
 
 <div class="page-container">

@@ -2,7 +2,7 @@
   import FloorComponent from "$lib/FloorComponent.svelte";
   import type { PageData } from "./$types";
 
-  export let data: PageData;
+  let { data }: { data: PageData } = $props();
 </script>
 
 <div style="min-height: 100vh; background-color: #eee; padding: 40px 0;">

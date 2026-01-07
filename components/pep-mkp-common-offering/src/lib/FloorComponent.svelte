@@ -2,18 +2,18 @@
     import Card from "./Card.svelte";
     import type { FloorData } from "./types";
 
-    export let data: FloorData = {};
+    let { data = {} }: { data?: FloorData } = $props();
 
-    // Default values
-    $: title = data.title || "";
-    $: isTitleCentered = data.isTitleCentered || false;
-    $: floorBackgroundColor = data.floorBackgroundColor || "#ffffff";
-    $: cardBackgroundColor = data.cardBackgroundColor || "#ffffff";
-    $: marginTop = data.marginTop || false;
-    $: marginBottom = data.marginBottom || false;
-    $: tabs = data.tabs || [];
+    // Derived values from props
+    let title = $derived(data.title || "");
+    let isTitleCentered = $derived(data.isTitleCentered || false);
+    let floorBackgroundColor = $derived(data.floorBackgroundColor || "#ffffff");
+    let cardBackgroundColor = $derived(data.cardBackgroundColor || "#ffffff");
+    let marginTop = $derived(data.marginTop || false);
+    let marginBottom = $derived(data.marginBottom || false);
+    let tabs = $derived(data.tabs || []);
 
-    let activeTab = 0;
+    let activeTab = $state(0);
 
     function setActiveTab(index: number) {
         activeTab = index;
@@ -42,7 +42,7 @@
                         <button
                             class="tab-btn"
                             class:active={activeTab === index}
-                            on:click={() => setActiveTab(index)}
+                            onclick={() => setActiveTab(index)}
                         >
                             {tab.title}
                         </button>

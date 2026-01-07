@@ -2,8 +2,8 @@
   import PepCommonCardV2 from '../../pep-common-card-v2.svelte';
   import { expiredConfig, leftLayoutConfig } from '$lib/test-data';
   
-  export let data;
-  $: ({ config } = data);
+  let { data } = $props();
+  let config = $derived(data.config);
 </script>
 
 <div class="demo-container">

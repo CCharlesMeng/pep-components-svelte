@@ -1,22 +1,33 @@
 <script lang="ts">
-  export let theme: 'white' | 'grey' = 'white';
-  export let isMergeTopSpacing: boolean = false;
-  export let isMergeBottomSpacing: boolean = false;
-  export let isShowMb: boolean = true;
-  export let maxWidth: string = '1200px';
-  export let componentName: string = '';
+  import type { Snippet } from 'svelte';
+
+  let { 
+    theme = 'white', 
+    isMergeTopSpacing = false, 
+    isMergeBottomSpacing = false, 
+    isShowMb = true, 
+    maxWidth = '1200px', 
+    componentName = '',
+    children
+  }: {
+    theme?: 'white' | 'grey';
+    isMergeTopSpacing?: boolean;
+    isMergeBottomSpacing?: boolean;
+    isShowMb?: boolean;
+    maxWidth?: string;
+    componentName?: string;
+    children?: Snippet;
+  } = $props();
 </script>
 
 <div 
-  class="pep-floor-container {componentName}" 
-  class:theme-grey={theme === 'grey'}
-  class:theme-white={theme === 'white'}
+  class="pep-floor-container {componentName} {theme === 'grey' ? 'theme-grey' : 'theme-white'}" 
   class:merge-top={isMergeTopSpacing}
   class:merge-bottom={isMergeBottomSpacing}
   class:hide-mb={!isShowMb}
 >
   <div class="pep-floor-container__inner" style="max-width: {maxWidth}">
-    <slot />
+    {@render children?.()}
   </div>
 </div>
 

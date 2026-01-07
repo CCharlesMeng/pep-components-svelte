@@ -1,14 +1,23 @@
 <script lang="ts">
-  export let title: string = '';
-  export let titleMb: string = '';
-  export let subtitle: string = '';
-  export let subtitleMb: string = '';
-  export let more: { text?: string; href?: string } = { text: '', href: '' };
-  export let textAlign: 'left' | 'center' = 'center';
+  let { 
+    title = '', 
+    titleMb = '', 
+    subtitle = '', 
+    subtitleMb = '', 
+    more = { text: '', href: '' }, 
+    textAlign = 'center' 
+  }: {
+    title?: string;
+    titleMb?: string;
+    subtitle?: string;
+    subtitleMb?: string;
+    more?: { text?: string; href?: string };
+    textAlign?: 'left' | 'center';
+  } = $props();
 </script>
 
 {#if title || subtitle || titleMb || subtitleMb}
-  <div class="pep-title" class:text-left={textAlign === 'left'} class:text-center={textAlign === 'center'}>
+  <div class="pep-title {textAlign === 'left' ? 'text-left' : 'text-center'}">
     {#if title || titleMb}
       <h2 class="pep-title__main">
         <span class="pc-only">{@html title}</span>

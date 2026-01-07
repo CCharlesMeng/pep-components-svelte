@@ -1,42 +1,57 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  import type { Snippet } from 'svelte';
   import type { TabItem, ProductItem } from './types';
   import PepTitle from '../../../shared/ui/src/PepTitle.svelte';
   import PepFloorContainer from '../../../shared/ui/src/PepFloorContainer.svelte';
   import PepButton from '../../../shared/ui/src/PepButton.svelte';
 
-  // Props 定义
-  export let title: string = '';
-  export let titleMb: string = '';
-  export let subtitle: string = '';
-  export let subtitleMb: string = '';
-  export let more: { text?: string; href?: string } = { text: '', href: '' };
-  export let cardType: 'left' | 'center' | 'product' = 'center';
-  export let theme: 'white' | 'grey' = 'white';
-  export let cardBgColor: 'white' | 'gray' = 'gray';
-  export let cardColumn: '2' | '3' | '4' | '5' = '3';
-  export let imgHeight: '80px' | '60px' | '48px' = '80px';
-  export let isMergeTopSpacing: boolean = true;
-  export let isMergeBottomSpacing: boolean = true;
-  export let isShowMb: boolean = false;
-  export let showCardDesc: boolean = true;
-  export let tabList: TabItem[] = [];
+  let {
+    title = '',
+    titleMb = '',
+    subtitle = '',
+    subtitleMb = '',
+    more = { text: '', href: '' },
+    cardType = 'center',
+    theme = 'white',
+    cardBgColor = 'gray',
+    cardColumn = '3',
+    imgHeight = '80px',
+    isMergeTopSpacing = true,
+    isMergeBottomSpacing = true,
+    isShowMb = false,
+    showCardDesc = true,
+    tabList = [],
+    children
+  }: {
+    title?: string;
+    titleMb?: string;
+    subtitle?: string;
+    subtitleMb?: string;
+    more?: { text?: string; href?: string };
+    cardType?: 'left' | 'center' | 'product';
+    theme?: 'white' | 'grey';
+    cardBgColor?: 'white' | 'gray';
+    cardColumn?: '2' | '3' | '4' | '5';
+    imgHeight?: '80px' | '60px' | '48px';
+    isMergeTopSpacing?: boolean;
+    isMergeBottomSpacing?: boolean;
+    isShowMb?: boolean;
+    showCardDesc?: boolean;
+    tabList?: TabItem[];
+    children?: Snippet;
+  } = $props();
 
   // 当前激活的页签索引
-  let activeTabIndex = 0;
+  let activeTabIndex = $state(0);
 
   // 倒计时管理
-  let now = Date.now();
-  let timer: any;
+  let now = $state(Date.now());
 
-  onMount(() => {
-    timer = setInterval(() => {
+  $effect(() => {
+    const timer = setInterval(() => {
       now = Date.now();
     }, 1000);
-  });
-
-  onDestroy(() => {
-    if (timer) clearInterval(timer);
+    return () => clearInterval(timer);
   });
 
   // 检查产品是否已过期
@@ -80,7 +95,7 @@
           <button 
             class="pep-common-card-v2__tab-item" 
             class:active={activeTabIndex === i}
-            on:click={() => activeTabIndex = i}
+            onclick={() => activeTabIndex = i}
           >
             {tab.title}
           </button>
@@ -172,7 +187,7 @@
       </div>
     {/if}
 
-    <slot />
+    {@render children?.()}
   </div>
 </PepFloorContainer>
 

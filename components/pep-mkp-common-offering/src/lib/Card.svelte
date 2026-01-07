@@ -1,8 +1,13 @@
 <script lang="ts">
   import type { CardData } from "./types";
 
-  export let cardData: CardData = {};
-  export let cardBackgroundColor: string = "#ffffff";
+  let { 
+    cardData = {}, 
+    cardBackgroundColor = "#ffffff" 
+  }: {
+    cardData?: CardData;
+    cardBackgroundColor?: string;
+  } = $props();
 </script>
 
 <div class="card" style="background-color: {cardBackgroundColor};">

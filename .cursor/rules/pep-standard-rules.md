@@ -9,9 +9,18 @@
 3.  **Schema 驱动**: JSON Schema 是组件配置的唯一事实来源。公共配置项必须通过 `$ref` 引用 `shared/schema` 中的定义，确保字段名和行为在 100+ 组件中绝对一致。
 
 ## 🏗 开发军规
-1.  **标题区规范**: 所有组件头部必须复用 `shared/ui/PepTitle.svelte`。
-2.  **布局容器规范**: 所有组件的最外层容器必须复用 `shared/ui/PepFloorContainer.svelte`，统一处理主题、边距和移动端显隐。
-3.  **样式隔离**: 业务组件样式必须限定在组件作用域内，全局样式必须通过 `shared/` 统一导出。
+1.  **Svelte 5 Runes 强制规范**:
+    - **禁止使用 `export let`**: 统一使用 `$props()` 接收参数。
+    - **禁止使用 `let` 声明普通状态**: 统一使用 `$state()` 或 `$state.raw()`。
+    - **禁止使用 `$: ` 声明衍生状态**: 统一使用 `$derived()` 或 `$derived.by()`。
+    - **禁止使用 `onMount`, `afterUpdate` 等生命周期**: 优先使用 `$effect()` 或 `$effect.pre()`。
+    - **禁止使用 `createEventDispatcher`**: 统一通过回调 Props (如 `onclick`) 传递事件处理函数。
+2.  **Snippet & Render 规范**:
+    - **禁止使用 `<slot />`**: 统一使用 `{#snippet}` 定义内容片段，并使用 `{@render}` 进行渲染。
+    - 组件内部可复用的 UI 逻辑应优先封装为 Snippet 而非拆分为微小组件。
+3.  **标题区规范**: 所有组件头部必须复用 `shared/ui/PepTitle.svelte`。
+4.  **布局容器规范**: 所有组件的最外层容器必须复用 `shared/ui/PepFloorContainer.svelte`，统一处理主题、边距和移动端显隐。
+5.  **样式隔离**: 业务组件样式必须限定在组件作用域内，全局样式必须通过 `shared/` 统一导出。
 
 ## 🧪 测试军规 (PEP Test Consistency)
 1.  **数据同源**: 测试断言内容必须引用自 `src/lib/test-data.ts`，严禁在测试文件中硬编码字面量。
