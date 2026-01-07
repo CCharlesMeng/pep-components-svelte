@@ -9,6 +9,7 @@
   "tabList": [
     {
       "title": "精选推荐",
+      "layoutMb": "leftRightLayout",
       "cards": {
         "products": [
           {
@@ -38,13 +39,14 @@
     },
     {
       "title": "最新动态",
+      "layoutMb": "leftRightLayout",
       "cards": {
         "products": [
           {
             "title": "限时促销产品",
             "desc": "<p>这是一个带倒计时的促销卡片示例</p>",
             "icon": "https://res-static.hc-cdn.cn/cloudbu-site/public/new-product-icon/Compute/ECS.png",
-            "endTime": "2026/01/01 12:00",
+            "endTime": "2027/01/01 12:00",
             "btnGroups": [
               {
                 "btnType": "por-btn-primary",

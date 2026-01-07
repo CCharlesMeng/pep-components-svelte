@@ -1,6 +1,9 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import type { TabItem, ProductItem } from './types';
+  import PepTitle from '../../../shared/ui/src/PepTitle.svelte';
+  import PepFloorContainer from '../../../shared/ui/src/PepFloorContainer.svelte';
+  import PepButton from '../../../shared/ui/src/PepButton.svelte';
 
   // Props 定义
   export let title: string = '';
@@ -37,217 +40,147 @@
   });
 
   // 检查产品是否已过期
-  function isExpired(endTime: string | undefined) {
+  function isExpired(endTime: string | undefined, currentTime: number) {
     if (!endTime) return false;
     const end = new Date(endTime.replace(/-/g, '/')).getTime(); // 适配多种格式
-    return end < now;
+    return end < currentTime;
   }
 
   // 格式化倒计时
-  function getRemainingTime(endTime: string | undefined) {
+  function getRemainingTime(endTime: string | undefined, currentTime: number) {
     if (!endTime) return '';
     const end = new Date(endTime.replace(/-/g, '/')).getTime();
-    const diff = end - now;
+    const diff = end - currentTime;
     if (diff <= 0) return '已结束';
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const secs = Math.floor((diff % (1000 * 60)) / 1000);
-    return `距结束 ${hours}:${mins}:${secs}`;
+    
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `距结束 ${pad(hours)}:${pad(mins)}:${pad(secs)}`;
   }
 </script>
 
-<div 
-  class="pep-common-card-v2" 
-  class:theme-grey={theme === 'grey'}
-  class:theme-white={theme === 'white'}
-  class:merge-top={isMergeTopSpacing}
-  class:merge-bottom={isMergeBottomSpacing}
-  class:hide-mb={!isShowMb}
+<PepFloorContainer
+  {theme}
+  {isMergeTopSpacing}
+  {isMergeBottomSpacing}
+  {isShowMb}
+  componentName="pep-common-card-v2"
 >
-  <div class="pep-common-card-v2__container">
-    <!-- 楼层头部 -->
-    {#if (title || subtitle) || (titleMb || subtitleMb)}
-      <div class="pep-common-card-v2__header">
-        {#if title || titleMb}
-          <h2 class="pep-common-card-v2__floor-title">
-            <span class="pc-only">{@html title}</span>
-            <span class="mb-only">{@html titleMb || title}</span>
-          </h2>
-        {/if}
-        {#if subtitle || subtitleMb}
-          <div class="pep-common-card-v2__floor-subtitle">
-            <span class="pc-only">{@html subtitle}</span>
-            <span class="mb-only">{@html subtitleMb || subtitle}</span>
-          </div>
-        {/if}
-        {#if more?.text}
-          <a href={more.href} class="pep-common-card-v2__more">{more.text} &gt;</a>
-        {/if}
+  <!-- 楼层头部 -->
+  <PepTitle {title} {titleMb} {subtitle} {subtitleMb} {more} />
+
+  <!-- 内容区：Tab 与 Cards -->
+  <div class="pep-common-card-v2__content">
+    <!-- Tab 导航条 -->
+    {#if tabList && tabList.length > 1}
+      <div class="pep-common-card-v2__tabs">
+        {#each tabList as tab, i}
+          <button 
+            class="pep-common-card-v2__tab-item" 
+            class:active={activeTabIndex === i}
+            on:click={() => activeTabIndex = i}
+          >
+            {tab.title}
+          </button>
+        {/each}
       </div>
     {/if}
 
-    <!-- 内容区：Tab 与 Cards -->
-    <div class="pep-common-card-v2__content">
-      <!-- Tab 导航条 -->
-      {#if tabList && tabList.length > 1}
-        <div class="pep-common-card-v2__tabs">
-          {#each tabList as tab, i}
-            <button 
-              class="pep-common-card-v2__tab-item" 
-              class:active={activeTabIndex === i}
-              on:click={() => activeTabIndex = i}
+    <!-- 卡片列表容器 -->
+    {#if tabList && tabList[activeTabIndex]}
+      <div 
+        class="pep-common-card-v2__card-grid"
+        style="--column: {cardColumn}"
+        class:layout-product={cardType === 'product'}
+        class:layout-center={cardType === 'center'}
+        class:layout-left={cardType === 'left'}
+      >
+        {#each tabList[activeTabIndex].cards?.products || [] as product}
+          {#if !isExpired(product.endTime, now)}
+            <a 
+              href={product.href || 'javascript:;'} 
+              class="pep-common-card-v2__card-item"
+              class:card-bg-white={cardBgColor === 'white'}
+              class:card-bg-gray={cardBgColor === 'gray'}
+              class:layout-mb-lr={tabList[activeTabIndex].layoutMb === 'leftRightLayout'}
+              class:layout-mb-ud={tabList[activeTabIndex].layoutMb === 'upDownLayout'}
+              target={product.href ? '_blank' : '_self'}
             >
-              {tab.title}
-            </button>
-          {/each}
-        </div>
-      {/if}
-
-      <!-- 卡片列表容器 -->
-      {#if tabList && tabList[activeTabIndex]}
-        <div 
-          class="pep-common-card-v2__card-grid"
-          style="--column: {cardColumn}"
-          class:layout-product={cardType === 'product'}
-          class:layout-center={cardType === 'center'}
-          class:layout-left={cardType === 'left'}
-        >
-          {#each tabList[activeTabIndex].cards?.products || [] as product}
-            {#if !isExpired(product.endTime)}
-              <a 
-                href={product.href || 'javascript:;'} 
-                class="pep-common-card-v2__card-item"
-                class:card-bg-white={cardBgColor === 'white'}
-                class:card-bg-gray={cardBgColor === 'gray'}
-                class:layout-mb-lr={tabList[activeTabIndex].layoutMb === 'leftRightLayout'}
-                class:layout-mb-ud={tabList[activeTabIndex].layoutMb === 'upDownLayout'}
-                target={product.href ? '_blank' : '_self'}
-              >
-                <!-- 倒计时 -->
-                {#if product.endTime}
-                  <div class="pep-common-card-v2__card-countdown">
-                    {getRemainingTime(product.endTime)}
-                  </div>
-                {/if}
-
-                <!-- 图标 -->
-                {#if product.icon || product.iconMb}
-                  <div class="pep-common-card-v2__card-icon" style="height: {imgHeight}">
-                    <img src={product.icon} class="pc-only" alt={product.title} />
-                    <img src={product.iconMb || product.icon} class="mb-only" alt={product.title} />
-                  </div>
-                {/if}
-
-                <!-- 标签 -->
-                {#if product.tags && product.tags.length > 0}
-                  <div class="pep-common-card-v2__card-tags">
-                    {#each product.tags as tag}
-                      <span class="pep-common-card-v2__tag">{tag}</span>
-                    {/each}
-                  </div>
-                {/if}
-
-                <!-- 内容文本区 -->
-                <div class="pep-common-card-v2__card-info">
-                  <!-- 标题 -->
-                  {#if product.title}
-                    <h3 class="pep-common-card-v2__card-title">{product.title}</h3>
-                  {/if}
-
-                  <!-- 重点文案 -->
-                  {#if product.keywords && product.keywords.length > 0}
-                    <div class="pep-common-card-v2__card-keywords">
-                      {#each product.keywords as kw}
-                        <span class="pep-common-card-v2__keyword">{kw.keyword}</span>
-                      {/each}
-                    </div>
-                  {/if}
-
-                  <!-- 描述 -->
-                  {#if showCardDesc && product.desc}
-                    <div class="pep-common-card-v2__card-desc">{@html product.desc}</div>
-                  {/if}
+              <!-- 倒计时 -->
+              {#if product.endTime}
+                <div class="pep-common-card-v2__card-countdown">
+                  {getRemainingTime(product.endTime, now)}
                 </div>
+              {/if}
 
-                <!-- 按钮组 -->
-                {#if product.btnGroups && product.btnGroups.length > 0}
-                  <div class="pep-common-card-v2__card-btns">
-                    {#each product.btnGroups as btn}
-                      <button 
-                        class="pep-common-card-v2__btn {btn.btnType}"
-                        on:click|stopPropagation={() => btn.btnHref && window.open(btn.btnHref)}
-                      >
-                        {btn.btnLinkText}
-                      </button>
+              <!-- 图标 -->
+              {#if product.icon || product.iconMb}
+                <div class="pep-common-card-v2__card-icon" style="height: {imgHeight}">
+                  <img src={product.icon} class="pc-only" alt={product.title} />
+                  <img src={product.iconMb || product.icon} class="mb-only" alt={product.title} />
+                </div>
+              {/if}
+
+              <!-- 标签 -->
+              {#if product.tags && product.tags.length > 0}
+                <div class="pep-common-card-v2__card-tags">
+                  {#each product.tags as tag}
+                    <span class="pep-common-card-v2__tag">{tag}</span>
+                  {/each}
+                </div>
+              {/if}
+
+              <!-- 内容文本区 -->
+              <div class="pep-common-card-v2__card-info">
+                <!-- 标题 -->
+                {#if product.title}
+                  <h3 class="pep-common-card-v2__card-title">{product.title}</h3>
+                {/if}
+
+                <!-- 重点文案 -->
+                {#if product.keywords && product.keywords.length > 0}
+                  <div class="pep-common-card-v2__card-keywords">
+                    {#each product.keywords as kw}
+                      <span class="pep-common-card-v2__keyword">{kw.keyword}</span>
                     {/each}
                   </div>
                 {/if}
-              </a>
-            {/if}
-          {/each}
-        </div>
-      {/if}
-      
-      <slot />
-    </div>
+
+                <!-- 描述 -->
+                {#if showCardDesc && product.desc}
+                  <div class="pep-common-card-v2__card-desc">{@html product.desc}</div>
+                {/if}
+              </div>
+
+              <!-- 按钮组 -->
+              {#if product.btnGroups && product.btnGroups.length > 0}
+                <div class="pep-common-card-v2__card-btns">
+                  {#each product.btnGroups as btn}
+                    <PepButton 
+                      text={btn.btnLinkText}
+                      href={btn.btnHref}
+                      btnType={btn.btnType}
+                    />
+                  {/each}
+                </div>
+              {/if}
+            </a>
+          {/if}
+        {/each}
+      </div>
+    {/if}
+
+    <slot />
   </div>
-</div>
+</PepFloorContainer>
 
 <style>
-  /* 基础容器 */
-  .pep-common-card-v2 {
+  /* 基础内容容器 */
+  .pep-common-card-v2__content {
     width: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
   }
-
-  .pep-common-card-v2__container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 60px 20px;
-  }
-
-  /* 背景主题 */
-  .theme-grey { background-color: #f5f5f5; }
-  .theme-white { background-color: #ffffff; }
-
-  /* 间距控制 */
-  .merge-top .pep-common-card-v2__container { padding-top: 0; }
-  .merge-bottom .pep-common-card-v2__container { padding-bottom: 0; }
-
-  /* 头部样式 */
-  .pep-common-card-v2__header {
-    text-align: center;
-    margin-bottom: 40px;
-    position: relative;
-  }
-
-  .pep-common-card-v2__floor-title {
-    font-size: 32px;
-    font-weight: 600;
-    color: #111;
-    margin: 0;
-    line-height: 1.4;
-  }
-
-  .pep-common-card-v2__floor-title :global(p) { margin: 0; }
-
-  .pep-common-card-v2__floor-subtitle {
-    font-size: 16px;
-    color: #666;
-    margin-top: 12px;
-    line-height: 1.6;
-  }
-
-  .pep-common-card-v2__more {
-    display: inline-block;
-    margin-top: 16px;
-    font-size: 14px;
-    color: #3b82f6;
-    text-decoration: none;
-  }
-
-  .pep-common-card-v2__more:hover { text-decoration: underline; }
 
   /* Tab 导航样式 */
   .pep-common-card-v2__tabs {
@@ -404,21 +337,6 @@
     justify-content: center;
   }
 
-  .pep-common-card-v2__btn {
-    flex: 1;
-    padding: 8px 16px;
-    font-size: 14px;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: 1px solid transparent;
-    max-width: 120px;
-  }
-
-  .por-btn-primary { background-color: #111; color: #fff; }
-  .por-btn-secondary { background-color: #fff; border-color: #111; color: #111; }
-  .por-btn-dark { background-color: transparent; color: #111; }
-
   /* 布局微调 */
   .layout-left .pep-common-card-v2__card-info,
   .layout-left .pep-common-card-v2__card-tags,
@@ -440,12 +358,8 @@
   }
 
   @media (max-width: 767px) {
-    .hide-mb { display: none; }
     .pc-only { display: none; }
     .mb-only { display: block; }
-    
-    .pep-common-card-v2__container { padding: 40px 16px; }
-    .pep-common-card-v2__floor-title { font-size: 24px; }
     
     .pep-common-card-v2__tabs {
       gap: 20px;
