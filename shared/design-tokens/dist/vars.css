@@ -1,0 +1,24 @@
+/**
+ * Do not edit directly, this file was auto-generated.
+ */
+
+:root {
+  --color-pep-primary: #e41e2b;
+  --color-pep-secondary: #111111;
+  --color-pep-white: #ffffff;
+  --color-pep-gray-100: #f9fafb;
+  --color-pep-gray-200: #f3f4f6;
+  --color-pep-gray-600: #666666;
+  --spacing-pep-xs: 4px;
+  --spacing-pep-sm: 8px;
+  --spacing-pep-md: 16px;
+  --spacing-pep-lg: 24px;
+  --spacing-pep-xl: 32px;
+  --spacing-pep-2xl: 40px;
+  --typography-pep-font-sans: Inter, system-ui, sans-serif;
+  --typography-pep-size-xs: 12px;
+  --typography-pep-size-sm: 14px;
+  --typography-pep-size-base: 16px;
+  --typography-pep-size-lg: 18px;
+  --typography-pep-size-xl: 24px;
+}

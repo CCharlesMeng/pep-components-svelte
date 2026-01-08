@@ -1,0 +1,63 @@
+{
+  "baseInfo": {
+    "theme": "light",
+    "title": "为什么选择华为云MaaS服务",
+    "subtitle": "模型全、免配置、免调优、性能优"
+  },
+  "cardItemLists": [
+    {
+      "layout": 2,
+      "cardItem": [
+        {
+          "cardTitle": "模型全、免配置、免调优、性能优",
+          "bgImage": "https://res.hc-cdn.com/aem-static-resource/1.0.1/images/modelarts/studio/advantage-1.png",
+          "cardInfos": [
+            {
+              "showLICircle": true,
+              "description": "业界SOTA大模型覆盖度99%，预置最优超参配置，基于昇腾算子、显存优化，大模型训练与推理性能大幅提升；并围绕大模型性能与精度评价体系构建标准化自动流水线。"
+            }
+          ],
+          "btnLists": []
+        },
+        {
+          "cardTitle": "开箱即用，一站式模型开发服务",
+          "bgImage": "https://res.hc-cdn.com/aem-static-resource/1.0.1/images/modelarts/studio/advantage-2.png",
+          "cardInfos": [
+            {
+              "showLICircle": true,
+              "description": "提供模型调优、压缩、部署、评测等全栈工具，功能覆盖大模型全生命周期，支持用户即开即用，低门槛使用各类大模型。"
+            }
+          ],
+          "btnLists": []
+        }
+      ]
+    },
+    {
+      "layout": 2,
+      "cardItem": [
+        {
+          "cardTitle": "资源一站式按需开通，建设周期短",
+          "bgImage": "https://res.hc-cdn.com/aem-static-resource/1.0.1/images/modelarts/studio/advantage-3.png",
+          "cardInfos": [
+            {
+              "showLICircle": true,
+              "description": "资源可分钟级获得，按需收费，按需扩缩容，并支持故障快恢与断点续训。"
+            }
+          ],
+          "btnLists": []
+        },
+        {
+          "cardTitle": "多服务组合竞争力，一站式应用能力集成",
+          "bgImage": "https://res.hc-cdn.com/aem-static-resource/1.0.1/images/modelarts/studio/advantage-4.png",
+          "cardInfos": [
+            {
+              "showLICircle": true,
+              "description": "即插即用MCP Server，LangChain、九问、RAG、Agent、Guard等组件化集成，快速构建一站式应用。"
+            }
+          ],
+          "btnLists": []
+        }
+      ]
+    }
+  ]
+}

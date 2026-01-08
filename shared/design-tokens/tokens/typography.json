@@ -1,0 +1,16 @@
+{
+  "typography": {
+    "pep": {
+      "font": {
+        "sans": { "value": "Inter, system-ui, sans-serif" }
+      },
+      "size": {
+        "xs": { "value": "12px" },
+        "sm": { "value": "14px" },
+        "base": { "value": "16px" },
+        "lg": { "value": "18px" },
+        "xl": { "value": "24px" }
+      }
+    }
+  }
+}

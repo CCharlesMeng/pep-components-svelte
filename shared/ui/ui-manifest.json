@@ -1,0 +1,71 @@
+{
+  "version": "1.0.0",
+  "components": [
+    {
+      "name": "PepButton",
+      "props": [
+        "text = ''",
+        "href = ''",
+        "btnType = 'pep-btn-primary'",
+        "target = '_blank'",
+        "customClass = ''",
+        "onclick"
+      ],
+      "path": "shared/ui/src/PepButton.svelte"
+    },
+    {
+      "name": "PepFloorContainer",
+      "props": [
+        "theme = 'white'",
+        "isMergeTopSpacing = false",
+        "isMergeBottomSpacing = false",
+        "isShowMb = true",
+        "maxWidth = '1200px'",
+        "componentName = ''",
+        "children"
+      ],
+      "path": "shared/ui/src/PepFloorContainer.svelte"
+    },
+    {
+      "name": "PepTitle",
+      "props": [],
+      "path": "shared/ui/src/PepTitle.svelte"
+    }
+  ],
+  "presets": {
+    "shortcuts": [
+      {
+        "name": "pep-card",
+        "value": "bg-pep-white p-pep-lg shadow-sm rounded-1 border border-pep-gray-200 transition-all duration-300 hover:(-translate-y-1 shadow-md)"
+      },
+      {
+        "name": "pep-btn-base",
+        "value": "inline-flex items-center justify-center px-pep-md py-pep-sm rounded-sm cursor-pointer transition-all duration-200 border border-transparent text-pep-sm"
+      },
+      {
+        "name": "pep-btn-primary",
+        "value": "pep-btn-base bg-pep-secondary text-pep-white hover:bg-pep-gray-600"
+      },
+      {
+        "name": "pep-btn-secondary",
+        "value": "pep-btn-base bg-pep-white border-pep-secondary text-pep-secondary hover:bg-pep-gray-100"
+      },
+      {
+        "name": "pep-btn-ghost",
+        "value": "pep-btn-base bg-transparent text-pep-secondary hover:underline"
+      },
+      {
+        "name": "pep-tab-item",
+        "value": "bg-transparent border-none py-pep-sm px-0 text-pep-sm text-pep-gray-600 cursor-pointer relative transition-colors duration-200 hover:text-pep-primary"
+      },
+      {
+        "name": "pep-tab-item-active",
+        "value": "text-pep-primary font-600 after:(content-[\"\"] absolute bottom-0 left-0 w-full h-2px bg-pep-primary)"
+      },
+      {
+        "name": "pep-tag",
+        "value": "text-pep-xs px-pep-xs py-1px bg-pep-gray-200 text-pep-gray-600 rounded-sm"
+      }
+    ]
+  }
+}

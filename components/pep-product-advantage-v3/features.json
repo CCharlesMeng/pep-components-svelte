@@ -1,0 +1,134 @@
+[
+  {
+    "id": "INIT-001",
+    "category": "setup",
+    "priority": "high",
+    "title": "组件基础结构",
+    "description": "已生成组件骨架，包含 Props 接口、基础结构、样式框架",
+    "status": "completed",
+    "completed_at": "2026-01-07T18:13:49.510813",
+    "estimated_complexity": 1,
+    "actual_complexity": 1
+  },
+  {
+    "id": "FEAT-001",
+    "category": "setup",
+    "priority": "high",
+    "title": "[公共] 定义数据模型与类型",
+    "description": "在 types.ts 中完善 BaseInfo, CardItem 等接口，作为组件数据传递的唯一契约",
+    "status": "completed",
+    "completed_at": "2026-01-08T10:05:00Z",
+    "estimated_complexity": 1,
+    "actual_complexity": 1
+  },
+  {
+    "id": "FEAT-002",
+    "category": "setup",
+    "priority": "high",
+    "title": "[公共] 集成楼层容器与标题原子",
+    "description": "集成 PepFloorContainer 处理背景/内边距，集成 PepTitle 渲染符合规范的主副标题",
+    "status": "completed",
+    "completed_at": "2026-01-08T10:10:00Z",
+    "estimated_complexity": 1,
+    "actual_complexity": 1
+  },
+  {
+    "id": "FEAT-003",
+    "category": "setup",
+    "priority": "high",
+    "title": "[公共] 按钮组适配与 PepButton 集成",
+    "description": "映射 btnType 到标准样式，并集成 PepButton 处理跳转链接适配",
+    "status": "completed",
+    "completed_at": "2026-01-08T10:15:00Z",
+    "estimated_complexity": 1,
+    "actual_complexity": 1
+  },
+  {
+    "id": "FEAT-004",
+    "category": "setup",
+    "priority": "high",
+    "title": "[公共] 响应式 Token 映射实现",
+    "description": "基于设计系统定义 1600/1280/768 三级断点下的字号与楼层间距 Token 逻辑",
+    "status": "completed",
+    "completed_at": "2026-01-08T10:20:00Z",
+    "estimated_complexity": 1,
+    "actual_complexity": 1
+  },
+  {
+    "id": "FEAT-005",
+    "category": "feature",
+    "priority": "high",
+    "title": "实现 PC 端非对称栅格布局",
+    "description": "实现 24 栅格下的 12:12, 14:10, 10:14 等比例映射，确保视觉分配准确",
+    "status": "completed",
+    "completed_at": "2026-01-08T10:30:00Z",
+    "estimated_complexity": 2,
+    "actual_complexity": 2
+  },
+  {
+    "id": "FEAT-006",
+    "category": "feature",
+    "priority": "high",
+    "title": "开发卡片 PC 端排版 (左右并列)",
+    "description": "实现 Flex Row 布局，描述内容占据剩余空间，图片自适应缩放",
+    "status": "completed",
+    "completed_at": "2026-01-08T10:40:00Z",
+    "estimated_complexity": 2,
+    "actual_complexity": 2
+  },
+  {
+    "id": "FEAT-007",
+    "category": "feature",
+    "priority": "high",
+    "title": "开发卡片移动端排版 (上下堆叠)",
+    "description": "在 ≤768px 时倒换布局顺序，图片置于顶部，内容区置于底部",
+    "status": "completed",
+    "completed_at": "2026-01-08T10:45:00Z",
+    "estimated_complexity": 1,
+    "actual_complexity": 1
+  },
+  {
+    "id": "FEAT-008",
+    "category": "feature",
+    "priority": "high",
+    "title": "实现多选折叠交互与平滑动画",
+    "description": "实现移动端标题点击切换展开/收起，并处理首项默认展开的逻辑及高度过渡动画",
+    "status": "completed",
+    "completed_at": "2026-01-08T11:00:00Z",
+    "estimated_complexity": 3,
+    "actual_complexity": 3
+  },
+  {
+    "id": "FEAT-009",
+    "category": "feature",
+    "priority": "medium",
+    "title": "图片懒加载优化",
+    "description": "集成 PepLazyLoad 处理图片按需加载，提升页面滚动性能",
+    "status": "completed",
+    "completed_at": "2026-01-08T11:10:00Z",
+    "estimated_complexity": 1,
+    "actual_complexity": 1
+  },
+  {
+    "id": "FEAT-010",
+    "category": "feature",
+    "priority": "low",
+    "title": "国际化 RTL 镜像支持",
+    "description": "支持从右向左布局，镜像调整图片与内容区的 Flex 排列方向",
+    "status": "completed",
+    "completed_at": "2026-01-08T11:15:00Z",
+    "estimated_complexity": 1,
+    "actual_complexity": 1
+  },
+  {
+    "id": "TEST-001",
+    "category": "testing",
+    "priority": "medium",
+    "title": "核心布局与折叠交互验收测试",
+    "description": "验证不同栅格比例的准确性，以及移动端折叠逻辑在不同操作下的稳定性",
+    "status": "completed",
+    "completed_at": "2026-01-08T11:30:00Z",
+    "estimated_complexity": 2,
+    "actual_complexity": 2
+  }
+]

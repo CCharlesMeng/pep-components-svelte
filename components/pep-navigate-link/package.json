@@ -12,8 +12,8 @@
 	"devDependencies": {
 		"@pep/config": "workspace:*",
 		"@pep/bff": "workspace:*",
-		"@sveltejs/kit": "^2.11.0",
-		"@sveltejs/vite-plugin-svelte": "^4.0.0",
+		"@sveltejs/kit": "^2.49.3",
+		"@sveltejs/vite-plugin-svelte": "^6.2.3",
 		"svelte": "^5.0.0",
 		"svelte-check": "^4.0.0",
 		"tslib": "^2.0.0",

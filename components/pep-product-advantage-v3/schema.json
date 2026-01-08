@@ -1,0 +1,203 @@
+{
+  "type": "object",
+  "title": "楼层信息",
+  "ui:widget": "tabContainer",
+  "ui:options": [
+    {
+      "title": "基本信息",
+      "content": [
+        "baseInfo"
+      ]
+    },
+    {
+      "title": "内容信息",
+      "content": [
+        "cardItemLists"
+      ]
+    }
+  ],
+  "properties": {
+    "baseInfo": {
+      "type": "object",
+      "properties": {
+        "theme": {
+          "title": "楼层背景",
+          "type": "string",
+          "ui:widget": "format",
+          "default": "light",
+          "ui:options": {
+            "previewMode": false,
+            "options": [
+              {
+                "value": "light",
+                "thumbnail": "https://res-static.hc-cdn.cn/components/web@1x/编组_16.png",
+                "label": "白色-黑字"
+              },
+              {
+                "value": "grey",
+                "thumbnail": "https://res-static.hc-cdn.cn/components/web@1x/编组_15.png",
+                "label": "灰色-黑字"
+              }
+            ]
+          }
+        },
+        "title": {
+          "title": "楼层标题",
+          "type": "string",
+          "description": "建议不超过1行"
+        },
+        "subtitle": {
+          "title": "楼层附标题",
+          "type": "string",
+          "ui:widget": "richtext",
+          "description": "建议不超过1行"
+        }
+      }
+    },
+    "cardItemLists": {
+      "type": "array",
+      "title": "卡片行数",
+      "ui:options": {
+        "min": 1,
+        "controls": true
+      },
+      "items": {
+        "title": "行 ",
+        "type": "object",
+        "properties": {
+          "layout": {
+            "title": "使用场景（24栅格）",
+            "type": "number",
+            "ui:options": {
+              "theme": "button"
+            },
+            "enum": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "enumNames": [
+              "一列",
+              "两列(12:12)",
+              "两列(14:10)",
+              "两列(10:14)"
+            ],
+            "default": 2
+          },
+          "cardItem": {
+            "type": "array",
+            "ui:options": {
+              "initNums": "rootValue.layout === 1 ? 1 : 2",
+              "hidden": "child-component"
+            },
+            "items": {
+              "type": "object",
+              "title": "卡片信息",
+              "ui:options": {
+                "showTitle": false
+              },
+              "properties": {
+                "cardTitle": {
+                  "title": "卡片标题",
+                  "type": "string",
+                  "description": "建议一行"
+                },
+                "bgImage": {
+                  "title": "图片链接",
+                  "type": "string",
+                  "ui:widget": "imageSelector",
+                  "description": "1、一列或两列宽12，图片建议宽692px；2、宽14，图片建议宽827px；3、宽10，图片建议宽556px"
+                },
+                "cardInfos": {
+                  "type": "array",
+                  "title": "卡片内容",
+                  "ui:options": {
+                    "min": 1,
+                    "max": 10,
+                    "controls": true
+                  },
+                  "items": {
+                    "type": "object",
+                    "title": "描述",
+                    "properties": {
+                      "showLICircle": {
+                        "title": "是否展示li符号（默认展示）",
+                        "type": "boolean",
+                        "ui:widget": "switch",
+                        "default": true
+                      },
+                      "description": {
+                        "title": "描述",
+                        "type": "string",
+                        "ui:widget": "richtext",
+                        "description": "建议一行"
+                      }
+                    }
+                  }
+                },
+                "btnLists": {
+                  "type": "array",
+                  "title": "按钮内容",
+                  "ui:options": {
+                    "max": 10,
+                    "controls": true
+                  },
+                  "items": {
+                    "type": "object",
+                    "title": "描述",
+                    "properties": {
+                      "btnType": {
+                        "title": "按钮样式",
+                        "type": "string",
+                        "ui:widget": "format",
+                        "ui:options": {
+                          "previewMode": false,
+                          "options": [
+                            {
+                              "value": "por-btn-primary",
+                              "thumbnail": "https://res-static.hc-cdn.cn/cloudbu-site/china/zh-cn/commons/thumbnail/components/primary.png",
+                              "label": "重要按钮"
+                            },
+                            {
+                              "value": "por-btn-secondary",
+                              "thumbnail": "https://res-static.hc-cdn.cn/cloudbu-site/china/zh-cn/commons/thumbnail/components/secondary.png",
+                              "label": "次要按钮"
+                            },
+                            {
+                              "value": "por-btn-dark",
+                              "thumbnail": "https://res-static.hc-cdn.cn/cloudbu-site/china/zh-cn/commons/thumbnail/components/dark.png",
+                              "label": "普通黑色边框按钮"
+                            },
+                            {
+                              "value": "por-btn-danger",
+                              "thumbnail": "https://res-static.hc-cdn.cn/cloudbu-site/china/zh-cn/commons/thumbnail/components/danger.png",
+                              "label": "危险按钮"
+                            }
+                          ]
+                        },
+                        "default": "por-btn-secondary"
+                      },
+                      "btnText": {
+                        "title": "文字",
+                        "type": "string",
+                        "description": "建议一行"
+                      },
+                      "btnLink": {
+                        "title": "链接",
+                        "type": "string",
+                        "ui:options": {
+                          "format": "url"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

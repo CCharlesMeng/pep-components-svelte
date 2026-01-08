@@ -6,9 +6,10 @@
 
 **核心目标**：
 1. 解析 spec.md 的需求
-2. 拆解为可执行的小任务
-3. 生成结构化的 features.json
-4. 评估优先级和复杂度
+2. **识别公共能力与通用适配逻辑（优先原则）**
+3. 拆解为可执行的小任务
+4. 生成结构化的 features.json
+5. 评估优先级和复杂度
 
 **前置条件**：spec.md 已完善（运行过 `/pep-spec`）
 
@@ -157,28 +158,31 @@ B. 继续生成（任务可能不够准确）
 
 ---
 
-### 阶段 3: 任务拆解
+### 阶段 3: 任务拆解与公共能力识别
 
 #### Agent 行为指令
 
-```markdown
-基于解析的信息，拆解任务：
+基于解析的信息，拆解任务，并**强制执行公共能力优先原则**：
 
-【拆解策略】
+1. **公共能力识别 (Public Capabilities First)**：
+   - 检查是否引用了标准原子组件 (`PepFloorContainer`, `PepButton`, `PepTitle` 等)。
+   - 检查是否涉及全局设计 Token 映射（字号、间距断点）。
+   - 检查是否涉及通用适配逻辑（链接跳转适配、图片懒加载适配）。
+   - **操作**：将这些任务归类为 `category: setup` 或高优先级的 `category: feature`，并在 `features.json` 中置顶。
 
-1. 按开发阶段分层：
-   - setup（基础搭建）
-   - feature（功能实现）
-   - testing（测试）
-   - enhancement（增强特性）
-   - documentation（文档）
+2. **按开发阶段分层**：
+   - **Public/Setup** (原子集成、类型契约、Token 映射) -> **必须最先执行**
+   - **Feature** (业务逻辑、组件特有交互)
+   - **Testing** (测试)
+   - **Enhancement** (增强特性)
+   - **Documentation** (文档)
 
-2. 粒度控制：
+3. **粒度控制**：
    - 每个任务 1-4 小时可完成
    - 复杂功能拆分为多个子任务
    - 简单功能合并为一个任务
 
-3. 依赖关系：
+4. **依赖关系**：
    - setup 任务优先级最高
    - feature 任务按依赖排序
    - testing 在 feature 之后
@@ -384,6 +388,7 @@ components/<component-name>/features.json
 
 3️⃣  调整任务（如需要）
    手动编辑 features.json，或重新运行 /pep-plan
+```
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -421,6 +426,10 @@ components/<component-name>/features.json
 - 支持重新生成（覆盖模式）
 - 保留已完成的任务
 - 提示用户确认覆盖
+
+### 5. **公共能力优先**
+- **强制识别标准原子组件、全局 Token 映射、通用适配逻辑**
+- **在 features.json 中将公共能力任务置顶执行**
 
 ---
 
@@ -543,7 +552,7 @@ Agent：
 
 1. **不要完善 spec**
    - 这是 /pep-spec 的职责
-   - /pep-plan 只负责读取和拆解
+   - /pep-plan 只负责读取 and 拆解
    - 发现 spec 不完整时，提示用户先运行 /pep-spec
 
 2. **任务粒度适中**

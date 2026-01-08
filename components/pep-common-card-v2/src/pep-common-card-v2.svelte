@@ -74,6 +74,13 @@
     const pad = (n: number) => n.toString().padStart(2, '0');
     return `距结束 ${pad(hours)}:${pad(mins)}:${pad(secs)}`;
   }
+
+  // 映射按钮类型
+  const btnTypeMap: Record<string, 'pep-btn-primary' | 'pep-btn-secondary' | 'pep-btn-ghost'> = {
+    'por-btn-primary': 'pep-btn-primary',
+    'por-btn-secondary': 'pep-btn-secondary',
+    'por-btn-dark': 'pep-btn-ghost'
+  };
 </script>
 
 <PepFloorContainer
@@ -83,18 +90,15 @@
   {isShowMb}
   componentName="pep-common-card-v2"
 >
-  <!-- 楼层头部 -->
   <PepTitle {title} {titleMb} {subtitle} {subtitleMb} {more} />
 
-  <!-- 内容区：Tab 与 Cards -->
-  <div class="pep-common-card-v2__content">
-    <!-- Tab 导航条 -->
+  <div class="w-full">
     {#if tabList && tabList.length > 1}
-      <div class="pep-common-card-v2__tabs">
+      <div class="flex justify-center gap-pep-xl mb-pep-xl border-b border-pep-gray-200 overflow-x-auto sm:justify-center">
         {#each tabList as tab, i}
           <button 
-            class="pep-common-card-v2__tab-item" 
-            class:active={activeTabIndex === i}
+            class="pep-tab-item" 
+            class:pep-tab-item-active={activeTabIndex === i}
             onclick={() => activeTabIndex = i}
           >
             {tab.title}
@@ -103,80 +107,73 @@
       </div>
     {/if}
 
-    <!-- 卡片列表容器 -->
     {#if tabList && tabList[activeTabIndex]}
       <div 
-        class="pep-common-card-v2__card-grid"
-        style="--column: {cardColumn}"
-        class:layout-product={cardType === 'product'}
-        class:layout-center={cardType === 'center'}
-        class:layout-left={cardType === 'left'}
+        class="grid gap-pep-md"
+        style="grid-template-columns: repeat(var(--column, 3), 1fr); --column: {cardColumn}"
+        class:sm:grid-cols-2={true}
+        class:xs:grid-cols-1={true}
       >
         {#each tabList[activeTabIndex].cards?.products || [] as product}
           {#if !isExpired(product.endTime, now)}
             <a 
               href={product.href || 'javascript:;'} 
-              class="pep-common-card-v2__card-item"
-              class:card-bg-white={cardBgColor === 'white'}
-              class:card-bg-gray={cardBgColor === 'gray'}
+              class="pep-card flex flex-col items-center"
+              class:!bg-white={cardBgColor === 'white'}
+              class:!bg-pep-gray-100={cardBgColor === 'gray'}
               class:layout-mb-lr={tabList[activeTabIndex].layoutMb === 'leftRightLayout'}
-              class:layout-mb-ud={tabList[activeTabIndex].layoutMb === 'upDownLayout'}
               target={product.href ? '_blank' : '_self'}
             >
-              <!-- 倒计时 -->
               {#if product.endTime}
-                <div class="pep-common-card-v2__card-countdown">
+                <div class="absolute top-pep-sm right-pep-sm text-pep-xs text-pep-primary bg-pep-primary/5 px-2 py-0.5 rounded-full">
                   {getRemainingTime(product.endTime, now)}
                 </div>
               {/if}
 
-              <!-- 图标 -->
               {#if product.icon || product.iconMb}
-                <div class="pep-common-card-v2__card-icon" style="height: {imgHeight}">
-                  <img src={product.icon} class="pc-only" alt={product.title} />
-                  <img src={product.iconMb || product.icon} class="mb-only" alt={product.title} />
+                <div class="flex items-center justify-center mb-pep-lg w-full" style="height: {imgHeight}">
+                  <img src={product.icon} class="hidden md:block h-full w-auto object-contain" alt={product.title} />
+                  <img src={product.iconMb || product.icon} class="md:hidden h-full w-auto object-contain" alt={product.title} />
                 </div>
               {/if}
 
-              <!-- 标签 -->
               {#if product.tags && product.tags.length > 0}
-                <div class="pep-common-card-v2__card-tags">
+                <div class="flex flex-wrap gap-pep-xs mb-pep-sm justify-center">
                   {#each product.tags as tag}
-                    <span class="pep-common-card-v2__tag">{tag}</span>
+                    <span class="pep-tag">{tag}</span>
                   {/each}
                 </div>
               {/if}
 
-              <!-- 内容文本区 -->
-              <div class="pep-common-card-v2__card-info">
-                <!-- 标题 -->
+              <div class="w-full flex flex-col items-center" class:text-left={cardType === 'left'}>
                 {#if product.title}
-                  <h3 class="pep-common-card-v2__card-title">{product.title}</h3>
+                  <h3 class="text-pep-lg font-600 text-pep-secondary mb-pep-sm text-center" class:!text-left={cardType === 'left'}>
+                    {product.title}
+                  </h3>
                 {/if}
 
-                <!-- 重点文案 -->
                 {#if product.keywords && product.keywords.length > 0}
-                  <div class="pep-common-card-v2__card-keywords">
+                  <div class="flex gap-pep-md mb-pep-sm justify-center" class:!justify-start={cardType === 'left'}>
                     {#each product.keywords as kw}
-                      <span class="pep-common-card-v2__keyword">{kw.keyword}</span>
+                      <span class="text-pep-sm text-pep-primary font-600">{kw.keyword}</span>
                     {/each}
                   </div>
                 {/if}
 
-                <!-- 描述 -->
                 {#if showCardDesc && product.desc}
-                  <div class="pep-common-card-v2__card-desc">{@html product.desc}</div>
+                  <div class="text-pep-sm text-pep-gray-600 text-center line-clamp-2" class:!text-left={cardType === 'left'}>
+                    {@html product.desc}
+                  </div>
                 {/if}
               </div>
 
-              <!-- 按钮组 -->
               {#if product.btnGroups && product.btnGroups.length > 0}
-                <div class="pep-common-card-v2__card-btns">
+                <div class="flex gap-pep-md mt-pep-lg w-full justify-center" class:!justify-start={cardType === 'left'}>
                   {#each product.btnGroups as btn}
                     <PepButton 
                       text={btn.btnLinkText}
                       href={btn.btnHref}
-                      btnType={btn.btnType}
+                      btnType={btnTypeMap[btn.btnType] || 'pep-btn-primary'}
                     />
                   {/each}
                 </div>
@@ -192,223 +189,13 @@
 </PepFloorContainer>
 
 <style>
-  /* 基础内容容器 */
-  .pep-common-card-v2__content {
-    width: 100%;
-  }
-
-  /* Tab 导航样式 */
-  .pep-common-card-v2__tabs {
-    display: flex;
-    justify-content: center;
-    gap: 32px;
-    margin-bottom: 32px;
-    border-bottom: 1px solid #eee;
-  }
-
-  .pep-common-card-v2__tab-item {
-    background: none;
-    border: none;
-    padding: 12px 0;
-    font-size: 16px;
-    color: #666;
-    cursor: pointer;
-    position: relative;
-    transition: color 0.2s;
-  }
-
-  .pep-common-card-v2__tab-item.active {
-    color: #e41e2b;
-    font-weight: 600;
-  }
-
-  .pep-common-card-v2__tab-item.active::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background-color: #e41e2b;
-  }
-
-  /* 卡片网格布局 */
-  .pep-common-card-v2__card-grid {
-    display: grid;
-    grid-template-columns: repeat(var(--column, 3), 1fr);
-    gap: 20px;
-  }
-
-  /* 卡片单项样式 */
-  .pep-common-card-v2__card-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 40px 24px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    border-radius: 4px;
-    box-sizing: border-box;
-    cursor: pointer;
-    position: relative;
-  }
-
-  .pep-common-card-v2__card-item:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  }
-
-  .card-bg-white { background-color: #ffffff; }
-  .card-bg-gray { background-color: #f9fafb; }
-
-  .pep-common-card-v2__card-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 24px;
-    width: 100%;
-  }
-
-  .pep-common-card-v2__card-icon img {
-    height: 100%;
-    width: auto;
-    object-fit: contain;
-  }
-
-  .pep-common-card-v2__card-info {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .pep-common-card-v2__card-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #111;
-    margin: 0 0 12px 0;
-    text-align: center;
-    line-height: 1.4;
-  }
-
-  .pep-common-card-v2__card-desc {
-    font-size: 14px;
-    color: #666;
-    text-align: center;
-    line-height: 1.6;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .pep-common-card-v2__card-desc :global(p) { margin: 0; }
-
-  .pep-common-card-v2__card-countdown {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    font-size: 12px;
-    color: #e41e2b;
-    background: rgba(228, 30, 43, 0.05);
-    padding: 2px 8px;
-    border-radius: 10px;
-  }
-
-  .pep-common-card-v2__card-tags {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .pep-common-card-v2__tag {
-    font-size: 12px;
-    padding: 2px 8px;
-    background: #f0f0f0;
-    color: #666;
-    border-radius: 2px;
-  }
-
-  .pep-common-card-v2__card-keywords {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 12px;
-    justify-content: center;
-  }
-
-  .pep-common-card-v2__keyword {
-    font-size: 14px;
-    color: #e41e2b;
-    font-weight: 600;
-  }
-
-  .pep-common-card-v2__card-btns {
-    display: flex;
-    gap: 12px;
-    margin-top: 24px;
-    width: 100%;
-    justify-content: center;
-  }
-
-  /* 布局微调 */
-  .layout-left .pep-common-card-v2__card-info,
-  .layout-left .pep-common-card-v2__card-tags,
-  .layout-left .pep-common-card-v2__card-keywords,
-  .layout-left .pep-common-card-v2__card-btns {
-    align-items: flex-start;
-    justify-content: flex-start;
-    text-align: left;
-  }
-  .layout-left .pep-common-card-v2__card-title,
-  .layout-left .pep-common-card-v2__card-desc { text-align: left; }
-
-  /* 响应式辅助 */
-  .pc-only { display: block; }
-  .mb-only { display: none; }
-
-  @media (max-width: 1024px) {
-    .pep-common-card-v2__card-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-
-  @media (max-width: 767px) {
-    .pc-only { display: none; }
-    .mb-only { display: block; }
-    
-    .pep-common-card-v2__tabs {
-      gap: 20px;
-      overflow-x: auto;
-      justify-content: flex-start;
-      padding-bottom: 4px;
-    }
-    
-    .pep-common-card-v2__card-grid { grid-template-columns: 1fr; }
-
-    /* 移动端左右布局 */
-    .pep-common-card-v2__card-item.layout-mb-lr {
-      flex-direction: row;
-      align-items: flex-start;
+  /* 仅保留复杂的业务逻辑或 UnoCSS 难以覆盖的微调 */
+  .layout-mb-lr {
+    @media (max-width: 767px) {
+      flex-direction: row !important;
+      align-items: flex-start !important;
       gap: 16px;
       padding: 16px;
     }
-
-    .layout-mb-lr .pep-common-card-v2__card-icon {
-      width: 80px;
-      margin-bottom: 0;
-      flex-shrink: 0;
-    }
-
-    .layout-mb-lr .pep-common-card-v2__card-info,
-    .layout-mb-lr .pep-common-card-v2__card-tags,
-    .layout-mb-lr .pep-common-card-v2__card-keywords,
-    .layout-mb-lr .pep-common-card-v2__card-btns {
-      align-items: flex-start;
-      justify-content: flex-start;
-      text-align: left;
-    }
-
-    .layout-mb-lr .pep-common-card-v2__card-title,
-    .layout-mb-lr .pep-common-card-v2__card-desc { text-align: left; }
   }
 </style>

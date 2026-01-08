@@ -1,0 +1,14 @@
+{
+  "color": {
+    "pep": {
+      "primary": { "value": "#e41e2b" },
+      "secondary": { "value": "#111111" },
+      "white": { "value": "#ffffff" },
+      "gray": {
+        "100": { "value": "#f9fafb" },
+        "200": { "value": "#f3f4f6" },
+        "600": { "value": "#666666" }
+      }
+    }
+  }
+}

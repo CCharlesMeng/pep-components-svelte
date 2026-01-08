@@ -1,0 +1,11 @@
+{
+  "name": "@pep/unocss-preset",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./index.ts",
+  "dependencies": {
+    "unocss": "^65.0.0",
+    "@pep/design-tokens": "workspace:*"
+  }
+}

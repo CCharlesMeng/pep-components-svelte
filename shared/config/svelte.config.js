@@ -12,9 +12,8 @@ const config = {
 
     kit: {
         adapter: adapter(),
-        files: {
-            appTemplate: path.resolve(__dirname, '../../templates/app.html')
-        },
+        // Removed deprecated 'files.appTemplate' option
+        // SvelteKit will automatically use src/app.html if it exists
         paths: {
             assets: process.env.SVELTE_CLIENT_ASSET_PATH,
             relative: false

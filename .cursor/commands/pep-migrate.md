@@ -5,9 +5,11 @@
 
 # 输入（由调用者提供）：  
 - URL: 网页地址（例如 https://example.com/page）
-- COMPONENT_ID: 要查找的 DOM id（例如 "xxx"）
-- 配置数据（JSON 格式）：组件初始化时所需的默认数据或配置  
-- JSON Schema（JSON 格式）：描述组件可配置项的所有字段，包含类型、是否必填、默认值等  
+- data-mod-id: 要查找的 DOM 属性 data-mod-id，一般是  组件名_时间戳，这个组件名需要作为新组件的组件名
+- JSON Schema（JSON 格式）：描述组件可配置项的所有字段，包含类型、是否必填、默认值等。
+
+# 输入（由你自行获取）
+- 配置数据（JSON 格式）：组件初始化时所需的默认数据或配置，通过接口 https://portal.huaweicloud.com/rest/cbc/portalapppublishservice/v1/content/page?location=${URL}获取页面全量数据，根据componentId解析出对应组件数据
 
 在继续操作前，你**必须**（MUST）先查看用户输入，如果为空，提醒用户输入。
 

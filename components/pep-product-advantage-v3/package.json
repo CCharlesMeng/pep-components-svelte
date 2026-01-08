@@ -1,7 +1,7 @@
 {
-  "name": "pep-common-card-v2",
+  "name": "pep-product-advantage-v2",
   "version": "0.1.0",
-  "description": "通用卡片组件 v2",
+  "description": "产品优势展示组件，支持多断点响应式和移动端折叠交互",
   "type": "module",
   "private": true,
   "scripts": {
@@ -24,7 +24,7 @@
   },
   "keywords": [
     "svelte",
-    "pep-common-card-v2",
+    "pep-product-advantage-v2",
     "pep-components"
   ]
 }
