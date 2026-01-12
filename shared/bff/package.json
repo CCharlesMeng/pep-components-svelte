@@ -7,7 +7,7 @@
         ".": "./src/loader.ts"
     },
     "dependencies": {
-        "@sveltejs/kit": "^2.0.0"
+        "svelte": "^5.0.0"
     },
     "devDependencies": {
         "@types/node": "^20.0.0"
