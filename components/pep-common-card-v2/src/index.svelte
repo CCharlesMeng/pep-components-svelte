@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte";
+  import { onMount, onDestroy, type Snippet } from "svelte";
   import type { TabItem } from "./types";
   import { isExpired } from "../../../shared/utils/date";
   import CardHeader from "./lib/components/CardHeader.svelte";
@@ -22,7 +22,8 @@
     isMergeBottomSpacing = true,
     isShowMb = false,
     showCardDesc = true,
-    tabList = []
+    tabList = [],
+    children
   } = $props<{
     title?: string;
     titleMb?: string;
@@ -39,13 +40,14 @@
     isShowMb?: boolean;
     showCardDesc?: boolean;
     tabList?: TabItem[];
+    children?: Snippet;
   }>();
 
   // 当前激活的页签索引
-  let activeTabIndex = 0;
+  let activeTabIndex = $state(0);
 
   // 倒计时管理
-  let now = Date.now();
+  let now = $state(Date.now());
   let timer: any;
 
   onMount(() => {
@@ -100,7 +102,7 @@
         </div>
       {/if}
 
-      <slot />
+      {@render children?.()}
     </div>
   </div>
 </div>

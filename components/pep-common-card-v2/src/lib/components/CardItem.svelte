@@ -87,8 +87,10 @@
             {#each product.btnGroups as btn}
                 <button
                     class="pep-common-card-v2__btn {btn.btnType}"
-                    on:click|stopPropagation={() =>
-                        btn.btnHref && window.open(btn.btnHref)}
+                    onclick={(e) => {
+                        e.stopPropagation();
+                        btn.btnHref && window.open(btn.btnHref);
+                    }}
                 >
                     {btn.btnLinkText}
                 </button>

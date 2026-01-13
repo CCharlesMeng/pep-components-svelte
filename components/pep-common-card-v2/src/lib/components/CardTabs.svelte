@@ -16,7 +16,7 @@
             <button
                 class="pep-common-card-v2__tab-item"
                 class:active={activeTabIndex === i}
-                on:click={() => (activeTabIndex = i)}
+                onclick={() => (activeTabIndex = i)}
             >
                 {tab.title}
             </button>
