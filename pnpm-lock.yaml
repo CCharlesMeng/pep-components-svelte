@@ -138,7 +138,7 @@ importers:
         specifier: ^6.0.0
         version: 6.4.1(@types/node@24.10.1)(jiti@2.6.1)(yaml@2.8.2)
 
-  components/pep-product-advantage-v2:
+  components/pep-product-advantage-v3:
     devDependencies:
       '@pep/bff':
         specifier: workspace:*
