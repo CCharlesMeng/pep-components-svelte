@@ -1,8 +1,13 @@
 <script lang="ts">
     import type { TabItem } from "../../types";
 
-    export let tabList: TabItem[] = [];
-    export let activeTabIndex: number = 0;
+    let {
+        tabList = [],
+        activeTabIndex = $bindable(0)
+    } = $props<{
+        tabList?: TabItem[];
+        activeTabIndex?: number;
+    }>();
 </script>
 
 {#if tabList && tabList.length > 1}

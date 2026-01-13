@@ -1,9 +1,17 @@
 <script lang="ts">
-    export let title: string = "";
-    export let titleMb: string = "";
-    export let subtitle: string = "";
-    export let subtitleMb: string = "";
-    export let more: { text?: string; href?: string } | undefined = undefined;
+    let {
+        title = "",
+        titleMb = "",
+        subtitle = "",
+        subtitleMb = "",
+        more = undefined
+    } = $props<{
+        title?: string;
+        titleMb?: string;
+        subtitle?: string;
+        subtitleMb?: string;
+        more?: { text?: string; href?: string } | undefined;
+    }>();
 </script>
 
 {#if title || subtitle || titleMb || subtitleMb}

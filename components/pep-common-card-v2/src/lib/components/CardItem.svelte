@@ -2,13 +2,21 @@
     import type { ProductItem } from "../../types";
     import { getRemainingTime } from "../../../../../shared/utils/date";
 
-    export let product: ProductItem;
-    export let cardBgColor: "white" | "gray" = "gray";
-    export let imgHeight: string = "80px";
-    export let showCardDesc: boolean = true;
-    export let layoutMb: "upDownLayout" | "leftRightLayout" | undefined =
-        undefined;
-    export let now: number;
+    let {
+        product,
+        cardBgColor = "gray" as "white" | "gray",
+        imgHeight = "80px",
+        showCardDesc = true,
+        layoutMb = undefined,
+        now
+    } = $props<{
+        product: ProductItem;
+        cardBgColor?: "white" | "gray";
+        imgHeight?: string;
+        showCardDesc?: boolean;
+        layoutMb?: "upDownLayout" | "leftRightLayout" | undefined;
+        now: number;
+    }>();
 </script>
 
 <a

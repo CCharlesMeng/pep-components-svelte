@@ -1,0 +1,39 @@
+# Svelte 5 Development Rules (Updated: onMount allowed)
+
+You are an expert Svelte 5 developer. Strictly follow Svelte 5 syntax and Runes API. 
+
+## 1. Reactivity (Runes)
+- Use `$state(initialValue)` for all reactive variables.
+- Use `$derived(expression)` instead of `$: label = ...`.
+- Use `$effect(() => { ... })` for side effects that need to re-run when dependencies change.
+- **[NEW]** Use `onMount(() => { ... })` for logic that MUST only run once after the component is mounted (e.g., initializing a non-reactive third-party library or sending a single tracking event).
+
+## 2. Components & Props
+- Use `let { prop1, prop2, children } = $props();` to receive props. 
+- **NEVER** use `export let`.
+- Use TypeScript interfaces for props: `interface Props { ... }` and `let { ... }: Props = $props();`.
+
+## 3. Events
+- Use standard HTML attributes (e.g., `onclick={fn}`) instead of `on:click`.
+- Do NOT use `createEventDispatcher`. Pass callback functions as props instead.
+
+## 4. Snippets & Render Tags
+- Use `{#snippet name(args)} ... {/snippet}` and `{@render name(args)}` instead of `<slot>`.
+- Use the `children` snippet for passing content to components.
+
+## 5. Lifecycle Guidelines
+- **Prefer `$effect`** over `onMount` if the logic needs to react to state changes.
+- **Use `onMount`** only for pure initialization that doesn't need to track any Runes.
+- Avoid `beforeUpdate` and `afterUpdate` as they are deprecated; use `$effect` or `$inspect` for debugging.
+
+## 6. CSS & Styling
+- Use `<style>` blocks or Tailwind CSS (if detected in the project).
+- Prefer CSS variables for dynamic styling controlled by runes.
+
+## 7. Forbidden Syntax (Strictly Enforce)
+- NO `export let`
+- NO `on:click`, `on:change`, etc.
+- NO `createEventDispatcher`
+- NO `$: ` reactive statements
+- NO `<slot />` or `<slot name="..." />`
+- NO `beforeUpdate`, `afterUpdate`

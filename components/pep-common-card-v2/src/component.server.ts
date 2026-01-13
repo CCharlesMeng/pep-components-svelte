@@ -1,7 +1,7 @@
 import type { PepCommonCardV2Props } from './types';
 
 // Mock loader logic simulating BFF data fetching
-export const loader = (method: { requestClient: any }, data: any): PepCommonCardV2Props => {
+export const loader = async (method: { requestClient: any }, data: any): Promise<PepCommonCardV2Props> => {
     return {
         title: "热门活动",
         titleMb: "热门活动",

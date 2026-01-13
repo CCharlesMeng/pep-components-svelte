@@ -1,27 +1,45 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import type { TabItem } from "./types";
-  import { isExpired } from "../../shared/utils/date";
+  import { isExpired } from "../../../shared/utils/date";
   import CardHeader from "./lib/components/CardHeader.svelte";
   import CardTabs from "./lib/components/CardTabs.svelte";
   import CardItem from "./lib/components/CardItem.svelte";
 
   // Props 定义
-  export let title: string = "";
-  export let titleMb: string = "";
-  export let subtitle: string = "";
-  export let subtitleMb: string = "";
-  export let more: { text?: string; href?: string } = { text: "", href: "" };
-  export let cardType: "left" | "center" | "product" = "center";
-  export let theme: "white" | "grey" = "white";
-  export let cardBgColor: "white" | "gray" = "gray";
-  export let cardColumn: "2" | "3" | "4" | "5" = "3";
-  export let imgHeight: "80px" | "60px" | "48px" = "80px";
-  export let isMergeTopSpacing: boolean = true;
-  export let isMergeBottomSpacing: boolean = true;
-  export let isShowMb: boolean = false;
-  export let showCardDesc: boolean = true;
-  export let tabList: TabItem[] = [];
+  let {
+    title = "",
+    titleMb = "",
+    subtitle = "",
+    subtitleMb = "",
+    more = { text: "", href: "" },
+    cardType = "center" as "left" | "center" | "product",
+    theme = "white" as "white" | "grey",
+    cardBgColor = "gray" as "white" | "gray",
+    cardColumn = "3" as "2" | "3" | "4" | "5",
+    imgHeight = "80px" as "80px" | "60px" | "48px",
+    isMergeTopSpacing = true,
+    isMergeBottomSpacing = true,
+    isShowMb = false,
+    showCardDesc = true,
+    tabList = []
+  } = $props<{
+    title?: string;
+    titleMb?: string;
+    subtitle?: string;
+    subtitleMb?: string;
+    more?: { text?: string; href?: string };
+    cardType?: "left" | "center" | "product";
+    theme?: "white" | "grey";
+    cardBgColor?: "white" | "gray";
+    cardColumn?: "2" | "3" | "4" | "5";
+    imgHeight?: "80px" | "60px" | "48px";
+    isMergeTopSpacing?: boolean;
+    isMergeBottomSpacing?: boolean;
+    isShowMb?: boolean;
+    showCardDesc?: boolean;
+    tabList?: TabItem[];
+  }>();
 
   // 当前激活的页签索引
   let activeTabIndex = 0;

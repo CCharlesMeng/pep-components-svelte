@@ -1,6 +1,4 @@
-// @ts-ignore - aliases are resolved by Vite
 import Component from '$component';
-// @ts-ignore
 import data from '$data';
 
 import { mount, type Component as SvelteComponent } from 'svelte';
@@ -36,6 +34,10 @@ const loadComponentData = async () => {
         // Dynamically import the component.server.ts to get the loader
         const { loader } = await import('$loader');
 
+        if (!loader) {
+            return data;
+        }
+
         // Create mock request client for development
         const mockRequestClient = {
             get: async (url: string) => ({ data: {} }),
@@ -43,9 +45,9 @@ const loadComponentData = async () => {
             // Add other HTTP methods as needed
         };
 
-        // Call loader with mock client and data
+        // Call loader with mock client and data (now async)
         const method = { requestClient: mockRequestClient };
-        const loadedData = loader(method, data);
+        const loadedData = await loader(method, data);
 
         // Combine loader result with original data
         const combinedData = {
@@ -53,7 +55,6 @@ const loadComponentData = async () => {
             ...loadedData
         };
 
-        console.log('[Dev] Loaded component data:', combinedData);
         return combinedData;
     } catch (error) {
         console.warn('[Dev] Failed to load component data, using raw data:', error);
