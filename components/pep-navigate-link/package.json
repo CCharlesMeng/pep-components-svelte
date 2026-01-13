@@ -11,7 +11,7 @@
 	},
 	"scripts": {
 		"dev": "vite dev",
-		"build": "npm run build:client && npm run build:server",
+		"build": "npm run build:client && npm run build:server && npm run build:data && npm run build:editor",
 		"build:client": "vite build --mode=production --config vite.config.ts --outDir dist/client",
 		"build:server": "vite build --mode=server --config vite.config.ts --outDir dist/server",
 		"build:data": "[ -f src/server.ts ] && vite build --mode=data --config vite.config.ts --outDir dist/data || echo 'Skipping data build: src/component.server.ts not found'",
