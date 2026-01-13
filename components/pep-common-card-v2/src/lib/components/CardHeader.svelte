@@ -1,4 +1,8 @@
 <script lang="ts">
+    // 1. 导入
+    // (无)
+
+    // 2. Props 定义
     let {
         title = "",
         titleMb = "",
@@ -39,14 +43,14 @@
 <style>
     .pep-common-card-v2__header {
         text-align: center;
-        margin-bottom: 40px;
+        margin-bottom: var(--primitive-space-10);
         position: relative;
     }
 
     .pep-common-card-v2__floor-title {
-        font-size: 32px;
+        font-size: var(--primitive-font-3xl);
         font-weight: 600;
-        color: #111;
+        color: var(--text-primary);
         margin: 0;
         line-height: 1.4;
     }
@@ -56,17 +60,17 @@
     }
 
     .pep-common-card-v2__floor-subtitle {
-        font-size: 16px;
-        color: #666;
-        margin-top: 12px;
+        font-size: var(--primitive-font-base);
+        color: var(--text-secondary);
+        margin-top: var(--primitive-space-3);
         line-height: 1.6;
     }
 
     .pep-common-card-v2__more {
         display: inline-block;
-        margin-top: 16px;
-        font-size: 14px;
-        color: #3b82f6;
+        margin-top: var(--primitive-space-4);
+        font-size: var(--primitive-font-sm);
+        color: var(--text-link);
         text-decoration: none;
     }
 
@@ -90,7 +94,7 @@
         }
 
         .pep-common-card-v2__floor-title {
-            font-size: 24px;
+            font-size: var(--primitive-font-2xl);
         }
     }
 </style>

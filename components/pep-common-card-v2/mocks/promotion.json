@@ -1,0 +1,60 @@
+{
+  "_id": "pep-common-card-v2_promotion",
+  "title": "<p>限时促销活动</p>",
+  "theme": "white",
+  "tabList": [
+    {
+      "title": "今日秒杀",
+      "layoutMb": "upDownLayout",
+      "cards": {
+        "products": [
+          {
+            "title": "云服务器 S6",
+            "desc": "<p>极致性价比，适用于中小型网站</p>",
+            "icon": "https://res-static.hc-cdn.cn/cloudbu-site/public/new-product-icon/Compute/ECS.png",
+            "endTime": "2026-01-20 23:59:59",
+            "keywords": [
+              {
+                "keyword": "低至1折"
+              },
+              {
+                "keyword": "买一年送半年"
+              }
+            ],
+            "btnGroups": [
+              {
+                "btnType": "por-btn-primary",
+                "btnLinkText": "秒杀中",
+                "btnHref": "#"
+              }
+            ]
+          },
+          {
+            "title": "对象存储 OBS",
+            "desc": "<p>安全可靠、高性价比的云存储服务</p>",
+            "icon": "https://res-static.hc-cdn.cn/cloudbu-site/public/new-product-icon/Storage/OBS.png",
+            "endTime": "2026/01/15 12:00:00",
+            "keywords": [
+              {
+                "keyword": "0元体验"
+              }
+            ],
+            "tags": [
+              "限时优惠"
+            ],
+            "btnGroups": [
+              {
+                "btnType": "por-btn-secondary",
+                "btnLinkText": "立即查看",
+                "btnHref": "#"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "cardType": "product",
+  "cardColumn": "2",
+  "cardBgColor": "gray"
+}

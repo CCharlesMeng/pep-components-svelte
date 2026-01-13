@@ -1,0 +1,33 @@
+:root {
+  /* Colors */
+  --primitive-gray-50: #f9fafb;
+  --primitive-gray-100: #f5f5f5;
+  --primitive-gray-200: #eeeeee;
+  --primitive-gray-600: #666666;
+  --primitive-gray-900: #111111;
+  
+  --primitive-red-500: #e41e2b;
+  --primitive-red-50: rgba(228, 30, 43, 0.05);
+  
+  --primitive-blue-500: #3b82f6;
+
+  /* Spacing */
+  --primitive-space-2: 8px;
+  --primitive-space-3: 12px;
+  --primitive-space-4: 16px;
+  --primitive-space-5: 20px;
+  --primitive-space-6: 24px;
+  --primitive-space-8: 32px;
+  --primitive-space-10: 40px;
+  --primitive-space-12: 48px;
+  --primitive-space-15: 60px;
+
+  /* Font Sizes */
+  --primitive-font-xs: 12px;
+  --primitive-font-sm: 14px;
+  --primitive-font-base: 16px;
+  --primitive-font-lg: 18px;
+  --primitive-font-xl: 20px;
+  --primitive-font-2xl: 24px;
+  --primitive-font-3xl: 32px;
+}

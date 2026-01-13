@@ -1,68 +1,17 @@
 import type { PepCommonCardV2Props } from './types';
 
-// Mock loader logic simulating BFF data fetching
+/**
+ * 服务端数据加载器
+ * 
+ * @param method - 包含 requestClient 等工具
+ * @param data - 基础配置数据（由 Vite 插件或本地文件注入）
+ * @returns 经过处理后的组件 Props
+ */
 export const loader = async (method: { requestClient: any }, data: any): Promise<PepCommonCardV2Props> => {
+    // 逻辑：直接返回从配置文件读取的数据，不再写死
+    // 在开发环境下，data 会由 shared/core/main.ts 加载并传入
+    // 在生产环境下，此 loader 可能会执行更复杂的业务逻辑（如调用 API）
     return {
-        title: "热门活动",
-        titleMb: "热门活动",
-        subtitle: "精选活动不容错过",
-        subtitleMb: "精选活动",
-        theme: "white",
-        cardType: "center",
-        cardBgColor: "gray",
-        cardColumn: "3",
-        imgHeight: "80px",
-        isMergeTopSpacing: true,
-        isMergeBottomSpacing: true,
-        isShowMb: true,
-        showCardDesc: true,
-        more: {
-            text: "查看更多",
-            href: "/more"
-        },
-        tabList: [
-            {
-                title: "精选推荐",
-                layoutMb: "leftRightLayout",
-                cards: {
-                    products: [
-                        {
-                            title: "示例产品 1",
-                            desc: "这是一个示例产品的描述文案，支持富文本。",
-                            icon: "https://via.placeholder.com/80",
-                            href: "#",
-                            tags: ["热销", "新品"],
-                            btnGroups: [
-                                {
-                                    btnType: "por-btn-primary",
-                                    btnLinkText: "立即购买",
-                                    btnHref: "#"
-                                }
-                            ]
-                        },
-                        {
-                            title: "示例产品 2",
-                            desc: "这是一个示例产品的描述文案。",
-                            icon: "https://via.placeholder.com/80",
-                            href: "#",
-                            tags: ["优惠"],
-                            endTime: "2025-12-31 23:59:59"
-                        },
-                        {
-                            title: "示例产品 3",
-                            desc: "这是一个示例产品的描述文案。",
-                            icon: "https://via.placeholder.com/80",
-                            href: "#"
-                        }
-                    ]
-                }
-            },
-            {
-                title: "最新活动",
-                cards: {
-                    products: []
-                }
-            }
-        ]
+        ...data
     };
 }

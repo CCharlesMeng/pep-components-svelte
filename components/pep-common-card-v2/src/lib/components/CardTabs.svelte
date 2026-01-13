@@ -28,24 +28,24 @@
     .pep-common-card-v2__tabs {
         display: flex;
         justify-content: center;
-        gap: 32px;
-        margin-bottom: 32px;
-        border-bottom: 1px solid #eee;
+        gap: var(--primitive-space-8);
+        margin-bottom: var(--primitive-space-8);
+        border-bottom: 1px solid var(--primitive-gray-200);
     }
 
     .pep-common-card-v2__tab-item {
         background: none;
         border: none;
-        padding: 12px 0;
-        font-size: 16px;
-        color: #666;
+        padding: var(--primitive-space-3) 0;
+        font-size: var(--primitive-font-base);
+        color: var(--text-secondary);
         cursor: pointer;
         position: relative;
         transition: color 0.2s;
     }
 
     .pep-common-card-v2__tab-item.active {
-        color: #e41e2b;
+        color: var(--text-accent);
         font-weight: 600;
     }
 
@@ -56,12 +56,12 @@
         left: 0;
         width: 100%;
         height: 2px;
-        background-color: #e41e2b;
+        background-color: var(--text-accent);
     }
 
     @media (max-width: 767px) {
         .pep-common-card-v2__tabs {
-            gap: 20px;
+            gap: var(--primitive-space-5);
             overflow-x: auto;
             justify-content: flex-start;
             padding-bottom: 4px;

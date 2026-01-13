@@ -20,11 +20,22 @@ export function createComponentConfig({ cwd, name }) {
     const sharedCoreDir = resolve(sharedRoot, 'shared/core');
 
     // Common aliases for all modes
+    // Priority: mocks/index.ts > mocks/index.js > mocks/default.json
+    let dataPath = resolve(cwd, 'mocks/default.json');
+    const mockIndexPath = resolve(cwd, 'mocks/index.ts');
+    const mockIndexJsPath = resolve(cwd, 'mocks/index.js');
+
+    if (fs.existsSync(mockIndexPath)) {
+        dataPath = mockIndexPath;
+    } else if (fs.existsSync(mockIndexJsPath)) {
+        dataPath = mockIndexJsPath;
+    }
+
     const commonAliases = {
         '$lib': resolve(cwd, 'src/lib'),
         '$component': resolve(cwd, 'src/index.svelte'), // Convention: main component is src/index.svelte
         '$loader': resolve(cwd, 'src/component.server.ts'),
-        '$data': resolve(cwd, 'data.json'),
+        '$data': dataPath,
         '/@shared': resolve(sharedRoot, 'shared')
     };
 
@@ -47,7 +58,10 @@ export function createComponentConfig({ cwd, name }) {
                         fileName: (format) => `load-data.${format}`
                     },
                     outDir: 'dist/data',
-                    emptyOutDir: true
+                    emptyOutDir: true,
+                    rollupOptions: {
+                        external: [/\.json$/] // Don't bundle JSON files
+                    }
                 },
                 resolve: { alias: commonAliases }
             });

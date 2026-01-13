@@ -11,6 +11,7 @@
     },
     "include": [
         "src/**/*",
+        "mocks/**/*",
         "vite.config.ts",
         "../../types.d.ts"
     ]

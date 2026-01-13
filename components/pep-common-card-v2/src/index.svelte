@@ -1,23 +1,25 @@
 <script lang="ts">
-  import { onMount, onDestroy, type Snippet } from "svelte";
-  import type { TabItem } from "./types";
+  // 1. 导入：Svelte → 第三方 → 本地
+  import { type Snippet } from "svelte";
+  import type { TabItem, ProductItem } from "./types";
   import { isExpired } from "../../../shared/utils/date";
+  import { createTimer } from "./state/timer.svelte";
   import CardHeader from "./lib/components/CardHeader.svelte";
   import CardTabs from "./lib/components/CardTabs.svelte";
-  import CardItem from "./lib/components/CardItem.svelte";
+  import CardGrid from "./lib/components/CardGrid.svelte";
 
-  // Props 定义
+  // 2. Props 定义
   let {
     title = "",
     titleMb = "",
     subtitle = "",
     subtitleMb = "",
     more = { text: "", href: "" },
-    cardType = "center" as "left" | "center" | "product",
-    theme = "white" as "white" | "grey",
-    cardBgColor = "gray" as "white" | "gray",
-    cardColumn = "3" as "2" | "3" | "4" | "5",
-    imgHeight = "80px" as "80px" | "60px" | "48px",
+    cardType = "center",
+    theme = "white",
+    cardBgColor = "gray",
+    cardColumn = "3",
+    imgHeight = "80px",
     isMergeTopSpacing = true,
     isMergeBottomSpacing = true,
     isShowMb = false,
@@ -43,22 +45,15 @@
     children?: Snippet;
   }>();
 
-  // 当前激活的页签索引
+  // 3. 状态管理
+  const timer = createTimer();
   let activeTabIndex = $state(0);
 
-  // 倒计时管理
-  let now = $state(Date.now());
-  let timer: any;
-
-  onMount(() => {
-    timer = setInterval(() => {
-      now = Date.now();
-    }, 1000);
-  });
-
-  onDestroy(() => {
-    if (timer) clearInterval(timer);
-  });
+  // 4. 派生状态
+  const activeTab = $derived(tabList[activeTabIndex]);
+  const displayProducts = $derived(
+    activeTab?.cards?.products?.filter((p: ProductItem) => !isExpired(p.endTime, timer.current)) || []
+  );
 </script>
 
 <div
@@ -70,36 +65,22 @@
   class:hide-mb={!isShowMb}
 >
   <div class="pep-common-card-v2__container">
-    <!-- 楼层头部 -->
     <CardHeader {title} {titleMb} {subtitle} {subtitleMb} {more} />
 
-    <!-- 内容区：Tab 与 Cards -->
     <div class="pep-common-card-v2__content">
-      <!-- Tab 导航条 -->
       <CardTabs {tabList} bind:activeTabIndex />
 
-      <!-- 卡片列表容器 -->
-      {#if tabList && tabList[activeTabIndex]}
-        <div
-          class="pep-common-card-v2__card-grid"
-          style="--column: {cardColumn}"
-          class:layout-product={cardType === "product"}
-          class:layout-center={cardType === "center"}
-          class:layout-left={cardType === "left"}
-        >
-          {#each tabList[activeTabIndex].cards?.products || [] as product}
-            {#if !isExpired(product.endTime, now)}
-              <CardItem
-                {product}
-                {cardBgColor}
-                {imgHeight}
-                {showCardDesc}
-                layoutMb={tabList[activeTabIndex].layoutMb}
-                {now}
-              />
-            {/if}
-          {/each}
-        </div>
+      {#if activeTab}
+        <CardGrid
+          products={displayProducts}
+          {cardColumn}
+          {cardType}
+          {cardBgColor}
+          {imgHeight}
+          {showCardDesc}
+          layoutMb={activeTab.layoutMb}
+          now={timer.current}
+        />
       {/if}
 
       {@render children?.()}
@@ -108,7 +89,6 @@
 </div>
 
 <style>
-  /* 基础容器 */
   .pep-common-card-v2 {
     width: 100%;
     box-sizing: border-box;
@@ -116,38 +96,23 @@
   }
 
   .pep-common-card-v2__container {
-    max-width: 1200px;
+    max-width: var(--container-max-width);
     margin: 0 auto;
-    padding: 60px 20px;
+    padding: var(--primitive-space-15) var(--primitive-space-5);
   }
 
-  /* 背景主题 */
   .theme-grey {
-    background-color: #f5f5f5;
+    background-color: var(--bg-grey);
   }
   .theme-white {
-    background-color: #ffffff;
+    background-color: var(--bg-primary);
   }
 
-  /* 间距控制 */
   .merge-top .pep-common-card-v2__container {
     padding-top: 0;
   }
   .merge-bottom .pep-common-card-v2__container {
     padding-bottom: 0;
-  }
-
-  /* 卡片网格布局 */
-  .pep-common-card-v2__card-grid {
-    display: grid;
-    grid-template-columns: repeat(var(--column, 3), 1fr);
-    gap: 20px;
-  }
-
-  @media (max-width: 1024px) {
-    .pep-common-card-v2__card-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
   }
 
   @media (max-width: 767px) {
@@ -156,11 +121,7 @@
     }
 
     .pep-common-card-v2__container {
-      padding: 40px 16px;
-    }
-
-    .pep-common-card-v2__card-grid {
-      grid-template-columns: 1fr;
+      padding: var(--primitive-space-10) var(--primitive-space-4);
     }
   }
 </style>

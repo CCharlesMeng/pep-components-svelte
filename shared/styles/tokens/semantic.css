@@ -1,0 +1,31 @@
+@import "./primitives.css";
+
+:root {
+  /* Text */
+  --text-primary: var(--primitive-gray-900);
+  --text-secondary: var(--primitive-gray-600);
+  --text-accent: var(--primitive-red-500);
+  --text-link: var(--primitive-blue-500);
+  --text-inverse: #ffffff;
+
+  /* Background */
+  --bg-primary: #ffffff;
+  --bg-secondary: var(--primitive-gray-50);
+  --bg-grey: var(--primitive-gray-100);
+
+  /* Layout */
+  --container-max-width: 1200px;
+  --grid-gap: var(--primitive-space-5);
+
+  /* Component: Card */
+  --card-bg: var(--bg-primary);
+  --card-padding: var(--primitive-space-10) var(--primitive-space-6);
+  --card-radius: 4px;
+  --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+  /* Component: Button */
+  --btn-primary-bg: var(--primitive-gray-900);
+  --btn-primary-text: var(--text-inverse);
+  --btn-secondary-border: var(--primitive-gray-900);
+  --btn-secondary-text: var(--primitive-gray-900);
+}

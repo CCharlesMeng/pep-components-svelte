@@ -2,6 +2,7 @@
     "extends": "../../shared/config/tsconfig.json",
     "include": [
         "src/**/*",
+        "mocks/**/*",
         "vite.config.ts",
         "../../types.d.ts"
     ]

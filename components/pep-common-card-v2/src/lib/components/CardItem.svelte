@@ -4,7 +4,7 @@
 
     let {
         product,
-        cardBgColor = "gray" as "white" | "gray",
+        cardBgColor = "gray",
         imgHeight = "80px",
         showCardDesc = true,
         layoutMb = undefined,
@@ -58,12 +58,10 @@
 
     <!-- 内容文本区 -->
     <div class="pep-common-card-v2__card-info">
-        <!-- 标题 -->
         {#if product.title}
             <h3 class="pep-common-card-v2__card-title">{product.title}</h3>
         {/if}
 
-        <!-- 重点文案 -->
         {#if product.keywords && product.keywords.length > 0}
             <div class="pep-common-card-v2__card-keywords">
                 {#each product.keywords as kw}
@@ -73,7 +71,6 @@
             </div>
         {/if}
 
-        <!-- 描述 -->
         {#if showCardDesc && product.desc}
             <div class="pep-common-card-v2__card-desc">
                 {@html product.desc}
@@ -104,33 +101,32 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 40px 24px;
+        padding: var(--card-padding);
         text-decoration: none;
         transition: all 0.3s ease;
-        border-radius: 4px;
+        border-radius: var(--card-radius);
         box-sizing: border-box;
         cursor: pointer;
         position: relative;
-        /* Allow parent to control grid layout */
     }
 
     .pep-common-card-v2__card-item:hover {
         transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        box-shadow: var(--card-shadow);
     }
 
     .card-bg-white {
-        background-color: #ffffff;
+        background-color: var(--bg-primary);
     }
     .card-bg-gray {
-        background-color: #f9fafb;
+        background-color: var(--bg-secondary);
     }
 
     .pep-common-card-v2__card-icon {
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 24px;
+        margin-bottom: var(--primitive-space-6);
         width: 100%;
     }
 
@@ -148,21 +144,22 @@
     }
 
     .pep-common-card-v2__card-title {
-        font-size: 18px;
+        font-size: var(--primitive-font-lg);
         font-weight: 600;
-        color: #111;
-        margin: 0 0 12px 0;
+        color: var(--text-primary);
+        margin: 0 0 var(--primitive-space-3) 0;
         text-align: center;
         line-height: 1.4;
     }
 
     .pep-common-card-v2__card-desc {
-        font-size: 14px;
-        color: #666;
+        font-size: var(--primitive-font-sm);
+        color: var(--text-secondary);
         text-align: center;
         line-height: 1.6;
         display: -webkit-box;
         -webkit-line-clamp: 2;
+        line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
@@ -173,56 +170,56 @@
 
     .pep-common-card-v2__card-countdown {
         position: absolute;
-        top: 12px;
-        right: 12px;
-        font-size: 12px;
-        color: #e41e2b;
-        background: rgba(228, 30, 43, 0.05);
-        padding: 2px 8px;
+        top: var(--primitive-space-3);
+        right: var(--primitive-space-3);
+        font-size: var(--primitive-font-xs);
+        color: var(--text-accent);
+        background: var(--primitive-red-50);
+        padding: 2px var(--primitive-space-2);
         border-radius: 10px;
     }
 
     .pep-common-card-v2__card-tags {
         display: flex;
-        gap: 8px;
-        margin-bottom: 12px;
+        gap: var(--primitive-space-2);
+        margin-bottom: var(--primitive-space-3);
         flex-wrap: wrap;
         justify-content: center;
     }
 
     .pep-common-card-v2__tag {
-        font-size: 12px;
-        padding: 2px 8px;
-        background: #f0f0f0;
-        color: #666;
+        font-size: var(--primitive-font-xs);
+        padding: 2px var(--primitive-space-2);
+        background: var(--primitive-gray-200);
+        color: var(--text-secondary);
         border-radius: 2px;
     }
 
     .pep-common-card-v2__card-keywords {
         display: flex;
-        gap: 12px;
-        margin-bottom: 12px;
+        gap: var(--primitive-space-3);
+        margin-bottom: var(--primitive-space-3);
         justify-content: center;
     }
 
     .pep-common-card-v2__keyword {
-        font-size: 14px;
-        color: #e41e2b;
+        font-size: var(--primitive-font-sm);
+        color: var(--text-accent);
         font-weight: 600;
     }
 
     .pep-common-card-v2__card-btns {
         display: flex;
-        gap: 12px;
-        margin-top: 24px;
+        gap: var(--primitive-space-3);
+        margin-top: var(--primitive-space-6);
         width: 100%;
         justify-content: center;
     }
 
     .pep-common-card-v2__btn {
         flex: 1;
-        padding: 8px 16px;
-        font-size: 14px;
+        padding: var(--primitive-space-2) var(--primitive-space-4);
+        font-size: var(--primitive-font-sm);
         border-radius: 2px;
         cursor: pointer;
         transition: all 0.2s;
@@ -231,20 +228,19 @@
     }
 
     .por-btn-primary {
-        background-color: #111;
-        color: #fff;
+        background-color: var(--btn-primary-bg);
+        color: var(--btn-primary-text);
     }
     .por-btn-secondary {
-        background-color: #fff;
-        border-color: #111;
-        color: #111;
+        background-color: var(--bg-primary);
+        border-color: var(--btn-secondary-border);
+        color: var(--btn-secondary-text);
     }
     .por-btn-dark {
         background-color: transparent;
-        color: #111;
+        color: var(--text-primary);
     }
 
-    /* 布局微调 */
     :global(.layout-left) .pep-common-card-v2__card-info,
     :global(.layout-left) .pep-common-card-v2__card-tags,
     :global(.layout-left) .pep-common-card-v2__card-keywords,
@@ -258,7 +254,6 @@
         text-align: left;
     }
 
-    /* 响应式辅助 */
     .pc-only {
         display: block;
     }
@@ -274,12 +269,11 @@
             display: block;
         }
 
-        /* 移动端左右布局 */
         .pep-common-card-v2__card-item.layout-mb-lr {
             flex-direction: row;
             align-items: flex-start;
-            gap: 16px;
-            padding: 16px;
+            gap: var(--primitive-space-4);
+            padding: var(--primitive-space-4);
         }
 
         .layout-mb-lr .pep-common-card-v2__card-icon {
