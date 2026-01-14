@@ -1,14 +1,18 @@
 <script lang="ts">
   // 1. 导入：Svelte → 第三方 → 本地
   import { type Snippet } from "svelte";
-  import type { TabItem, ProductItem } from "./types";
+  import type { TabItem, ProductItem, PepCommonCardV2Props } from "./types";
   import { isExpired } from "../../../shared/utils/date";
   import { createTimer } from "./state/timer.svelte";
-  import CardHeader from "./lib/components/CardHeader.svelte";
-  import CardTabs from "./lib/components/CardTabs.svelte";
-  import CardGrid from "./lib/components/CardGrid.svelte";
+  
+  // 共享 UI 组件
+  import FloorHeader from "/@shared/ui/FloorHeader.svelte";
+  import FloorTabs from "/@shared/ui/FloorTabs.svelte";
+  
+  // 本地业务组件
+  import CardGrid from "./components/CardGrid.svelte";
 
-  // 2. Props 定义
+  // 2. Props 定义 (严格对应 schema.json)
   let {
     title = "",
     titleMb = "",
@@ -26,24 +30,7 @@
     showCardDesc = true,
     tabList = [],
     children
-  } = $props<{
-    title?: string;
-    titleMb?: string;
-    subtitle?: string;
-    subtitleMb?: string;
-    more?: { text?: string; href?: string };
-    cardType?: "left" | "center" | "product";
-    theme?: "white" | "grey";
-    cardBgColor?: "white" | "gray";
-    cardColumn?: "2" | "3" | "4" | "5";
-    imgHeight?: "80px" | "60px" | "48px";
-    isMergeTopSpacing?: boolean;
-    isMergeBottomSpacing?: boolean;
-    isShowMb?: boolean;
-    showCardDesc?: boolean;
-    tabList?: TabItem[];
-    children?: Snippet;
-  }>();
+  } = $props<PepCommonCardV2Props & { children?: Snippet }>();
 
   // 3. 状态管理
   const timer = createTimer();
@@ -65,10 +52,10 @@
   class:hide-mb={!isShowMb}
 >
   <div class="pep-common-card-v2__container">
-    <CardHeader {title} {titleMb} {subtitle} {subtitleMb} {more} />
+    <FloorHeader {title} {titleMb} {subtitle} {subtitleMb} {more} />
 
     <div class="pep-common-card-v2__content">
-      <CardTabs {tabList} bind:activeTabIndex />
+      <FloorTabs {tabList} bind:activeTabIndex />
 
       {#if activeTab}
         <CardGrid

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ProductItem } from "../../types";
+  import type { ProductItem } from "../types";
   import CardItem from "./CardItem.svelte";
 
   let {

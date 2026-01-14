@@ -1,5 +1,11 @@
 <script lang="ts">
-    import type { TabItem } from "../../types";
+    /**
+     * 通用楼层页签组件
+     */
+    interface TabItem {
+        title?: string;
+        [key: string]: any;
+    }
 
     let {
         tabList = [],
@@ -11,10 +17,10 @@
 </script>
 
 {#if tabList && tabList.length > 1}
-    <div class="pep-common-card-v2__tabs">
+    <div class="pep-floor-tabs">
         {#each tabList as tab, i}
             <button
-                class="pep-common-card-v2__tab-item"
+                class="pep-floor-tabs__item"
                 class:active={activeTabIndex === i}
                 onclick={() => (activeTabIndex = i)}
             >
@@ -25,7 +31,7 @@
 {/if}
 
 <style>
-    .pep-common-card-v2__tabs {
+    .pep-floor-tabs {
         display: flex;
         justify-content: center;
         gap: var(--primitive-space-8);
@@ -33,7 +39,7 @@
         border-bottom: 1px solid var(--primitive-gray-200);
     }
 
-    .pep-common-card-v2__tab-item {
+    .pep-floor-tabs__item {
         background: none;
         border: none;
         padding: var(--primitive-space-3) 0;
@@ -44,12 +50,12 @@
         transition: color 0.2s;
     }
 
-    .pep-common-card-v2__tab-item.active {
+    .pep-floor-tabs__item.active {
         color: var(--text-accent);
         font-weight: 600;
     }
 
-    .pep-common-card-v2__tab-item.active::after {
+    .pep-floor-tabs__item.active::after {
         content: "";
         position: absolute;
         bottom: -1px;
@@ -60,7 +66,7 @@
     }
 
     @media (max-width: 767px) {
-        .pep-common-card-v2__tabs {
+        .pep-floor-tabs {
             gap: var(--primitive-space-5);
             overflow-x: auto;
             justify-content: flex-start;

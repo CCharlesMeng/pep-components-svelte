@@ -1,8 +1,8 @@
 <script lang="ts">
-    // 1. 导入
-    // (无)
-
-    // 2. Props 定义
+    /**
+     * 通用楼层头部组件
+     * 支持 PC/移动端 标题、副标题及“更多”链接
+     */
     let {
         title = "",
         titleMb = "",
@@ -19,35 +19,35 @@
 </script>
 
 {#if title || subtitle || titleMb || subtitleMb}
-    <div class="pep-common-card-v2__header">
+    <div class="pep-floor-header">
         {#if title || titleMb}
-            <h2 class="pep-common-card-v2__floor-title">
+            <h2 class="pep-floor-header__title">
                 <span class="pc-only">{@html title}</span>
                 <span class="mb-only">{@html titleMb || title}</span>
             </h2>
         {/if}
         {#if subtitle || subtitleMb}
-            <div class="pep-common-card-v2__floor-subtitle">
+            <div class="pep-floor-header__subtitle">
                 <span class="pc-only">{@html subtitle}</span>
                 <span class="mb-only">{@html subtitleMb || subtitle}</span>
             </div>
         {/if}
         {#if more?.text}
-            <a href={more.href} class="pep-common-card-v2__more"
-                >{more.text} &gt;</a
-            >
+            <a href={more.href} class="pep-floor-header__more">
+                {more.text} &gt;
+            </a>
         {/if}
     </div>
 {/if}
 
 <style>
-    .pep-common-card-v2__header {
+    .pep-floor-header {
         text-align: center;
         margin-bottom: var(--primitive-space-10);
         position: relative;
     }
 
-    .pep-common-card-v2__floor-title {
+    .pep-floor-header__title {
         font-size: var(--primitive-font-3xl);
         font-weight: 600;
         color: var(--text-primary);
@@ -55,18 +55,18 @@
         line-height: 1.4;
     }
 
-    .pep-common-card-v2__floor-title :global(p) {
+    .pep-floor-header__title :global(p) {
         margin: 0;
     }
 
-    .pep-common-card-v2__floor-subtitle {
+    .pep-floor-header__subtitle {
         font-size: var(--primitive-font-base);
         color: var(--text-secondary);
         margin-top: var(--primitive-space-3);
         line-height: 1.6;
     }
 
-    .pep-common-card-v2__more {
+    .pep-floor-header__more {
         display: inline-block;
         margin-top: var(--primitive-space-4);
         font-size: var(--primitive-font-sm);
@@ -74,7 +74,7 @@
         text-decoration: none;
     }
 
-    .pep-common-card-v2__more:hover {
+    .pep-floor-header__more:hover {
         text-decoration: underline;
     }
 
@@ -93,7 +93,7 @@
             display: block;
         }
 
-        .pep-common-card-v2__floor-title {
+        .pep-floor-header__title {
             font-size: var(--primitive-font-2xl);
         }
     }
