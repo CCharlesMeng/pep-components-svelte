@@ -4,11 +4,11 @@
   import type { TabItem, ProductItem, PepCommonCardV2Props } from "./types";
   import { isExpired } from "../../../shared/utils/date";
   import { createTimer } from "./state/timer.svelte";
-  
+
   // 共享 UI 组件
   import FloorHeader from "/@shared/ui/FloorHeader.svelte";
   import FloorTabs from "/@shared/ui/FloorTabs.svelte";
-  
+
   // 本地业务组件
   import CardGrid from "./components/CardGrid.svelte";
 
@@ -29,7 +29,7 @@
     isShowMb = false,
     showCardDesc = true,
     tabList = [],
-    children
+    children,
   } = $props<PepCommonCardV2Props & { children?: Snippet }>();
 
   // 3. 状态管理
@@ -39,7 +39,9 @@
   // 4. 派生状态
   const activeTab = $derived(tabList[activeTabIndex]);
   const displayProducts = $derived(
-    activeTab?.cards?.products?.filter((p: ProductItem) => !isExpired(p.endTime, timer.current)) || []
+    activeTab?.cards?.products?.filter(
+      (p: ProductItem) => !isExpired(p.endTime, timer.current),
+    ) || [],
   );
 </script>
 
