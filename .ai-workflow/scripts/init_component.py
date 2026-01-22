@@ -23,13 +23,13 @@ def parse_args() -> argparse.Namespace:
         epilog="""
 示例:
   # 初始化新组件
-  python init_component.py --component pep-button --features 20
+  python init-component.js --component pep-button --features 20
   
   # 从规格文件初始化
-  python init_component.py --component pep-modal --spec components/pep-modal/SPEC.md
+  python init-component.js --component pep-modal --spec components/pep-modal/SPEC.md
   
   # 使用AI辅助
-  python init_component.py --component pep-table --ai-assist
+  python init-component.js --component pep-table --ai-assist
         """
     )
     
@@ -620,7 +620,7 @@ def main():
     print(f"\n🚀 下一步:")
     print(f"  1. cd {component_dir}")
     print(f"  2. 完善功能清单（features.json）")
-    print(f"  3. 运行: python ../../cursor-autonomous-coding/scripts/next_task.py --component {args.component}")
+    print(f"  3. 运行: python ../../cursor-autonomous-coding/scripts/next-task.js --component {args.component}")
     print(f"  4. 在Cursor中开始开发\n")
 
 

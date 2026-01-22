@@ -12,8 +12,8 @@
 
 **之前**: 需要记住和输入完整的 python 脚本路径
 ```bash
-python3 cursor-autonomous-coding/scripts/next_task.py --component pep-button
-python3 cursor-autonomous-coding/scripts/mark_done.py --component pep-button --feature-id 1
+node scripts/next-task.js --component pep-button
+node scripts/mark-done.js --component pep-button --feature-id 1
 ```
 
 **现在**: 简洁的命令行工具
@@ -27,7 +27,7 @@ pep-dev done pep-button 1 --tested
 **之前**: 手动编写或半自动生成 features.json
 ```bash
 # 初始化生成模板
-python3 scripts/init_component.py --component pep-button --features 20
+node scripts/init-component.js --component pep-button --features 20
 
 # 手动修改 features.json
 vim components/pep-button/features.json
@@ -213,15 +213,15 @@ mv .component-dev .component-dev.old
 
 | V1.0 命令 | V2.0 命令 | 说明 |
 |-----------|-----------|------|
-| `python3 scripts/init_component.py --component X` | `pep-dev init X` | 初始化 |
+| `node scripts/init-component.js --component X` | `pep-dev init X` | 初始化 |
 | _(新功能)_ | `pep-dev spec X` | 生成features |
-| `python3 scripts/next_task.py --component X` | `pep-dev next X --save` | 获取任务 |
-| `python3 scripts/mark_done.py --component X --feature-id N` | `pep-dev done X N --tested` | 完成任务 |
-| `python3 scripts/validate.py --component X` | `pep-dev validate X` | 验证清单 |
+| `node scripts/next-task.js --component X` | `pep-dev next X --save` | 获取任务 |
+| `node scripts/mark-done.js --component X --feature-id N` | `pep-dev done X N --tested` | 完成任务 |
+| `node scripts/validate.js --component X` | `pep-dev validate X` | 验证清单 |
 | _(新功能)_ | `pep-dev check X` | 合规检查 |
 | _(新功能)_ | `pep-dev rules X` | 规则检查 |
-| `python3 scripts/report.py --component X` | `pep-dev status X` | 查看进度 |
-| `python3 scripts/monorepo_summary.py` | `pep-dev summary` | 整体进度 |
+| `node scripts/report.js --component X` | `pep-dev status X` | 查看进度 |
+| `node scripts/monorepo-summary.js` | `pep-dev summary` | 整体进度 |
 
 ---
 
@@ -339,7 +339,7 @@ pep-dev spec X      # 生成功能清单
 pep-dev next pep-button --save
 
 # ❌ 不推荐（但仍然有效）
-python3 cursor-autonomous-coding/scripts/next_task.py --component pep-button
+node scripts/next-task.js --component pep-button
 ```
 
 ### 3. 定期验证

@@ -87,7 +87,7 @@ component/
 
 ```bash
 # 直接调用脚本
-python3 scripts/scaffold_component.py \
+node scripts/scaffold-component.js \
   --component pep-my-component \
   --mode minimal \
   --template-data '{

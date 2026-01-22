@@ -75,7 +75,7 @@ def get_features_file(project_dir: Path, component: Optional[str] = None) -> Pat
         if not features_file.exists():
             raise FileNotFoundError(
                 f"组件功能清单不存在: {features_file}\n"
-                f"请先运行: python scripts/init_component.py --component {component}"
+                f"请先运行: python scripts/init-component.js --component {component}"
             )
     else:
         # 标准模式：在项目根目录
@@ -83,7 +83,7 @@ def get_features_file(project_dir: Path, component: Optional[str] = None) -> Pat
         if not features_file.exists():
             raise FileNotFoundError(
                 f"功能清单不存在: {features_file}\n"
-                "请先运行: python scripts/init_project.py"
+                "请先运行: python scripts/init-project.js"
             )
     return features_file
 
@@ -269,7 +269,7 @@ git commit -m "feat: {feature['title']} (#{feature['id']})"
 
 ### 4. 标记完成
 ```bash
-python cursor-autonomous-coding/scripts/mark_done.py --feature-id {feature['id']}
+python cursor-autonomous-coding/scripts/mark-done.js --feature-id {feature['id']}
 ```
 
 ---
@@ -434,7 +434,7 @@ def main():
             print("="*60)
             print("\n添加 --save 参数可以将任务保存到 .cursor-session/current-task.md")
             print("\n示例:")
-            print("  python scripts/next_task.py --save\n")
+            print("  python scripts/next-task.js --save\n")
     
     except FileNotFoundError as e:
         print(f"\n❌ 错误: {e}\n")

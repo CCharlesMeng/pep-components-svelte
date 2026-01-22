@@ -43,12 +43,12 @@ echo "
 # PEP组件开发别名
 export PEP_ROOT='/Users/mengxin/Documents/Code/公司项目/pep-components-svelte'
 export CAC_ROOT='\$PEP_ROOT/cursor-autonomous-coding'
-alias pep-init='python3 \$CAC_ROOT/scripts/init_component.py --workspace-root \$PEP_ROOT'
-alias pep-next='python3 \$CAC_ROOT/scripts/next_task.py --project-dir \$PEP_ROOT'
-alias pep-done='python3 \$CAC_ROOT/scripts/mark_done.py --project-dir \$PEP_ROOT'
-alias pep-report='python3 \$CAC_ROOT/scripts/report.py --project-dir \$PEP_ROOT'
-alias pep-check='python3 \$CAC_ROOT/scripts/validate.py --project-dir \$PEP_ROOT'
-alias pep-summary='python3 \$CAC_ROOT/scripts/monorepo_summary.py --workspace-root \$PEP_ROOT'
+alias pep-init='python3 \$CAC_ROOT/scripts/init-component.js --workspace-root \$PEP_ROOT'
+alias pep-next='python3 \$CAC_ROOT/scripts/next-task.js --project-dir \$PEP_ROOT'
+alias pep-done='python3 \$CAC_ROOT/scripts/mark-done.js --project-dir \$PEP_ROOT'
+alias pep-report='python3 \$CAC_ROOT/scripts/report.js --project-dir \$PEP_ROOT'
+alias pep-check='python3 \$CAC_ROOT/scripts/validate.js --project-dir \$PEP_ROOT'
+alias pep-summary='python3 \$CAC_ROOT/scripts/monorepo-summary.js --workspace-root \$PEP_ROOT'
 " >> ~/.zshrc
 
 source ~/.zshrc
@@ -361,11 +361,11 @@ pep-summary | grep "🔄" | sort  # 进行中的组件，按进度排序
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     
-    "comp:init": "python3 cursor-autonomous-coding/scripts/init_component.py",
-    "comp:next": "python3 cursor-autonomous-coding/scripts/next_task.py",
-    "comp:done": "python3 cursor-autonomous-coding/scripts/mark_done.py",
-    "comp:report": "python3 cursor-autonomous-coding/scripts/report.py",
-    "comp:summary": "python3 cursor-autonomous-coding/scripts/monorepo_summary.py"
+    "comp:init": "node scripts/init-component.js",
+    "comp:next": "node scripts/next-task.js",
+    "comp:done": "node scripts/mark-done.js",
+    "comp:report": "node scripts/report.js",
+    "comp:summary": "node scripts/monorepo-summary.js"
   }
 }
 ```
@@ -399,7 +399,7 @@ jobs:
       
       - name: Generate Progress Report
         run: |
-          python3 cursor-autonomous-coding/scripts/monorepo_summary.py \
+          node scripts/monorepo-summary.js \
             --format html \
             --output weekly-progress.html
       
@@ -458,7 +458,7 @@ pep-summary --format html --output team-progress.html
 
 ```bash
 cd /path/to/pep-components-svelte
-python3 cursor-autonomous-coding/scripts/init_component.py \
+node scripts/init-component.js \
   --component pep-button
 ```
 

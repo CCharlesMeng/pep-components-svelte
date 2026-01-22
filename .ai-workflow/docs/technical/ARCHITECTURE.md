@@ -103,7 +103,7 @@ Cursor自主编码流程基于以下核心理念：
 - ❌ 不删除功能（除非确实需要）
 - ❌ 不修改ID
 
-### 2. init_project.py
+### 2. init-project.js
 
 **职责**: 初始化项目结构
 
@@ -126,7 +126,7 @@ Cursor自主编码流程基于以下核心理念：
 5. 创建会话目录和配置
 6. 初始化Git仓库
 
-### 3. next_task.py
+### 3. next-task.js
 
 **职责**: 获取下一个应该完成的任务
 
@@ -155,7 +155,7 @@ priority_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
 sort_key = (priority_order[priority], id)
 ```
 
-### 4. mark_done.py
+### 4. mark-done.js
 
 **职责**: 标记功能为已完成
 
@@ -180,7 +180,7 @@ sort_key = (priority_order[priority], id)
 7. 更新进度文档
 8. 显示统计信息
 
-### 5. report.py
+### 5. report.js
 
 **职责**: 生成进度报告
 
@@ -210,7 +210,7 @@ complexity_hours = {
 }
 ```
 
-### 6. validate.py
+### 6. validate.js
 
 **职责**: 验证功能清单的正确性
 
@@ -273,13 +273,13 @@ def has_cycle(feature_id, visited, rec_stack):
 ```
 用户编写spec.md
        ↓
-运行 init_project.py
+运行 init-project.js
        ↓
 生成 features.json (模板或AI生成)
        ↓
 用户完善 features.json
        ↓
-运行 validate.py 确保正确
+运行 validate.js 确保正确
        ↓
 提交到Git
 ```
@@ -287,7 +287,7 @@ def has_cycle(feature_id, visited, rec_stack):
 ### 开发迭代流程
 
 ```
-运行 next_task.py
+运行 next-task.js
        ↓
 获取任务提示词
        ↓
@@ -297,13 +297,13 @@ def has_cycle(feature_id, visited, rec_stack):
        ↓
 Git提交
        ↓
-运行 mark_done.py
+运行 mark-done.js
        ↓
 更新 features.json
        ↓
 更新 cursor-progress.md
        ↓
-运行 report.py 查看进度
+运行 report.js 查看进度
        ↓
 循环到下一个任务
 ```
@@ -323,7 +323,7 @@ Git提交
 
 ### 1. 自定义验证规则
 
-在 `validate.py` 中添加新的验证函数：
+在 `validate.js` 中添加新的验证函数：
 
 ```python
 def validate_custom_rule(features):
@@ -338,7 +338,7 @@ all_errors.extend(validate_custom_rule(features))
 
 ### 2. 自定义报告格式
 
-在 `report.py` 中添加新的生成函数：
+在 `report.js` 中添加新的生成函数：
 
 ```python
 def generate_custom_report(features, stats):
@@ -459,7 +459,7 @@ def update_feature(project_dir, feature_id, updates):
 
 ### 单元测试
 ```python
-# tests/test_validate.py
+# tests/test_validate.js
 def test_validate_schema():
     features = [
         {"id": 1, "title": "Test", "status": "pending"}

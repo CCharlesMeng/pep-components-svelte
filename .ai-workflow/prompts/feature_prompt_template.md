@@ -96,7 +96,7 @@ git commit -m "feat: {feature_title} (#{feature_id})"
 
 ### 4. 标记完成
 ```bash
-python cursor-autonomous-coding/scripts/mark_done.py --feature-id {feature_id}
+python cursor-autonomous-coding/scripts/mark-done.js --feature-id {feature_id}
 ```
 
 ---

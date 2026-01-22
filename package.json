@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "build": "pnpm -r build",
-        "dev": "./scripts/dev-pkg.sh",
+        "dev": "node scripts/dev-pkg.js",
         "lint": "pnpm -r lint",
         "check": "pnpm -r check",
         "format": "pnpm -r format",

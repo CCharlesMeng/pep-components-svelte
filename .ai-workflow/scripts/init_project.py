@@ -23,13 +23,13 @@ def parse_args() -> argparse.Namespace:
         epilog="""
 示例:
   # 基础用法
-  python init_project.py --spec spec.md
+  python init-project.js --spec spec.md
   
   # 指定功能数量和项目目录
-  python init_project.py --spec spec.md --features 200 --project-dir ./my-app
+  python init-project.js --spec spec.md --features 200 --project-dir ./my-app
   
   # 使用AI辅助生成功能清单
-  python init_project.py --spec spec.md --ai-assist
+  python init-project.js --spec spec.md --ai-assist
         """
     )
     
@@ -482,7 +482,7 @@ def main():
         print(f"     1. 在Cursor中打开: {prompt_file}")
         print("     2. 使用Composer或Chat功能，粘贴提示词")
         print("     3. 将生成的JSON保存到: features.json")
-        print("     4. 运行验证: python scripts/validate.py\n")
+        print("     4. 运行验证: python scripts/validate.js\n")
         
         return
     
@@ -523,7 +523,7 @@ def main():
     
     print("\n🚀 下一步:")
     print("  1. 完善功能清单（features.json）")
-    print("  2. 运行: python scripts/next_task.py")
+    print("  2. 运行: python scripts/next-task.js")
     print("  3. 在Cursor中开始开发\n")
 
 

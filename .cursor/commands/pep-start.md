@@ -36,7 +36,7 @@
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🎯 PEP 组件初始化
 
-快速开始：输入 'skip' 生成最小模板
+快速开始：输入 'skip' 生成 minimal 模板
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 请选择生成方式：
@@ -270,7 +270,7 @@ AI 生成模式下，先收集和准备信息，在【阶段 4】确认后执行
 2. 跳到【阶段 4：生成确认】
    
 3. 用户确认后执行：
-   - 调用 scaffold_component.py 生成标准模板
+   - 调用 scaffold-component.js 生成标准模板
    - 读取生成的模板文件
    - 使用 search_replace 替换为 AI 生成的代码
 ```
@@ -300,7 +300,7 @@ AI 生成模式下，先收集和准备信息，在【阶段 4】确认后执行
 
 **Agent 行为指令**：
 
-用户确认后，调用 Python 脚本完成组件生成：
+用户确认后，调用 Node.js 脚本完成组件生成：
 
 **重要：不要使用 read_file/write 工具，效率太低！直接调用脚本！**
 
@@ -309,7 +309,7 @@ AI 生成模式下，先收集和准备信息，在【阶段 4】确认后执行
 ### 模式 1：系统模板模式
 
 ```bash
-python3 scripts/scaffold_component.py \
+node scripts/scaffold-component.js \
   --component <component-name> \
   --mode minimal \
   --template-data '{"description": "<组件描述>"}'
@@ -318,7 +318,7 @@ python3 scripts/scaffold_component.py \
 ### 模式 2：拷贝组件模式
 
 ```bash
-python3 scripts/copy_component_template.py \
+node scripts/copy-template.js \
   --source <source-component> \
   --target <component-name> \
   --clean-spec \
@@ -331,7 +331,7 @@ python3 scripts/copy_component_template.py \
 
 ```bash
 # 第一步：使用标准模式生成基础结构
-python3 scripts/scaffold_component.py \
+node scripts/scaffold-component.js \
   --component <component-name> \
   --mode standard \
   --template-data '{"description": "<用户描述>"}'
@@ -342,7 +342,7 @@ python3 scripts/scaffold_component.py \
 ```
 
 **AI 模式流程**：
-1. 脚本生成标准模板（占位符版本）
+1. 脚本生成 standard 模板（占位符版本）
 2. Agent 读取模板文件
 3. Agent 基于用户描述生成代码
 4. Agent 使用 search_replace 替换模板中的代码部分
@@ -545,7 +545,7 @@ function toPascalCase(kebabCase) {
 ### 语义匹配（组件推荐）
 
 ```markdown
-基于用户描述和组件 README.md 进行匹配：
+基于用户描述 and 组件 README.md 进行匹配：
 
 1. 使用 LLM 理解用户需求
 2. 读取所有组件的 README.md（概述部分）
@@ -558,14 +558,14 @@ function toPascalCase(kebabCase) {
 
 ### 文件拷贝与替换
 
-**重要：使用 Python 脚本，不要使用 read_file/write 工具！**
+**重要：使用 Node.js 脚本，不要使用 read_file/write 工具！**
 
 ```markdown
-从模板或源组件拷贝时，调用 Python 脚本：
+从模板或源组件拷贝时，调用 Node.js 脚本：
 
 脚本路径：
-- scripts/scaffold_component.py（系统模板 / AI 生成）
-- scripts/copy_component_template.py（拷贝组件）
+- scripts/scaffold-component.js（系统模板 / AI 生成）
+- scripts/copy-template.js（拷贝组件）
 
 脚本功能：
 1. 批量复制所有文件

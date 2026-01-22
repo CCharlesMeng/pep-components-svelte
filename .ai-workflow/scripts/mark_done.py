@@ -382,7 +382,7 @@ def main():
         # 建议下一步
         print("💡 下一步:")
         print("   1. 确保代码已提交Git")
-        print("   2. 运行: python scripts/next_task.py")
+        print("   2. 运行: python scripts/next-task.js")
         print("   3. 继续下一个功能\n")
         
         return 0

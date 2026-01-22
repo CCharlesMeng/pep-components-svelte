@@ -4,7 +4,7 @@
 
 ## 脚本列表
 
-### 1. copy_component_template.py
+### 1. copy-template.js
 
 **用途**: 从现有组件拷贝结构创建新组件
 
@@ -19,12 +19,12 @@
 
 ```bash
 # 基础用法：从 pep-notice 拷贝创建 pep-new-alert
-python3 scripts/copy_component_template.py \
+node scripts/copy-template.js \
   --source pep-notice \
   --target pep-new-alert
 
 # 拷贝并清理文档（推荐用于快速开始）
-python3 scripts/copy_component_template.py \
+node scripts/copy-template.js \
   --source pep-notice \
   --target pep-new-alert \
   --clean-spec \
@@ -50,7 +50,7 @@ python3 scripts/copy_component_template.py \
 
 ---
 
-### 2. scaffold_component.py
+### 2. scaffold-component.js
 
 **用途**: 基于模板创建新组件
 
@@ -62,7 +62,7 @@ python3 scripts/copy_component_template.py \
 **使用方法**:
 
 ```bash
-python3 scripts/scaffold_component.py \
+node scripts/scaffold-component.js \
   --component pep-new-component \
   --mode minimal \
   --template-data '{"description": "新组件描述"}'
@@ -75,19 +75,29 @@ python3 scripts/scaffold_component.py \
 
 ---
 
-### 3. generate_features.py
+### 3. generate-features.js
 
 **用途**: 生成或更新 features.json 文件
 
-（详细用法请查看脚本文件）
+**使用方法**:
+
+```bash
+node scripts/generate-features.js --component pep-new-component
+```
 
 ---
 
-### 4. dev-pkg.sh
+### 4. dev-pkg.js
 
-**用途**: 开发工具脚本
+**用途**: 开发工具脚本，用于启动特定组件的开发服务器。
 
-（详细用法请查看脚本文件）
+**使用方法**:
+
+```bash
+pnpm run dev <package-name>
+# 或者直接运行
+node scripts/dev-pkg.js <package-name>
+```
 
 ---
 
@@ -108,7 +118,7 @@ python3 scripts/scaffold_component.py \
 
 ```
 → 选择 0 或直接回车
-→ 调用 scaffold_component.py
+→ 调用 scaffold-component.js
 ```
 
 **优点**: 
@@ -125,7 +135,7 @@ python3 scripts/scaffold_component.py \
 ```
 → 输入 'list' 查看可用组件
 → 选择参考组件（如 pep-notice）
-→ 调用 copy_component_template.py
+→ 调用 copy-template.js
 ```
 
 **优点**: 
@@ -144,7 +154,7 @@ python3 scripts/scaffold_component.py \
 /pep-start pep-new-component --quick
 → 选择 2（AI 生成）
 → 简单描述组件功能
-→ 调用 scaffold_component.py
+→ 调用 scaffold-component.js
 ```
 
 **优点**:
@@ -161,18 +171,17 @@ python3 scripts/scaffold_component.py \
 
 ### 添加新脚本
 
-1. 创建新的 `.py` 文件
-2. 添加执行权限：`chmod +x scripts/your_script.py`
-3. 遵循现有脚本的结构和风格
-4. 更新此 README 文件
+1. 创建新的 `.js` 文件
+2. 遵循现有脚本的结构和风格
+3. 更新此 README 文件
 
 ### 脚本规范
 
-- 使用 Python 3.8+
-- 添加清晰的文档字符串
-- 使用 argparse 处理命令行参数
+- 使用 Node.js 20+
+- 添加清晰的文档注释
+- 使用 `node:util` 的 `parseArgs` 处理命令行参数
 - 提供友好的错误信息
-- 使用 `PROJECT_ROOT = Path(__file__).parent.parent` 获取项目根目录
+- 使用 `path.resolve(__dirname, '..')` 获取项目根目录
 
 ---
 
@@ -180,9 +189,9 @@ python3 scripts/scaffold_component.py \
 
 ### 脚本无法执行
 
+确保已安装依赖：
 ```bash
-# 添加执行权限
-chmod +x scripts/copy_component_template.py
+pnpm install
 ```
 
 ### 组件拷贝失败
@@ -192,23 +201,12 @@ chmod +x scripts/copy_component_template.py
 ls components/
 
 # 查看可用组件列表
-python3 scripts/copy_component_template.py --source nonexistent --target test
+node scripts/copy-template.js --source nonexistent --target test
 ```
 
-### Python 版本问题
+### Node.js 版本问题
 
 ```bash
-# 检查 Python 版本
-python3 --version  # 需要 3.8+
+# 检查 Node.js 版本
+node --version  # 建议 20+
 ```
-
----
-
-## 贡献
-
-如果你发现脚本有问题或想要添加新功能，请：
-
-1. 测试你的修改
-2. 更新相关文档
-3. 提交 Pull Request
-

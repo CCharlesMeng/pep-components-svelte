@@ -17,10 +17,10 @@
 │   ├── utils/                   # 通用工具函数
 │   └── templates/               # 共享模板和资源文件
 ├── scripts/                     # 开发工具脚本
-│   ├── copy_component_template.py   # 组件模板拷贝工具
-│   ├── scaffold_component.py        # 组件脚手架生成器
-│   ├── generate_features.py         # 功能特性生成器
-│   └── dev-pkg.sh                   # 开发环境管理脚本
+│   ├── copy-template.js           # 组件模板拷贝工具
+│   ├── scaffold-component.js      # 组件脚手架生成器
+│   ├── generate-features.js       # 功能特性生成器
+│   └── dev-pkg.js                 # 开发环境管理脚本
 ├── autonomous-coding/           # 自主编码代理演示系统
 │   ├── agent.py                  # 代理核心逻辑
 │   ├── autonomous_agent_demo.py  # 演示入口
@@ -61,8 +61,9 @@ pnpm install
 
 | 脚本 | 说明 |
 |------|------|
-| `python3 scripts/copy_component_template.py --source <源组件> --target <新组件>` | 从现有组件拷贝创建新组件 |
-| `python3 scripts/scaffold_component.py --component <组件名> --mode standard` | 使用脚手架快速创建组件 |
+| `node scripts/copy-template.js --source <源组件> --target <新组件>` | 从现有组件拷贝创建新组件 |
+| `node scripts/scaffold-component.js --component <组件名> --mode standard` | 使用脚手架快速创建组件 |
+| `node scripts/generate-features.js --component <组件名>` | 生成任务列表 |
 
 ### 开发单个组件
 要启动特定组件的开发服务器（例如 `pep-common-card-v2`）：
@@ -128,10 +129,10 @@ pnpm build
 
 `scripts/` 目录包含用于组件开发的自动化工具：
 
-- **`copy_component_template.py`**: 从现有组件完整拷贝结构创建新组件，支持自动重命名和文档清理。
-- **`scaffold_component.py`**: 基于模板快速生成新组件，支持多种模式（最小、标准、定制）。
-- **`generate_features.py`**: 生成或更新组件的 `features.json` 配置文件。
-- **`dev-pkg.sh`**: 开发环境管理脚本，支持多组件并行开发。
+- **`copy-template.js`**: 从现有组件完整拷贝结构创建新组件，支持自动重命名和文档清理。
+- **`scaffold-component.js`**: 基于模板快速生成新组件，支持多种模式（最小、标准、定制）。
+- **`generate-features.js`**: 生成或更新组件的 `features.json` 配置文件。
+- **`dev-pkg.js`**: 开发环境管理脚本，支持多组件并行开发。
 
 详细用法请参考 [`scripts/README.md`](scripts/README.md)。
 
@@ -165,13 +166,13 @@ pnpm build
 #### 快速创建（推荐新手）
 ```bash
 # 使用预制模板创建标准组件
-python3 scripts/scaffold_component.py --component pep-new-component --mode standard
+node scripts/scaffold-component.js --component pep-new-component --mode standard
 ```
 
 #### 从现有组件拷贝
 ```bash
 # 从相似组件拷贝结构
-python3 scripts/copy_component_template.py --source pep-common-card-v2 --target pep-new-component
+node scripts/copy-template.js --source pep-common-card-v2 --target pep-new-component
 ```
 
 ### 方式二：手动创建

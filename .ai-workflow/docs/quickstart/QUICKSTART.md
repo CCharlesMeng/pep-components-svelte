@@ -75,7 +75,7 @@ echo "✅ 项目规格已创建"
 
 ```bash
 # 运行初始化脚本
-python3 /path/to/cursor-autonomous-coding/scripts/init_project.py \
+python3 /path/to/cursor-autonomous-coding/scripts/init-project.js \
   --spec spec.md \
   --features 30
 
@@ -92,7 +92,7 @@ echo "✅ 项目初始化完成"
 
 ```bash
 # 获取第一个任务并保存
-python3 /path/to/cursor-autonomous-coding/scripts/next_task.py --save
+python3 /path/to/cursor-autonomous-coding/scripts/next-task.js --save
 
 # 输出会显示类似：
 # ╔══════════════════════════════════════════╗
@@ -166,7 +166,7 @@ echo "✅ 代码已提交"
 
 ```bash
 # 标记功能完成
-python3 /path/to/cursor-autonomous-coding/scripts/mark_done.py \
+python3 /path/to/cursor-autonomous-coding/scripts/mark-done.js \
   --feature-id 1 \
   --tested
 
@@ -181,7 +181,7 @@ echo "✅ 功能 #1 已完成"
 
 ```bash
 # 生成进度报告
-python3 /path/to/cursor-autonomous-coding/scripts/report.py
+python3 /path/to/cursor-autonomous-coding/scripts/report.js
 
 # 你会看到漂亮的进度统计：
 # ╔══════════════════════════════════════════╗
@@ -198,7 +198,7 @@ python3 /path/to/cursor-autonomous-coding/scripts/report.py
 
 ```bash
 # 获取下一个任务
-python3 /path/to/cursor-autonomous-coding/scripts/next_task.py --save
+python3 /path/to/cursor-autonomous-coding/scripts/next-task.js --save
 
 # 重复步骤 5-8
 ```
@@ -220,28 +220,28 @@ python3 /path/to/cursor-autonomous-coding/scripts/next_task.py --save
 
 ```bash
 # 查看下一个任务
-python3 scripts/next_task.py
+node scripts/next-task.js
 
 # 查看接下来5个任务
-python3 scripts/next_task.py --count 5
+node scripts/next-task.js --count 5
 
 # 只看高优先级任务
-python3 scripts/next_task.py --priority high
+node scripts/next-task.js --priority high
 
 # 标记功能完成
-python3 scripts/mark_done.py --feature-id <ID>
+node scripts/mark-done.js --feature-id <ID>
 
 # 查看进度
-python3 scripts/report.py
+node scripts/report.js
 
 # 生成HTML报告
-python3 scripts/report.py --format html --output report.html
+node scripts/report.js --format html --output report.html
 
 # 验证功能清单
-python3 scripts/validate.py
+node scripts/validate.js
 
 # 自动修复问题
-python3 scripts/validate.py --fix
+node scripts/validate.js --fix
 ```
 
 ### 小技巧
@@ -250,10 +250,10 @@ python3 scripts/validate.py --fix
 
 ```bash
 # 添加到 ~/.zshrc 或 ~/.bashrc
-alias cac-next="python3 /path/to/cursor-autonomous-coding/scripts/next_task.py --save"
-alias cac-done="python3 /path/to/cursor-autonomous-coding/scripts/mark_done.py"
-alias cac-report="python3 /path/to/cursor-autonomous-coding/scripts/report.py"
-alias cac-validate="python3 /path/to/cursor-autonomous-coding/scripts/validate.py"
+alias cac-next="python3 /path/to/cursor-autonomous-coding/scripts/next-task.js --save"
+alias cac-done="python3 /path/to/cursor-autonomous-coding/scripts/mark-done.js"
+alias cac-report="python3 /path/to/cursor-autonomous-coding/scripts/report.js"
+alias cac-validate="python3 /path/to/cursor-autonomous-coding/scripts/validate.js"
 
 # 然后就可以这样用：
 # cac-next
@@ -269,7 +269,7 @@ alias cac-validate="python3 /path/to/cursor-autonomous-coding/scripts/validate.p
 项目使用Cursor自主编码流程管理。
 
 开始新功能前：
-1. 运行 `python3 scripts/next_task.py --save`
+1. 运行 `node scripts/next-task.js --save`
 2. 查看 .cursor-session/current-task.md
 3. 理解所有验收标准
 4. 询问我任何不清楚的地方
@@ -283,7 +283,7 @@ alias cac-validate="python3 /path/to/cursor-autonomous-coding/scripts/validate.p
 完成后：
 1. 测试所有验收标准
 2. 提交代码
-3. 运行 `python3 scripts/mark_done.py --feature-id <id>`
+3. 运行 `node scripts/mark-done.js --feature-id <id>`
 ```
 
 ---
@@ -296,12 +296,12 @@ A: 创建符号链接：
 ```bash
 cd your-project
 ln -s /path/to/cursor-autonomous-coding/scripts ./scripts
-# 然后就可以：python3 scripts/next_task.py
+# 然后就可以：node scripts/next-task.js
 ```
 
 **Q: 可以直接修改features.json吗？**
 
-A: 可以！修改后运行 `python3 scripts/validate.py` 确保没问题。
+A: 可以！修改后运行 `node scripts/validate.js` 确保没问题。
 
 **Q: 功能太大怎么办？**
 

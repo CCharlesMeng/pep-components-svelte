@@ -539,7 +539,7 @@ function inferCommitType(category: string): string {
 
 ```bash
 # 标记任务完成
-python3 scripts/mark_done.py \
+node scripts/mark-done.js \
   --component <component-name> \
   --feature-id <feature-id> \
   --notes "<completion-notes>" \

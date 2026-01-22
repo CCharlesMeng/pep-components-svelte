@@ -560,7 +560,7 @@ function prepareTaskContext(task: Feature, component: string): TaskContext {
 
 ```bash
 # 获取下一个任务
-python3 scripts/next_task.py \
+node scripts/next-task.js \
   --component <component-name>
 
 # 输出:

@@ -601,7 +601,7 @@ function generateFixSuggestions(state: ComponentState, checks: Checks): Suggesti
 
 ```bash
 # 状态检查
-python3 scripts/check_component_state.py \
+node scripts/check-component-state.js \
   --component <component-name>
 
 # 输出:

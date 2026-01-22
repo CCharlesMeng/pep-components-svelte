@@ -132,7 +132,7 @@ Monorepo单组件完整开发流程：
 
 ```bash
 cd /path/to/your/project
-python3 cursor-autonomous-coding/scripts/init_project.py --spec spec.md
+node scripts/init-project.js --spec spec.md
 ```
 
 ### Monorepo模式
@@ -141,24 +141,24 @@ python3 cursor-autonomous-coding/scripts/init_project.py --spec spec.md
 cd /path/to/your/monorepo
 
 # 初始化单个组件
-python3 cursor-autonomous-coding/scripts/init_component.py \
+node scripts/init-component.js \
   --component pep-common-banner
 
 # 验证全局规则
-python3 cursor-autonomous-coding/scripts/validate_global_rules.py \
+node scripts/validate-global-rules.js \
   --component pep-common-banner
 
 # 获取组件任务
-python3 cursor-autonomous-coding/scripts/next_task.py \
+node scripts/next-task.js \
   --component pep-common-banner \
   --save
 
 # 可选：启动全自动化模式
-python3 cursor-autonomous-coding/scripts/auto_develop.py \
+node scripts/auto-develop.js \
   --component pep-common-banner
 
 # 查看全局进度
-python3 cursor-autonomous-coding/scripts/monorepo_summary.py
+node scripts/monorepo-summary.js
 ```
 
 这将创建：
@@ -172,7 +172,7 @@ python3 cursor-autonomous-coding/scripts/monorepo_summary.py
 
 ```bash
 # 查看当前应该做什么
-python3 cursor-autonomous-coding/scripts/next_task.py
+node scripts/next-task.js
 
 # 这会输出下一个任务的详细提示词
 # 复制提示词到Cursor的Composer中
@@ -182,14 +182,14 @@ python3 cursor-autonomous-coding/scripts/next_task.py
 
 ```bash
 # 标记功能为已完成
-python3 cursor-autonomous-coding/scripts/mark_done.py --feature-id 1
+node scripts/mark-done.js --feature-id 1
 
 # 提交进度
 git add .
 git commit -m "feat: 完成功能 #1 - [功能描述]"
 
 # 生成进度报告
-python3 cursor-autonomous-coding/scripts/report.py
+node scripts/report.js
 ```
 
 ## 工作流程
@@ -198,7 +198,7 @@ python3 cursor-autonomous-coding/scripts/report.py
 
 ```mermaid
 graph TD
-    A[编写项目规格 spec.md] --> B[运行 init_project.py]
+    A[编写项目规格 spec.md] --> B[运行 init-project.js]
     B --> C[生成 features.json]
     B --> D[创建初始项目结构]
     B --> E[初始化Git仓库]
@@ -272,11 +272,11 @@ your-project/
 
 ### 标准项目模式脚本
 
-#### init_project.py
+#### init-project.js
 初始化项目结构和功能清单
 
 ```bash
-python3 scripts/init_project.py --spec spec.md --features 150
+node scripts/init-project.js --spec spec.md --features 150
 ```
 
 参数：
@@ -284,22 +284,22 @@ python3 scripts/init_project.py --spec spec.md --features 150
 - `--features` - 生成的功能数量（默认150）
 - `--project-dir` - 项目目录（默认当前目录）
 
-### next_task.py
+### next-task.js
 获取下一个应该完成的任务
 
 ```bash
-python3 scripts/next_task.py --format markdown
+node scripts/next-task.js --format markdown
 ```
 
 参数：
 - `--format` - 输出格式：markdown/json/text
 - `--count` - 显示接下来N个任务（默认1）
 
-### mark_done.py
+### mark-done.js
 标记功能为已完成
 
 ```bash
-python3 scripts/mark_done.py --feature-id 1 --commit-hash abc123
+node scripts/mark-done.js --feature-id 1 --commit-hash abc123
 ```
 
 参数：
@@ -307,22 +307,22 @@ python3 scripts/mark_done.py --feature-id 1 --commit-hash abc123
 - `--commit-hash` - Git提交哈希（可选，自动获取）
 - `--tested` - 标记为已测试
 
-### report.py
+### report.js
 生成进度报告
 
 ```bash
-python3 scripts/report.py --output report.html
+node scripts/report.js --output report.html
 ```
 
 参数：
 - `--output` - 输出文件路径
 - `--format` - 格式：html/markdown/json
 
-### validate.py
+### validate.js
 验证功能清单和项目状态
 
 ```bash
-python3 scripts/validate.py
+node scripts/validate.js
 ```
 
 检查：
@@ -331,11 +331,11 @@ python3 scripts/validate.py
 - 依赖关系的完整性
 - 测试覆盖情况
 
-### validate_global_rules.py ⭐ NEW
+### validate-global-rules.js ⭐ NEW
 验证组件是否符合全局规范
 
 ```bash
-python3 scripts/validate_global_rules.py --component pep-common-banner
+node scripts/validate-global-rules.js --component pep-common-banner
 ```
 
 检查：
@@ -346,11 +346,11 @@ python3 scripts/validate_global_rules.py --component pep-common-banner
 - Git规范
 - 无障碍要求
 
-### auto_develop.py ⭐ NEW
+### auto-develop.js ⭐ NEW
 全自动化开发模式
 
 ```bash
-python3 scripts/auto_develop.py --component pep-common-banner
+node scripts/auto-develop.js --component pep-common-banner
 ```
 
 功能：
@@ -432,7 +432,7 @@ python3 scripts/auto_develop.py --component pep-common-banner
 ## 完成后
 运行以下命令标记完成：
 ```bash
-python3 cursor-autonomous-coding/scripts/mark_done.py --feature-id {feature_id}
+node scripts/mark-done.js --feature-id {feature_id}
 ```
 ```
 
@@ -463,7 +463,7 @@ python3 cursor-autonomous-coding/scripts/mark_done.py --feature-id {feature_id}
 ### 4. 会话管理
 - 每个功能开发在一个独立的Composer会话中
 - 复杂功能可以分解为多个子任务
-- 使用 `next_task.py` 获取下一个任务
+- 使用 `next-task.js` 获取下一个任务
 
 ## 与原始Claude版本的区别
 
@@ -482,19 +482,19 @@ python3 cursor-autonomous-coding/scripts/mark_done.py --feature-id {feature_id}
 ### 批量处理功能
 ```bash
 # 获取所有高优先级待完成功能
-python3 scripts/next_task.py --priority high --count 10
+node scripts/next-task.js --priority high --count 10
 
 # 批量生成提示词
-python3 scripts/batch_prompts.py --category core
+node scripts/batch_prompts.py --category core
 ```
 
 ### 功能依赖管理
 ```bash
 # 显示依赖树
-python3 scripts/dependencies.py --visualize
+node scripts/dependencies.py --visualize
 
 # 检查可并行开发的功能
-python3 scripts/dependencies.py --parallel
+node scripts/dependencies.py --parallel
 ```
 
 ### 自定义验证规则
@@ -522,12 +522,12 @@ python3 scripts/dependencies.py --parallel
 
 ### features.json格式错误
 ```bash
-python3 scripts/validate.py --fix
+node scripts/validate.js --fix
 ```
 
 ### Git历史不一致
 ```bash
-python3 scripts/sync_git.py
+node scripts/sync_git.py
 ```
 
 ### 进度丢失
@@ -543,12 +543,12 @@ cp features.json features.backup.json
 ```bash
 # 1. 初始化项目
 cd my-new-project
-python3 /path/to/cursor-autonomous-coding/scripts/init_project.py \
+python3 /path/to/cursor-autonomous-coding/scripts/init-project.js \
   --spec project-spec.md \
   --features 120
 
 # 2. 查看第一个任务
-python3 /path/to/cursor-autonomous-coding/scripts/next_task.py
+python3 /path/to/cursor-autonomous-coding/scripts/next-task.js
 
 # 输出：
 # ╔══════════════════════════════════════════════════════════╗
@@ -563,17 +563,17 @@ python3 /path/to/cursor-autonomous-coding/scripts/next_task.py
 # 3. 复制提示词到Cursor Composer，完成开发
 
 # 4. 标记完成
-python3 /path/to/cursor-autonomous-coding/scripts/mark_done.py --feature-id 1
+python3 /path/to/cursor-autonomous-coding/scripts/mark-done.js --feature-id 1
 
 # 5. 提交代码
 git add .
 git commit -m "feat: 完成项目基础架构设置"
 
 # 6. 查看进度
-python3 /path/to/cursor-autonomous-coding/scripts/report.py
+python3 /path/to/cursor-autonomous-coding/scripts/report.js
 
 # 7. 继续下一个任务
-python3 /path/to/cursor-autonomous-coding/scripts/next_task.py
+python3 /path/to/cursor-autonomous-coding/scripts/next-task.js
 ```
 
 ## 贡献指南

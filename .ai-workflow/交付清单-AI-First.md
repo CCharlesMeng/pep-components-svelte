@@ -72,7 +72,7 @@
 
 所有脚本位于 `scripts/` 目录：
 
-1. **`scaffold_component.py`** - 组件脚手架生成
+1. **`scaffold-component.js`** - 组件脚手架生成
    - ✅ 三种模式：minimal / standard / custom
    - ✅ 智能模板生成
    - ✅ 根据 template_data 定制代码
@@ -81,7 +81,7 @@
    - ✅ 生成初始 features.json
    - ✅ 初始化 session_state.json
 
-2. **`generate_features.py`** - 任务生成
+2. **`generate-features.js`** - 任务生成
    - ✅ 读取 spec.md
    - ✅ 验证内容完整性
    - ✅ 备份现有 features.json
@@ -363,8 +363,8 @@ AI: ✅ 状态检查完成！一切正常
 - `.cursor/commands/pep-check.md`
 
 ### 2. 后端脚本 (2 个新增)
-- `scripts/scaffold_component.py`
-- `scripts/generate_features.py`
+- `scripts/scaffold-component.js`
+- `scripts/generate-features.js`
 
 ### 3. 文档 (2 个核心)
 - `cursor-autonomous-coding/AI-FIRST-WORKFLOW.md` (完整流程说明)

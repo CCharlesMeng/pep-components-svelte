@@ -108,7 +108,7 @@ AI: [生成定制脚手架]
 ```
 
 **AI 在后台做了什么**：
-1. 调用 `scaffold_component.py --mode custom`
+1. 调用 `scaffold-component.js --mode custom`
 2. 根据理解生成定制代码
 3. 创建 spec.md 草稿（包含提取的需求）
 4. 初始化 session_state.json

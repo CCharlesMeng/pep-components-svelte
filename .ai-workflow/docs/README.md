@@ -65,7 +65,7 @@ docs/
 2. **快速上手**: [QUICKSTART.md](./quickstart/QUICKSTART.md)
 3. 根据项目类型选择：
    - Monorepo → [02-单组件开发.md](./guides/02-单组件开发.md)
-   - 标准项目 → 直接使用 `next_task.py` 命令
+   - 标准项目 → 直接使用 `next-task.js` 命令
 
 ### 我要开发单个组件（Monorepo）
 
@@ -94,44 +94,44 @@ docs/
 
 ```bash
 # 初始化组件
-python3 scripts/init_component.py --component <组件名>
+node scripts/init-component.js --component <组件名>
 
 # 获取任务
-python3 scripts/next_task.py --component <组件名> --save
+node scripts/next-task.js --component <组件名> --save
 
 # 标记完成
-python3 scripts/mark_done.py --component <组件名> --feature-id <ID>
+node scripts/mark-done.js --component <组件名> --feature-id <ID>
 
 # 查看进度
-python3 scripts/report.py --component <组件名>
+node scripts/report.js --component <组件名>
 
 # 全局汇总
-python3 scripts/monorepo_summary.py
+node scripts/monorepo-summary.js
 
 # 验证全局规则
-python3 scripts/validate_global_rules.py --component <组件名>
+node scripts/validate-global-rules.js --component <组件名>
 
 # 全自动化模式
-python3 scripts/auto_develop.py --component <组件名>
+node scripts/auto-develop.js --component <组件名>
 ```
 
 ### 标准项目模式
 
 ```bash
 # 初始化项目
-python3 scripts/init_project.py --spec spec.md
+node scripts/init-project.js --spec spec.md
 
 # 获取任务
-python3 scripts/next_task.py --save
+node scripts/next-task.js --save
 
 # 标记完成
-python3 scripts/mark_done.py --feature-id <ID>
+node scripts/mark-done.js --feature-id <ID>
 
 # 查看进度
-python3 scripts/report.py
+node scripts/report.js
 
 # 验证清单
-python3 scripts/validate.py
+node scripts/validate.js
 ```
 
 ---
@@ -153,7 +153,7 @@ python3 scripts/validate.py
    
    标准项目:
    └─> 直接使用命令开始开发
-       └─> python3 scripts/init_project.py --spec spec.md
+       └─> node scripts/init-project.js --spec spec.md
 ```
 
 ### 进阶路径
@@ -197,13 +197,13 @@ python3 scripts/validate.py
 
 ```
 1. 获取任务
-   python3 scripts/next_task.py --save
+   node scripts/next-task.js --save
 
 2. Cursor中开发
    复制提示词 → AI对话 → 编码
 
 3. 标记完成
-   python3 scripts/mark_done.py --feature-id N
+   node scripts/mark-done.js --feature-id N
 
 4. 提交代码
    git commit
@@ -218,7 +218,7 @@ python3 scripts/validate.py
 | **适用场景** | 100+组件，多人维护 | 单体应用，中小型项目 |
 | **命令参数** | 需要 `--component` | 无需 `--component` |
 | **功能清单位置** | `components/xxx/features.json` | `features.json` |
-| **全局汇总** | ✅ 支持 `monorepo_summary.py` | ❌ 不需要 |
+| **全局汇总** | ✅ 支持 `monorepo-summary.js` | ❌ 不需要 |
 | **全局规则** | ✅ 支持 `global-rules.json` | ❌ 不需要 |
 
 ---
@@ -228,7 +228,7 @@ python3 scripts/validate.py
 ### 遇到问题
 
 1. 查看对应指南的"常见问题"章节
-2. 运行 `python3 scripts/validate.py` 检查配置
+2. 运行 `node scripts/validate.js` 检查配置
 3. 查看 `DEVELOPMENT.md` 了解开发历史
 
 ### 找不到文档

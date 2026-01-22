@@ -49,17 +49,17 @@ done
 # 3. 检查脚本
 echo ""
 echo "3️⃣  检查脚本..."
-if [ -f "scripts/scaffold_component.py" ]; then
-    echo "✅ scaffold_component.py 存在"
+if [ -f "scripts/scaffold-component.js" ]; then
+    echo "✅ scaffold-component.js 存在"
     
     # 检查是否使用了模板拷贝方式
-    if grep -q "TEMPLATE_DIR" scripts/scaffold_component.py; then
+    if grep -q "TEMPLATE_DIR" scripts/scaffold-component.js; then
         echo "✅ 脚本已更新为模板拷贝模式"
     else
         echo "⚠️  脚本可能未更新"
     fi
 else
-    echo "❌ scaffold_component.py 不存在"
+    echo "❌ scaffold-component.js 不存在"
     exit 1
 fi
 
@@ -78,7 +78,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     
     # 运行脚本
     echo "运行脚本生成测试组件..."
-    python3 scripts/scaffold_component.py \
+    node scripts/scaffold-component.js \
         --component "$TEST_COMPONENT" \
         --mode minimal \
         --template-data '{
