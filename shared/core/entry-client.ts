@@ -1,4 +1,5 @@
 // @ts-ignore - $component is an alias
+import '/@shared/styles/tokens/semantic.css';
 import Component from '$component';
 import { hydrate, type Component as SvelteComponent } from 'svelte';
 

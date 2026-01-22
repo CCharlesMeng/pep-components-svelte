@@ -1,0 +1,16 @@
+{
+  "title": "组件标题 (Mock)",
+  "description": "这是一个基于 Svelte 5 的示例组件，展示了如何使用子组件和共享组件。",
+  "buttonText": "增加计数",
+  "header": {
+    "title": "楼层标题",
+    "subTitle": "楼层副标题"
+  },
+  "spacing": {
+    "isMergeTopSpacing": false,
+    "isMergeBottomSpacing": false
+  },
+  "visibility": {
+    "isShowMb": true
+  }
+}

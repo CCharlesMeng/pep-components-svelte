@@ -1,3 +1,3 @@
-export { default as {{COMPONENT_NAME_PASCAL}} } from './{{COMPONENT_NAME}}.svelte';
+export { default as {{COMPONENT_NAME_PASCAL}} } from './index.svelte';
 export type * from './types';
 

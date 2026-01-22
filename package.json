@@ -2,6 +2,7 @@
     "name": "pep-components-svelte-monorepo",
     "version": "0.0.0",
     "private": true,
+    "type": "module",
     "scripts": {
         "build": "pnpm -r build",
         "dev": "node scripts/dev-pkg.js",

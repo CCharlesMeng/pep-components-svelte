@@ -17,7 +17,7 @@ async function main() {
 
   const child = spawn('pnpm', ['--filter', pkgName, 'dev'], {
     stdio: 'inherit',
-    shell: true,
+    shell: false,
   });
 
   child.on('exit', (code) => {

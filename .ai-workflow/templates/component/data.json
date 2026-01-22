@@ -1,6 +1,0 @@
-{
-  "title": "示例组件标题",
-  "description": "这是一个从 data.json 加载的示例组件，包含卡片、按钮和响应式状态",
-  "buttonText": "增加计数"
-}
-

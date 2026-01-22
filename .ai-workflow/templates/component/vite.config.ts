@@ -1,3 +1,6 @@
-import sharedConfig from '@pep/config/vite.config';
+import { createComponentConfig } from '../../shared/config/vite.factory';
 
-export default sharedConfig();
+export default createComponentConfig({
+    cwd: process.cwd(),
+    name: '{{COMPONENT_NAME_PASCAL}}'
+});

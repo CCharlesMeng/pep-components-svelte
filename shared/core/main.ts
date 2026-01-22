@@ -1,3 +1,4 @@
+import '/@shared/styles/tokens/semantic.css';
 import Component from '$component';
 import data from '$data';
 

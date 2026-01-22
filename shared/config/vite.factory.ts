@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 // Get current directory of this factory file
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const sharedRoot = resolve(__dirname, '../../'); // Go up from shared/config to root
+const projectRoot = resolve(__dirname, '../../'); // Go up from shared/config to project root
 
 /**
  * Shared Vite configuration factory for PEP components
@@ -17,7 +17,7 @@ const sharedRoot = resolve(__dirname, '../../'); // Go up from shared/config to 
  * @returns {import('vite').UserConfig}
  */
 export function createComponentConfig({ cwd, name }) {
-    const sharedCoreDir = resolve(sharedRoot, 'shared/core');
+    const sharedCoreDir = resolve(projectRoot, 'shared/core');
 
     // Common aliases for all modes
     // Priority: mocks/index.ts > mocks/index.js > mocks/default.json
@@ -36,7 +36,7 @@ export function createComponentConfig({ cwd, name }) {
         '$component': resolve(cwd, 'src/index.svelte'), // Convention: main component is src/index.svelte
         '$loader': resolve(cwd, 'src/component.server.ts'),
         '$data': dataPath,
-        '/@shared': resolve(sharedRoot, 'shared')
+        '/@shared': resolve(projectRoot, 'shared')
     };
 
     return defineConfig(({ command, mode }) => {
@@ -136,8 +136,8 @@ export function createComponentConfig({ cwd, name }) {
                     name: 'serve-shared-html',
                     configureServer(server) {
                         server.middlewares.use((req, res, next) => {
-                            if (req.url === '/' || req.url === '/index.html') {
-                                const templatePath = resolve(sharedRoot, 'shared/templates/index.html');
+                                if (req.url === '/' || req.url === '/index.html') {
+                                const templatePath = resolve(projectRoot, 'shared/templates/index.html');
                                 try {
                                     const html = fs.readFileSync(templatePath, 'utf-8');
                                     // Transform HTML to let Vite inject its client scripts
