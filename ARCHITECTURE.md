@@ -143,8 +143,8 @@ export function createCountdown(interval = 1000) {
 ```
 components/your-component/
 ├── src/
-│   ├── index.svelte              # 主组件（< 100 行）
-│   ├── types.ts                  # 类型定义
+│   ├── index.svelte              # 主组件（遵循特征架构 pickTrait）
+│   ├── types.ts                  # 类型定义（使用 UseTraits 组合）
 │   ├── component.server.ts       # 服务端数据
 │   │
 │   ├── components/               # 子组件
@@ -159,13 +159,61 @@ components/your-component/
 │
 ├── tests/
 │   ├── unit/
+│   │   └── consistency.spec.ts   # 一致性看护测试
 │   └── integration/
 │
 ├── data.json
 └── README.md
 ```
 
-### 共享资源结构
+---
+
+## 🧩 特征架构 (Trait-based Architecture)
+
+为了应对 100+ 组件能力的复用与分发，本项目采用 **特征注册 (Trait Registry)** 模式。其核心目标是解耦通用能力（如标题、间距、显隐等）与业务逻辑。
+
+### 1. 类型注册 (types.ts)
+禁止深层 `extends`。必须将业务属性与通用楼层特征进行交叉组合。
+
+```typescript
+import type { UseTraits } from "/@shared/ui/types";
+
+// ✅ 正确：定义业务属性并组合特征
+export interface CardBusinessProps {
+  cardType?: 'left' | 'center';
+}
+
+export type YourComponentProps = CardBusinessProps & UseTraits<'header' | 'spacing' | 'visibility'>;
+```
+
+### 2. 显式属性分拣 (index.svelte)
+主组件入口禁止大规模解构 Props。必须使用 `pickTrait` 显式声明属性流向，分发给共享组件。
+
+```svelte
+<script lang="ts">
+  import { pickTrait } from "/@shared/ui/traits";
+  let props: YourComponentProps = $props();
+
+  // 1. 透明分拣特征属性
+  const headerProps = $derived(pickTrait(props, 'header'));
+  const spacingProps = $derived(pickTrait(props, 'spacing'));
+
+  // 2. 局部使用业务属性
+  const { cardType } = props;
+</script>
+
+<div class:merge-top={spacingProps.isMergeTopSpacing}>
+  <FloorHeader {...headerProps} />
+  <CardGrid type={cardType} />
+</div>
+```
+
+### 3. 一致性看护
+每个组件必须在 `tests/unit/consistency.spec.ts` 中编写看护用例，确保 `schema.json`、`types.ts` 与 `pickTrait` 映射表完全一致。
+
+---
+
+## 共享资源结构
 
 ```
 shared/

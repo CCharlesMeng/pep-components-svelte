@@ -12,31 +12,32 @@
   // 本地业务组件
   import CardGrid from "./components/CardGrid.svelte";
 
+  import { pickTrait } from "/@shared/ui/traits";
+
   // 2. Props 定义 (严格对应 schema.json)
-  let {
-    title = "",
-    titleMb = "",
-    subtitle = "",
-    subtitleMb = "",
-    more = { text: "", href: "" },
+  let props: PepCommonCardV2Props & { children?: Snippet } = $props();
+
+  // 3. 业务逻辑默认值处理 (仅针对本组件逻辑使用的属性)
+  const {
     cardType = "center",
     theme = "white",
     cardBgColor = "gray",
     cardColumn = "3",
     imgHeight = "80px",
-    isMergeTopSpacing = true,
-    isMergeBottomSpacing = true,
-    isShowMb = false,
     showCardDesc = true,
     tabList = [],
-    children,
-  } = $props<PepCommonCardV2Props & { children?: Snippet }>();
+  } = props;
 
-  // 3. 状态管理
+  // 4. 状态管理
   const timer = createTimer();
   let activeTabIndex = $state(0);
 
-  // 4. 派生状态
+  // 5. 特征分拣 (Explicit Forwarder) - 自动同步 Trait 属性
+  const headerProps = $derived(pickTrait(props, "header"));
+  const spacingProps = $derived(pickTrait(props, "spacing"));
+  const visibilityProps = $derived(pickTrait(props, "visibility"));
+
+  // 6. 派生状态
   const activeTab = $derived(tabList[activeTabIndex]);
   const displayProducts = $derived(
     activeTab?.cards?.products?.filter(
@@ -49,12 +50,12 @@
   class="pep-common-card-v2"
   class:theme-grey={theme === "grey"}
   class:theme-white={theme === "white"}
-  class:merge-top={isMergeTopSpacing}
-  class:merge-bottom={isMergeBottomSpacing}
-  class:hide-mb={!isShowMb}
+  class:merge-top={spacingProps.isMergeTopSpacing ?? true}
+  class:merge-bottom={spacingProps.isMergeBottomSpacing ?? true}
+  class:hide-mb={visibilityProps.isShowMb === false}
 >
   <div class="pep-common-card-v2__container">
-    <FloorHeader {title} {titleMb} {subtitle} {subtitleMb} {more} />
+    <FloorHeader {...headerProps} />
 
     <div class="pep-common-card-v2__content">
       <FloorTabs {tabList} bind:activeTabIndex />
@@ -72,7 +73,7 @@
         />
       {/if}
 
-      {@render children?.()}
+      {@render props.children?.()}
     </div>
   </div>
 </div>

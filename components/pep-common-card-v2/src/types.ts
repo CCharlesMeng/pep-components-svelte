@@ -1,21 +1,9 @@
+import type { UseTraits, TabItem as BaseTabItem } from "/@shared/ui/types";
+
 /**
- * PepCommonCardV2 组件的 Props 类型定义
- * 严格对应 schema.json 的属性结构
+ * 1. 定义该组件特有的“纯业务”属性
  */
-export interface PepCommonCardV2Props {
-  /** 楼层标题 (支持 HTML) */
-  title?: string;
-  /** 移动端楼层标题 */
-  titleMb?: string;
-  /** 楼层副标题 (支持富文本) */
-  subtitle?: string;
-  /** 移动端楼层副标题 */
-  subtitleMb?: string;
-  /** 更多链接配置 */
-  more?: {
-    text?: string;
-    href?: string;
-  };
+export interface CardBusinessProps {
   /** PC 端卡片样式 */
   cardType?: 'left' | 'center' | 'product';
   /** 背景色主题 */
@@ -26,21 +14,19 @@ export interface PepCommonCardV2Props {
   cardColumn?: '2' | '3' | '4' | '5';
   /** 图片/图标高度 */
   imgHeight?: '80px' | '60px' | '48px';
-  /** 是否显示楼层顶部间距 */
-  isMergeTopSpacing?: boolean;
-  /** 是否显示楼层底部间距 */
-  isMergeBottomSpacing?: boolean;
-  /** 移动端是否展示 */
-  isShowMb?: boolean;
   /** 是否展示卡片描述 */
   showCardDesc?: boolean;
   /** 页签列表 */
   tabList?: TabItem[];
 }
 
-export interface TabItem {
-  /** Tab 标题 */
-  title?: string;
+/**
+ * 2. 导出组合后的最终 Props
+ * 通过 UseTraits 一眼看出该组件集成了哪些通用能力
+ */
+export type PepCommonCardV2Props = CardBusinessProps & UseTraits<'header' | 'spacing' | 'visibility'>;
+
+export interface TabItem extends BaseTabItem {
   /** 移动端布局方式 */
   layoutMb?: 'upDownLayout' | 'leftRightLayout';
   /** 内容区 */

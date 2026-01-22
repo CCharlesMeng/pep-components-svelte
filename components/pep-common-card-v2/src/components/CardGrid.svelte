@@ -10,7 +10,7 @@
     imgHeight = "80px",
     showCardDesc = true,
     layoutMb = undefined,
-    now
+    now,
   } = $props<{
     products: ProductItem[];
     cardColumn?: string;

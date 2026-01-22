@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { FloorHeaderProps } from "./types";
     /**
      * 通用楼层头部组件
      * 支持 PC/移动端 标题、副标题及“更多”链接
@@ -9,13 +10,7 @@
         subtitle = "",
         subtitleMb = "",
         more = undefined
-    } = $props<{
-        title?: string;
-        titleMb?: string;
-        subtitle?: string;
-        subtitleMb?: string;
-        more?: { text?: string; href?: string } | undefined;
-    }>();
+    }: FloorHeaderProps = $props();
 </script>
 
 {#if title || subtitle || titleMb || subtitleMb}

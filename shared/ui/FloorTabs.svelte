@@ -1,19 +1,12 @@
 <script lang="ts">
+    import type { FloorTabsProps } from "./types";
     /**
      * 通用楼层页签组件
      */
-    interface TabItem {
-        title?: string;
-        [key: string]: any;
-    }
-
     let {
         tabList = [],
         activeTabIndex = $bindable(0)
-    } = $props<{
-        tabList?: TabItem[];
-        activeTabIndex?: number;
-    }>();
+    }: FloorTabsProps = $props();
 </script>
 
 {#if tabList && tabList.length > 1}
