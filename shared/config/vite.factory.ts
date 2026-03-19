@@ -16,7 +16,8 @@ const projectRoot = resolve(__dirname, '../../'); // Go up from shared/config to
  * @param {string} options.name - Component library name (e.g., 'NavigateLinkData')
  * @returns {import('vite').UserConfig}
  */
-export function createComponentConfig({ cwd, name }) {
+export function createComponentConfig(options: { cwd: string; name: string }) {
+    const { cwd, name } = options;
     const sharedCoreDir = resolve(projectRoot, 'shared/core');
 
     // Common aliases for all modes

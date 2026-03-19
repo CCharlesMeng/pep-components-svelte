@@ -29,6 +29,11 @@ You are an expert Svelte 5 developer. Strictly follow Svelte 5 syntax and Runes 
 ## 6. CSS & Styling
 - Use `<style>` blocks or Tailwind CSS (if detected in the project).
 - Prefer CSS variables for dynamic styling controlled by runes.
+- Component CSS Rules:
+- All selectors must be scoped by a component root class (e.g. `.pep-xxx ...`).
+- Do not use bare tag selectors (`a`, `button`, `iframe`, etc.); always add a component prefix.
+- `:global(...)` is allowed only with an explicit component parent prefix.
+- Any injected/remote CSS must be namespaced to the component container before rendering.
 
 ## 7. Forbidden Syntax (Strictly Enforce)
 - NO `export let`

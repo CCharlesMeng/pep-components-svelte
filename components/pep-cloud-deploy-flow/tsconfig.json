@@ -1,0 +1,19 @@
+{
+    "extends": "../../shared/config/tsconfig.json",
+    "compilerOptions": {
+        "moduleResolution": "bundler",
+        "target": "esnext",
+        "module": "esnext",
+        "types": [
+            "svelte",
+            "vite/client"
+        ]
+    },
+    "include": [
+        "src/**/*",
+        "mocks/**/*",
+        "tests/**/*",
+        "vite.config.ts",
+        "../../types.d.ts"
+    ]
+}

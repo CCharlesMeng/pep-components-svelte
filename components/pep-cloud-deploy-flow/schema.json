@@ -1,0 +1,618 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Cloud Deploy Flow",
+  "additionalProperties": false,
+  "required": [
+    "navbar",
+    "sidebar",
+    "mainContent",
+    "iframePages"
+  ],
+  "properties": {
+    "navbar": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "logo",
+        "breadcrumbs",
+        "rightActions"
+      ],
+      "properties": {
+        "logo": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "img",
+            "text"
+          ],
+          "properties": {
+            "img": {
+              "title": "Logo 图片地址",
+              "type": "string",
+              "ui:widget": "imageSelector"
+            },
+            "text": {
+              "title": "Logo 文本",
+              "type": "string"
+            }
+          }
+        },
+        "breadcrumbs": {
+          "title": "面包屑",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "text"
+            ],
+            "properties": {
+              "text": {
+                "title": "文案",
+                "type": "string"
+              },
+              "url": {
+                "title": "链接",
+                "type": "string",
+                "ui:options": { "format": "url" }
+              }
+            }
+          }
+        },
+        "rightActions": {
+          "title": "右侧操作",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "icon",
+              "text"
+            ],
+            "properties": {
+              "icon": {
+                "title": "图标地址（真实图标 URL）",
+                "type": "string"
+              },
+              "text": {
+                "title": "文案",
+                "type": "string"
+              },
+              "url": {
+                "title": "链接",
+                "type": "string",
+                "ui:options": { "format": "url" }
+              }
+            }
+          }
+        },
+        "endDeployment": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "buttonText",
+            "modal",
+            "successPage"
+          ],
+          "properties": {
+            "buttonText": {
+              "title": "按钮文案",
+              "type": "string"
+            },
+            "icon": {
+              "title": "按钮图标地址（真实图标 URL）",
+              "type": "string"
+            },
+            "modal": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "title",
+                "content",
+                "confirmText"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "icon": {
+                  "title": "提示图标地址",
+                  "type": "string"
+                },
+                "content": {
+                  "type": "string"
+                },
+                "confirmText": {
+                  "type": "string"
+                }
+              }
+            },
+            "successPage": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "title",
+                "items",
+                "redeployText"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "title": "结束页描述文案",
+                  "type": "string"
+                },
+                "items": {
+                  "title": "快捷入口卡片列表",
+                  "type": "array",
+                  "default": [],
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["icon", "text", "url"],
+                    "properties": {
+                      "icon": {
+                        "title": "图标地址（真实图标 URL）",
+                        "type": "string"
+                      },
+                      "text": {
+                        "title": "文案",
+                        "type": "string"
+                      },
+                      "url": {
+                        "title": "跳转链接",
+                        "type": "string",
+                        "ui:options": { "format": "url" }
+                      }
+                    }
+                  }
+                },
+                "redeployText": {
+                  "title": "重新部署按钮文案",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "sidebar": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tabs",
+        "footer",
+        "texts"
+      ],
+      "properties": {
+        "icons": {
+          "title": "侧边栏右上角图标（真实图标 URL）",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "floatIcon": { "type": "string" },
+            "switchToSideModeIcon": { "title": "悬浮态切回侧边模式图标", "type": "string" },
+            "minimizeToSideIcon": { "title": "全屏态切回侧边模式图标", "type": "string" },
+            "fullscreenIcon": { "type": "string" },
+            "collapseIcon": { "type": "string" },
+            "stepCheckedIcon": { "title": "步骤条已完成状态图标", "type": "string" }
+          }
+        },
+        "tabs": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "title"
+            ],
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "applications": {
+                "title": "应用列表，每个应用对应一套 steps；未配置或为空时不展示下拉框",
+                "type": "array",
+                "default": [],
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["title", "steps"],
+                  "properties": {
+                    "title": { "type": "string" },
+                    "steps": {
+                      "type": "array",
+                      "default": [],
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["title", "remoteContent"],
+                        "properties": {
+                          "title": { "type": "string" },
+                          "remoteContent": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": ["source"],
+                            "properties": {
+                              "source": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": ["htmlUrl"],
+                                "properties": {
+                                  "htmlUrl": { "type": "string" },
+                                  "cssUrl": { "type": "string" }
+                                }
+                              },
+                              "preloaded": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "html": { "type": "string" },
+                                  "css": { "type": "string" }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "steps": {
+                "title": "步骤列表，无 applications 时使用",
+                "type": "array",
+                "default": [],
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "title",
+                    "remoteContent"
+                  ],
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "remoteContent": {
+                      "type": "object",
+                      "additionalProperties": false,
+                    "required": [
+                        "source"
+                      ],
+                      "properties": {
+                        "source": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": ["htmlUrl"],
+                          "properties": {
+                            "htmlUrl": {
+                              "type": "string"
+                            },
+                            "cssUrl": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "preloaded": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                            "html": { "type": "string" },
+                            "css": { "type": "string" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "footer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "prevText",
+            "nextText"
+          ],
+          "properties": {
+            "prevText": {
+              "type": "string"
+            },
+            "nextText": {
+              "type": "string"
+            }
+          }
+        },
+        "texts": {
+          "title": "侧边栏文案配置",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "openExternalDefaultTitle",
+            "remoteLoadingText",
+            "remoteLoadFailedText",
+            "remoteFallbackMessageTemplate",
+            "remoteFallbackLinkText"
+          ],
+          "properties": {
+            "openExternalDefaultTitle": {
+              "title": "链接缺失标题时的默认标题",
+              "type": "string"
+            },
+            "remoteLoadingText": {
+              "title": "远程内容加载中文案",
+              "type": "string"
+            },
+            "remoteLoadFailedText": {
+              "title": "远程内容加载失败文案",
+              "type": "string"
+            },
+            "remoteFallbackMessageTemplate": {
+              "title": "远程内容降级文案模板（支持 {tabLabel}/{stepId}/{stepLabel}）",
+              "type": "string"
+            },
+            "remoteFallbackLinkText": {
+              "title": "远程内容降级链接文案",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "mainContent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "notice",
+        "cloudProducts",
+        "deploymentEstimate",
+        "action",
+        "agreement"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "notice": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "title",
+            "contentHtml"
+          ],
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "contentHtml": {
+              "type": "string"
+            }
+          }
+        },
+        "cloudProducts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "title",
+            "products"
+          ],
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "products": {
+              "type": "array",
+              "default": [],
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "icon",
+                  "text",
+                  "url"
+                ],
+                "properties": {
+                  "icon": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string",
+                    "ui:options": { "format": "url" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deploymentEstimate": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "price",
+            "priceNote",
+            "duration",
+            "durationLabel"
+          ],
+          "properties": {
+            "price": {
+              "type": "string"
+            },
+            "priceNote": {
+              "type": "string"
+            },
+            "duration": {
+              "type": "string"
+            },
+            "durationLabel": {
+              "type": "string"
+            }
+          }
+        },
+        "action": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "buttonText",
+            "url",
+            "launchTitle"
+          ],
+          "properties": {
+            "buttonText": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string",
+              "ui:options": { "format": "url" }
+            },
+            "launchTitle": {
+              "title": "部署启动后页签标题",
+              "type": "string"
+            }
+          }
+        },
+        "agreement": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "contentHtml"
+          ],
+          "properties": {
+            "contentHtml": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "backgroundImage": {
+      "title": "全局背景图片地址，应用于部署引导页、实操结束页和伪浏览器空白页",
+      "type": "string"
+    },
+    "iframePages": {
+      "title": "伪浏览器与新建页配置",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "newTabPage"
+      ],
+      "properties": {
+        "domainWhitelistPatterns": {
+          "title": "伪浏览器域名白名单（pattern 列表）",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "icons": {
+          "title": "伪浏览器图标资源（真实图标 URL）",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "headerLogo": { "title": "地址栏 URL 前缀图标", "type": "string" },
+            "addTab": { "title": "新建页签图标", "type": "string" },
+            "collapse": { "title": "折叠左侧面板图标", "type": "string" },
+            "fullscreen": { "title": "全屏伪浏览器图标", "type": "string" },
+            "closeTab": { "title": "页签关闭图标", "type": "string" },
+            "switchToSideIcon": { "title": "全屏时切回侧边模式图标", "type": "string" }
+          }
+        },
+        "newTabPage": {
+          "title": "新建页配置",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tabTitle",
+            "title",
+            "addressPlaceholder",
+            "shortcuts"
+          ],
+          "properties": {
+            "tabTitle": { "title": "新标签页页签标题", "type": "string" },
+            "title": {
+              "title": "新建页主标题",
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "text"
+              ],
+              "properties": {
+                "icon": { "title": "主标题图标 URL", "type": "string" },
+                "text": { "title": "主标题文案", "type": "string" }
+              }
+            },
+            "addressPlaceholder": {
+              "title": "新建标签页地址栏 placeholder 文案",
+              "type": "string"
+            },
+            "shortcuts": {
+              "title": "快捷入口配置",
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "title",
+                "items"
+              ],
+              "properties": {
+                "title": { "title": "快捷入口区域标题", "type": "string" },
+                "items": {
+                  "title": "快捷入口列表",
+                  "type": "array",
+                  "default": [],
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["icon", "text", "url"],
+                    "properties": {
+                      "icon": { "title": "快捷入口图标 URL", "type": "string" },
+                      "text": { "title": "快捷入口名称", "type": "string" },
+                      "url": {
+                        "title": "快捷入口跳转链接",
+                        "type": "string",
+                        "ui:options": { "format": "url" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "commonConfig": {
+      "title": "组件公共配置",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "icons": {
+          "title": "折叠态恢复图标",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "sidebarMinimizeIcon": {
+              "title": "侧边栏折叠后恢复图标（左侧）",
+              "type": "string"
+            },
+            "browserMinimizeIcon": {
+              "title": "伪浏览器折叠后恢复图标（右侧）",
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
