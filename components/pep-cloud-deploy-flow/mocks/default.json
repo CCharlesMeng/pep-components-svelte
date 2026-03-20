@@ -61,11 +61,12 @@
   "sidebar": {
     "icons": {
       "floatIcon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/sidebarIcon/switchToFloatMode.svg",
-      "fullscreenIcon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/sidebarIcon/switchToFullMode.svg",
       "collapseIcon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/sidebarIcon/sidebarClose.svg",
       "switchToSideModeIcon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/sidebarIcon/switchToSideMode.svg",
-      "stepCheckedIcon":"https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/sidebarIcon/stepChecked.svg",
-      "minimizeToSideIcon":"https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/sidebarIcon/minimizeToSideMode.svg"
+      "stepCheckedIcon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/sidebarIcon/stepChecked.svg",
+      "minimizeToSideIcon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/sidebarIcon/minimizeToSideMode.svg",
+      "sideResizeIcon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/sidebarIcon/resize.svg",
+      "sidebarMinimizeIcon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/commonIcon/miniSidebarIcon.svg"
     },
     "tabs": [
       {
@@ -152,7 +153,8 @@
       "remoteLoadingText": "加载内容中...",
       "remoteLoadFailedText": "内容加载失败",
       "remoteFallbackMessageTemplate": "这是来自远程资源的内容占位，当前位于 {tabLabel} 的第 {stepId} 步（{stepLabel}）。链接异常，您可以手动复制打开此链接。",
-      "remoteFallbackLinkText": "打开远程链接"
+      "remoteFallbackLinkText": "打开远程链接",
+      "miniIconHoverText":"帮助手册"
     }
   },
   "mainContent": {
@@ -204,7 +206,6 @@
     "icons": {
       "headerLogo": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/browserIcon/HWCloudLogo.svg",
       "addTab": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/browserIcon/broswerTagAdd.svg",
-      "collapse": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/browserIcon/broswerDelete.svg",
       "fullscreen": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/browserIcon/broserFullScreenIcon.svg",
       "closeTab": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/browserIcon/broswerTagDelete.svg",
       "switchToSideIcon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/browserIcon/browserSwitchToSide.svg"
@@ -213,7 +214,7 @@
       "tabTitle": "新标签页",
       "title": {
         "icon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/infoIcon.png",
-        "text": "本区域为操作区，请参考左侧操作手册指引进行操作"
+        "text": "本区域为操作区，请参考右侧操作手册指引进行操作"
       },
       "addressPlaceholder": "输入huaweicloud.com域名下的地址，直接访问",
       "shortcuts": {
@@ -231,12 +232,6 @@
           }
         ]
       }
-    }
-  },
-  "commonConfig":{
-    "icons":{
-      "sidebarMinimizeIcon":"https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/commonIcon/iconLeft.svg",
-      "browserMinimizeIcon":"https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/commonIcon/iconRight.svg"
     }
   }
 }

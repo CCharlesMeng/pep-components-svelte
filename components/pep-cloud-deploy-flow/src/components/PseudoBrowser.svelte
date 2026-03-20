@@ -11,7 +11,6 @@
         isBrowserFullscreen?: boolean;
         onClose?: () => void;
         onFullscreen?: () => void;
-        onCollapse?: () => void;
         onSwitchToSideMode?: () => void;
     }
 
@@ -22,7 +21,6 @@
         isBrowserFullscreen = false,
         onClose,
         onFullscreen,
-        onCollapse,
         onSwitchToSideMode,
     }: Props = $props();
     let tabs = $state<BrowserTab[]>([]);
@@ -311,26 +309,6 @@
                     </svg>
                 {/if}
             </button>
-            <button
-                type="button"
-                class="pep-cloud-deploy-flow-browser__tool-btn"
-                onclick={onCollapse}
-                aria-label="折叠左侧面板"
-            >
-                {#if iframePages?.icons?.collapse}
-                    <img src={iframePages.icons.collapse} alt="" />
-                {:else}
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path
-                            d="M5 12h14"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                        ></path>
-                    </svg>
-                {/if}
-            </button>
         {/if}
     </div>
 
@@ -455,6 +433,7 @@
         gap: 6px;
         cursor: pointer;
         font-size: 12px;
+        line-height: 16px;
         max-width: 220px;
         position: relative;
         transition: background-color 0.15s;

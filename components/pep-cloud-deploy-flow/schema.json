@@ -208,16 +208,17 @@
       ],
       "properties": {
         "icons": {
-          "title": "侧边栏右上角图标地址",
+          "title": "侧栏头部工具区图标地址",
           "type": "object",
           "additionalProperties": false,
           "properties": {
             "floatIcon": { "title": "切换悬浮态图标", "type": "string", "ui:widget": "imageSelector" },
             "switchToSideModeIcon": { "title": "悬浮态切回侧边模式图标", "type": "string", "ui:widget": "imageSelector" },
             "minimizeToSideIcon": { "title": "全屏态切回侧边模式图标", "type": "string", "ui:widget": "imageSelector" },
-            "fullscreenIcon": { "title": "切换全屏态图标", "type": "string", "ui:widget": "imageSelector" },
             "collapseIcon": { "title": "折叠侧边栏图标", "type": "string", "ui:widget": "imageSelector" },
-            "stepCheckedIcon": { "title": "步骤条已完成状态图标", "type": "string", "ui:widget": "imageSelector" }
+            "stepCheckedIcon": { "title": "步骤条已完成状态图标", "type": "string", "ui:widget": "imageSelector" },
+            "sideResizeIcon": { "title": "侧栏左侧拖拽手柄图标", "type": "string", "ui:widget": "imageSelector" },
+            "sidebarMinimizeIcon": { "title": "侧栏折叠后恢复图标（视口右侧纵向居中）", "type": "string", "ui:widget": "imageSelector" }
           }
         },
         "tabs": {
@@ -586,7 +587,6 @@
           "properties": {
             "headerLogo": { "title": "地址栏前缀图标地址", "type": "string", "ui:widget": "imageSelector" },
             "addTab": { "title": "新建页签图标", "type": "string", "ui:widget": "imageSelector" },
-            "collapse": { "title": "折叠左侧面板图标", "type": "string", "ui:widget": "imageSelector" },
             "fullscreen": { "title": "全屏伪浏览器图标", "type": "string", "ui:widget": "imageSelector" },
             "closeTab": { "title": "页签关闭图标", "type": "string", "ui:widget": "imageSelector" },
             "switchToSideIcon": { "title": "全屏时切回侧边模式图标", "type": "string", "ui:widget": "imageSelector" }
@@ -651,30 +651,6 @@
                   }
                 }
               }
-            }
-          }
-        }
-      }
-    },
-    "commonConfig": {
-      "title": "组件公共配置",
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "icons": {
-          "title": "折叠态恢复图标",
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "sidebarMinimizeIcon": {
-              "title": "侧边栏折叠后恢复图标（左侧）",
-              "type": "string",
-              "ui:widget": "imageSelector"
-            },
-            "browserMinimizeIcon": {
-              "title": "伪浏览器折叠后恢复图标（右侧）",
-              "type": "string",
-              "ui:widget": "imageSelector"
             }
           }
         }

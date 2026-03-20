@@ -91,20 +91,23 @@ export interface SidebarTexts {
     remoteLoadFailedText: string;
     remoteFallbackMessageTemplate: string;
     remoteFallbackLinkText: string;
+    miniIconHoverText?: string;
 }
 
-/** 侧边栏右上角工具按钮图标（真实图标 URL，可填空字符串后填入） */
+/** 侧栏头部工具区图标（悬浮/全屏/折叠等，真实图标 URL） */
 export interface SidebarIcons {
     floatIcon?: string;
     switchToSideModeIcon?: string;
     minimizeToSideIcon?: string;
-    fullscreenIcon?: string;
     collapseIcon?: string;
     stepCheckedIcon?: string;
+    sideResizeIcon?: string;
+    /** 侧栏折叠后用于恢复的图标（视口右侧纵向居中） */
+    sidebarMinimizeIcon?: string;
 }
 
 export interface SidebarConfig {
-    /** 右上角图标：悬浮/全屏/折叠，填入图标地址 */
+    /** 头部工具区图标：悬浮/全屏/折叠等 */
     icons?: SidebarIcons;
     tabs: SidebarTab[];
     footer: SidebarFooter;
@@ -148,8 +151,6 @@ export interface IframePageIconConfig {
     headerLogo?: string;
     /** 新建页签图标 */
     addTab?: string;
-    /** 折叠左侧面板图标 */
-    collapse?: string;
     /** 全屏伪浏览器图标 */
     fullscreen?: string;
     /** 每个页签的关闭图标 */
@@ -202,18 +203,6 @@ export interface IframePagesConfig {
     domainWhitelistPatterns?: string[];
 }
 
-/** 折叠态公共图标配置 */
-export interface CommonIconsConfig {
-    /** 侧边栏折叠后用于恢复的图标（左侧中部） */
-    sidebarMinimizeIcon?: string;
-    /** 伪浏览器折叠后用于恢复的图标（右侧中部） */
-    browserMinimizeIcon?: string;
-}
-
-export interface CommonConfig {
-    icons?: CommonIconsConfig;
-}
-
 export interface PepCloudDeployFlowProps {
     navbar: NavbarConfig;
     sidebar: SidebarConfig;
@@ -222,6 +211,4 @@ export interface PepCloudDeployFlowProps {
     iframePages: IframePagesConfig;
     /** 全局背景图片地址，应用于部署引导页、实操结束页和伪浏览器空白页 */
     backgroundImage?: string;
-    /** 组件公共配置（含折叠态恢复图标等） */
-    commonConfig?: CommonConfig;
 }

@@ -9,7 +9,6 @@
         sidebar: SidebarConfig;
         onOpenExternal?: (url: string, title: string) => void;
         onFloat?: () => void;
-        onFullscreen?: () => void;
         onRestoreSide?: () => void;
         onCollapse?: () => void;
         isFloating?: boolean;
@@ -20,7 +19,6 @@
         sidebar,
         onOpenExternal,
         onFloat,
-        onFullscreen,
         onRestoreSide,
         onCollapse,
         isFloating = false,
@@ -290,15 +288,6 @@
                         <svg viewBox="0 0 24 24" aria-hidden="true" fill="none">
                             <rect x="2" y="5" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/>
                             <path d="M8 5V3h13a2 2 0 0 1 2 2v13h-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    {/if}
-                </button>
-                <button type="button" aria-label="全屏" title="全屏" onclick={onFullscreen}>
-                    {#if sidebar.icons?.fullscreenIcon}
-                        <img src={sidebar.icons.fullscreenIcon} alt="" />
-                    {:else}
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M21 21h-5v-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
                         </svg>
                     {/if}
                 </button>

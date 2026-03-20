@@ -32,7 +32,10 @@
 
     function updatePosition(): void {
         if (!triggerEl || !popupEl || !visible) return;
-        const rect = triggerEl.getBoundingClientRect();
+        // 优先使用首个元素子节点作为锚点，兼容子节点绝对定位场景（如折叠恢复按钮）
+        const anchorEl =
+            (triggerEl.firstElementChild as HTMLElement | null) ?? triggerEl;
+        const rect = anchorEl.getBoundingClientRect();
         const popupRect = popupEl.getBoundingClientRect();
         const gap = 8;
 
