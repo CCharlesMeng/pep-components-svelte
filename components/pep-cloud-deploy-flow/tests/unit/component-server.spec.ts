@@ -1,90 +1,41 @@
 import { describe, expect, it, vi, afterEach } from 'vitest';
 import { loader } from '../../src/component.server';
 import type { PepCloudDeployFlowProps } from '../../src/types';
+import defaultData from '../../mocks/default.json';
 
-const createMockData = (): PepCloudDeployFlowProps => ({
-    navbar: {
-        logo: { img: '', text: '' },
-        breadcrumbs: [],
-        rightActions: []
-    },
-    sidebar: {
-        tabs: [
-            {
-                title: '手册',
-                steps: [
-                    {
-                        title: '步骤1',
-                        remoteContent: {
-                            source: {
-                                htmlUrl: 'https://example.com/a.html',
-                                cssUrl: 'https://example.com/a.css'
-                            }
-                        }
-                    },
-                    {
-                        title: '步骤2',
-                        remoteContent: {
-                            source: {
-                                htmlUrl: 'https://example.com/a.html',
-                                cssUrl: 'https://example.com/a.css'
-                            }
+const cloneDefault = (): PepCloudDeployFlowProps =>
+    JSON.parse(JSON.stringify(defaultData)) as PepCloudDeployFlowProps;
+
+const createMockData = (): PepCloudDeployFlowProps => {
+    const data = cloneDefault();
+    data.mobile.steps = [];
+    data.sidebar.tabs = [
+        {
+            title: '手册',
+            steps: [
+                {
+                    title: '步骤1',
+                    remoteContent: {
+                        source: {
+                            htmlUrl: 'https://example.com/a.html',
+                            cssUrl: 'https://example.com/a.css'
                         }
                     }
-                ]
-            }
-        ],
-        footer: {
-            prevText: '上一步',
-            nextText: '下一步'
-        },
-        texts: {
-            openExternalDefaultTitle: '新页面',
-            remoteLoadingText: '加载中',
-            remoteLoadFailedText: '失败',
-            remoteFallbackMessageTemplate: '{tabLabel}-{stepId}-{stepLabel}',
-            remoteFallbackLinkText: '打开'
+                },
+                {
+                    title: '步骤2',
+                    remoteContent: {
+                        source: {
+                            htmlUrl: 'https://example.com/a.html',
+                            cssUrl: 'https://example.com/a.css'
+                        }
+                    }
+                }
+            ]
         }
-    },
-    mainContent: {
-        title: '',
-        notice: {
-            title: '',
-            contentHtml: ''
-        },
-        cloudProducts: {
-            title: '',
-            products: []
-        },
-        deploymentEstimate: {
-            price: '',
-            priceNote: '',
-            duration: '',
-            durationLabel: ''
-        },
-        action: {
-            buttonText: '',
-            url: '',
-            launchTitle: ''
-        },
-        agreement: {
-            contentHtml: ''
-        }
-    },
-    iframePages: {
-        newTabPage: {
-            tabTitle: '',
-            title: {
-                text: ''
-            },
-            addressPlaceholder: '',
-            shortcuts: {
-                title: '',
-                items: []
-            }
-        }
-    }
-});
+    ];
+    return data;
+};
 
 afterEach(() => {
     vi.unstubAllGlobals();
@@ -121,5 +72,31 @@ describe('component.server loader', () => {
         expect(firstStep?.remoteContent.preloaded).toBeUndefined();
         expect(firstStep?.remoteContent.source.htmlUrl).toBe('https://example.com/a.html');
         expect(firstStep?.remoteContent.source.cssUrl).toBe('https://example.com/a.css');
+    });
+
+    it('should preload html and css for mobile steps', async () => {
+        const data = createMockData();
+        data.mobile.steps = [
+            {
+                title: '移动步骤1',
+                remoteContent: {
+                    source: {
+                        htmlUrl: 'https://example.com/mobile-a.html',
+                        cssUrl: 'https://example.com/mobile-a.css'
+                    }
+                }
+            }
+        ];
+        const fetchMock = vi.fn(async (url: string) => ({
+            ok: true,
+            text: async () => (url.endsWith('.css') ? 'body{color:blue;}' : '<div>mobile</div>')
+        }));
+        vi.stubGlobal('fetch', fetchMock);
+
+        const result = await loader({}, data);
+
+        expect(result.mobile.steps[0].remoteContent.preloaded?.html).toBe('<div>mobile</div>');
+        expect(result.mobile.steps[0].remoteContent.preloaded?.css).toBe('body{color:blue;}');
+        expect(fetchMock).toHaveBeenCalledTimes(4);
     });
 });

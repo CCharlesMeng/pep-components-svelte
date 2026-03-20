@@ -1,4 +1,5 @@
-import type { PepCloudDeployFlowProps } from './types';
+import type { PepCloudDeployFlowProps, SidebarStep } from './types';
+import type { PepCloudDeployFlowRuntimeProps, SidebarStepWithPreload } from './runtime-data';
 
 interface LoaderMethod {
     requestClient?: {
@@ -33,7 +34,7 @@ function createFetchText(method: LoaderMethod): FetchText | null {
 async function preloadRemoteContent(
     props: PepCloudDeployFlowProps,
     fetchText: FetchText
-): Promise<PepCloudDeployFlowProps> {
+): Promise<PepCloudDeployFlowRuntimeProps> {
     const urlCache = new Map<string, Promise<string | null>>();
 
     const fetchOnce = (url: string | undefined): Promise<string | null> => {
@@ -49,7 +50,7 @@ async function preloadRemoteContent(
         return request;
     };
 
-    const preloadSteps = async (steps: NonNullable<PepCloudDeployFlowProps['sidebar']['tabs'][number]['steps']>) =>
+    const preloadSteps = async (steps: SidebarStep[]): Promise<SidebarStepWithPreload[]> =>
         Promise.all(
             steps.map(async (step) => {
                 const [html, css] = await Promise.all([
@@ -57,7 +58,6 @@ async function preloadRemoteContent(
                     fetchOnce(step.remoteContent.source.cssUrl)
                 ]);
                 const preloaded = {
-                    ...(step.remoteContent.preloaded ?? {}),
                     ...(html ? { html } : {}),
                     ...(css ? { css } : {})
                 };
@@ -92,11 +92,17 @@ async function preloadRemoteContent(
         })
     );
 
+    const mobileSteps = await preloadSteps(props.mobile.steps);
+
     return {
         ...props,
         sidebar: {
             ...props.sidebar,
             tabs
+        },
+        mobile: {
+            ...props.mobile,
+            steps: mobileSteps
         }
     };
 }
@@ -104,7 +110,7 @@ async function preloadRemoteContent(
 export const loader = async (
     method: LoaderMethod,
     data: unknown
-): Promise<PepCloudDeployFlowProps> => {
+): Promise<PepCloudDeployFlowRuntimeProps> => {
     const props = { ...(data as PepCloudDeployFlowProps) };
     const fetchText = createFetchText(method);
 

@@ -1,8 +1,7 @@
 {
   "navbar": {
     "logo": {
-      "img": "https://res-static.hc-cdn.cn/cloudbu-site/china/zh-cn/wangxue/header/logo.svg",
-      "text": "华为云"
+      "img": "https://res-static.hc-cdn.cn/cloudbu-site/china/zh-cn/wangxue/header/logo.svg"
     },
     "breadcrumbs": [
       {
@@ -88,7 +87,7 @@
                 "title": "立即部署",
                 "remoteContent": {
                   "source": {
-                    "htmlUrl": "https://support.huaweicloud.com/bestpractice-flexusl/flexusl_bp_0002.html",
+                    "htmlUrl": "https://support.huaweicloud.com/bestpractice-flexusl/practice_application_0005.html",
                     "cssUrl": "https://res-static.hc-cdn.cn/aem/content/dam/cloudbu-site/archive/china/zh-cn/support/resource/framework/v3/css/index_revision.css?20240716&sttl=3.0.67"
                   }
                 }
@@ -106,7 +105,7 @@
                 "title": "清理资源",
                 "remoteContent": {
                   "source": {
-                    "htmlUrl": "https://support.huaweicloud.com/bestpractice-flexusl/flexusl_bp_0002.html",
+                    "htmlUrl": "https://support.huaweicloud.com/bestpractice-flexusl/practice_application_0005.html",
                     "cssUrl": "https://res-static.hc-cdn.cn/aem/content/dam/cloudbu-site/archive/china/zh-cn/support/resource/framework/v3/css/index_revision.css?20240716&sttl=3.0.67"
                   }
                 }
@@ -136,7 +135,7 @@
             "title": "历史记录",
             "remoteContent": {
               "source": {
-                "htmlUrl": "https://support.huaweicloud.com/bestpractice-flexusl/flexusl_bp_0002.html",
+                "htmlUrl": "https://support.huaweicloud.com/bestpractice-flexusl/practice_application_0005.html",
                 "cssUrl": "https://res-static.hc-cdn.cn/aem/content/dam/cloudbu-site/archive/china/zh-cn/support/resource/framework/v3/css/index_revision.css?20240716&sttl=3.0.67"
               }
             }
@@ -154,7 +153,7 @@
       "remoteLoadFailedText": "内容加载失败",
       "remoteFallbackMessageTemplate": "这是来自远程资源的内容占位，当前位于 {tabLabel} 的第 {stepId} 步（{stepLabel}）。链接异常，您可以手动复制打开此链接。",
       "remoteFallbackLinkText": "打开远程链接",
-      "miniIconHoverText":"帮助手册"
+      "miniIconHoverText": "帮助手册"
     }
   },
   "mainContent": {
@@ -200,9 +199,7 @@
   },
   "backgroundImage": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/design/background.png",
   "iframePages": {
-    "domainWhitelistPatterns": [
-      "*.huaweicloud.com"
-    ],
+    "domainWhitelistPatterns": ["*.huaweicloud.com"],
     "icons": {
       "headerLogo": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/browserIcon/HWCloudLogo.svg",
       "addTab": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/browserIcon/broswerTagAdd.svg",
@@ -233,5 +230,68 @@
         ]
       }
     }
+  },
+  "mobile": {
+    "navbar": {
+      "logo": {
+        "img": "https://res-static.hc-cdn.cn/cloudbu-site/china/zh-cn/wangxue/header/logo.svg"
+      },
+      "breadcrumbs": [
+        {
+          "text": "解决方案实践",
+          "url": "https://www.huaweicloud.com/solution/practice.html"
+        },
+        {
+          "text": "快速搭建Dify-LLM应用开发平台",
+          "url": "https://www.huaweicloud.com"
+        },
+        {
+          "text": "在线部署",
+          "url": "#"
+        }
+      ]
+    },
+    "linkImage": {
+      "image": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/mobile/linkImage.png",
+      "url": "https://www.huaweicloud.com/product/flexus-x.html"
+    },
+    "steps": [
+      {
+        "title": "方案概述",
+        "remoteContent": {
+          "source": {
+            "htmlUrl": "https://support.huaweicloud.com/bestpractice-flexusl/flexusl_bp_0002.html",
+            "cssUrl": "https://res-static.hc-cdn.cn/aem/content/dam/cloudbu-site/archive/china/zh-cn/support/resource/framework/v3/css/index_revision.css?20240716&sttl=3.0.67"
+          }
+        }
+      },
+      {
+        "title": "立即部署",
+        "remoteContent": {
+          "source": {
+            "htmlUrl": "https://support.huaweicloud.com/bestpractice-flexusl/practice_application_0005.html",
+            "cssUrl": "https://res-static.hc-cdn.cn/aem/content/dam/cloudbu-site/archive/china/zh-cn/support/resource/framework/v3/css/index_revision.css?20240716&sttl=3.0.67"
+          }
+        }
+      },
+      {
+        "title": "方案验证",
+        "remoteContent": {
+          "source": {
+            "htmlUrl": "https://support.huaweicloud.com/bestpractice-flexusl/flexusl_bp_0002.html",
+            "cssUrl": "https://res-static.hc-cdn.cn/aem/content/dam/cloudbu-site/archive/china/zh-cn/support/resource/framework/v3/css/index_revision.css?20240716&sttl=3.0.67"
+          }
+        }
+      },
+      {
+        "title": "清理资源",
+        "remoteContent": {
+          "source": {
+            "htmlUrl": "https://support.huaweicloud.com/bestpractice-flexusl/practice_application_0005.html",
+            "cssUrl": "https://res-static.hc-cdn.cn/aem/content/dam/cloudbu-site/archive/china/zh-cn/support/resource/framework/v3/css/index_revision.css?20240716&sttl=3.0.67"
+          }
+        }
+      }
+    ]
   }
 }

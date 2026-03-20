@@ -4,27 +4,44 @@ import defaultData from '../../mocks/default.json';
 import type { PepCloudDeployFlowProps } from '../../src/types';
 
 describe('Schema & Data Consistency', () => {
-    it('default mock should satisfy top-level contract', () => {
+    it('default mock should satisfy authoring types', () => {
         const typedData: PepCloudDeployFlowProps = defaultData as PepCloudDeployFlowProps;
-        expect(typedData.navbar.logo.text).toBeTypeOf('string');
+        expect(typedData.navbar.logo.img).toBeTypeOf('string');
+        expect('text' in typedData.navbar.logo).toBe(false);
         expect(typedData.sidebar.tabs.length).toBeGreaterThan(0);
+        expect(typedData.sidebar.texts.miniIconHoverText).toBeTypeOf('string');
         expect(typedData.mainContent.cloudProducts.products.length).toBeGreaterThan(0);
     });
 
-    it('schema should define all top-level properties from types', () => {
+    it('schema should define all top-level keys present in default.json', () => {
         const schemaProperties = Object.keys((schema as { properties: Record<string, unknown> }).properties);
-        const requiredTopLevel: Array<keyof PepCloudDeployFlowProps> = ['navbar', 'sidebar', 'mainContent'];
-        requiredTopLevel.forEach((key) => {
+        const defaultKeys = Object.keys(defaultData);
+        for (const key of defaultKeys) {
             expect(schemaProperties).toContain(key);
-        });
+        }
     });
 
-    it('schema required fields should include top-level contract keys', () => {
-        const required = (schema as { required?: string[] }).required ?? [];
-        expect(required).toEqual(expect.arrayContaining(['navbar', 'sidebar', 'mainContent']));
+    it('schema root required should match default.json top-level keys', () => {
+        const required = new Set((schema as { required?: string[] }).required ?? []);
+        for (const key of Object.keys(defaultData)) {
+            expect(required.has(key)).toBe(true);
+        }
     });
 
-    it('schema should require deploy launch title instead of code fallback', () => {
+    it('mobile schema should not define title or footer (use PC fallbacks in code)', () => {
+        const mobileSchema = (
+            schema as {
+                properties: {
+                    mobile: { properties?: Record<string, unknown> };
+                };
+            }
+        ).properties.mobile;
+        expect(mobileSchema.properties).toBeDefined();
+        expect(Object.keys(mobileSchema.properties ?? {})).not.toContain('title');
+        expect(Object.keys(mobileSchema.properties ?? {})).not.toContain('footer');
+    });
+
+    it('schema should require deploy launch title', () => {
         const actionSchema = (
             schema as {
                 properties: {
@@ -42,9 +59,8 @@ describe('Schema & Data Consistency', () => {
         expect(defaultData.mainContent.action.launchTitle).toBeTypeOf('string');
     });
 
-    it('schema should require iframePages new-tab copy fields', () => {
+    it('schema should require iframePages domain whitelist, icons and new-tab fields', () => {
         const root = schema as {
-            required?: string[];
             properties: {
                 iframePages: {
                     required?: string[];
@@ -60,20 +76,21 @@ describe('Schema & Data Consistency', () => {
                 };
             };
         };
-        expect(root.required ?? []).toEqual(expect.arrayContaining(['iframePages']));
-        expect(root.properties.iframePages.required ?? []).toEqual(expect.arrayContaining(['newTabPage']));
+        expect(root.properties.iframePages.required ?? []).toEqual(
+            expect.arrayContaining(['domainWhitelistPatterns', 'icons', 'newTabPage'])
+        );
         expect(root.properties.iframePages.properties.newTabPage.required ?? []).toEqual(
             expect.arrayContaining(['tabTitle', 'title', 'addressPlaceholder', 'shortcuts'])
         );
         expect(
             root.properties.iframePages.properties.newTabPage.properties.title.required ?? []
-        ).toEqual(expect.arrayContaining(['text']));
+        ).toEqual(expect.arrayContaining(['icon', 'text']));
         expect(
             root.properties.iframePages.properties.newTabPage.properties.shortcuts.required ?? []
         ).toEqual(expect.arrayContaining(['title', 'items']));
     });
 
-    it('schema should require sidebar text copy fields', () => {
+    it('schema should require sidebar icons, tabs, footer, texts including miniIconHoverText', () => {
         const sidebarSchema = (
             schema as {
                 properties: {
@@ -87,16 +104,18 @@ describe('Schema & Data Consistency', () => {
             }
         ).properties.sidebar;
 
-        expect(sidebarSchema.required ?? []).toEqual(expect.arrayContaining(['tabs', 'footer', 'texts']));
+        expect(sidebarSchema.required ?? []).toEqual(
+            expect.arrayContaining(['icons', 'tabs', 'footer', 'texts'])
+        );
         expect(sidebarSchema.properties.texts.required ?? []).toEqual(
             expect.arrayContaining([
                 'openExternalDefaultTitle',
                 'remoteLoadingText',
                 'remoteLoadFailedText',
                 'remoteFallbackMessageTemplate',
-                'remoteFallbackLinkText'
+                'remoteFallbackLinkText',
+                'miniIconHoverText'
             ])
         );
-        expect(defaultData.sidebar.texts.openExternalDefaultTitle).toBeTypeOf('string');
     });
 });

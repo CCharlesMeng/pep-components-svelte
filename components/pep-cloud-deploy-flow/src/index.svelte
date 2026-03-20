@@ -1,12 +1,15 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import DeploymentFinished from "./components/DeploymentFinished.svelte";
   import EndDeploymentModal from "./components/EndDeploymentModal.svelte";
   import MainPanel from "./components/MainPanel.svelte";
+  import MobileFlow from "./components/MobileFlow.svelte";
   import Navbar from "./components/Navbar.svelte";
   import PseudoBrowser from "./components/PseudoBrowser.svelte";
   import SidebarPanel from "./components/SidebarPanel.svelte";
   import Tooltip from "./components/Tooltip.svelte";
-  import type { PepCloudDeployFlowProps } from "./types";
+  import type { PepCloudDeployFlowRuntimeProps } from "./runtime-data";
+  import { resolveMobileConfig } from "./utils/mobile-config";
   import type { BrowserExternalUrl } from "./utils/phase2";
   import {
     computeMaxSidebarWidthByRightDock,
@@ -16,13 +19,16 @@
     shouldSnapToRightDock,
   } from "./utils/sidebar-layout";
 
-  let data: PepCloudDeployFlowProps = $props();
+  let data: PepCloudDeployFlowRuntimeProps = $props();
   let navbar = $derived(data.navbar);
   let sidebar = $derived(data.sidebar);
   let mainContent = $derived(data.mainContent);
+  let mobile = $derived(resolveMobileConfig(data));
   let backgroundImage = $derived(data.backgroundImage);
   let sidebarMinimizeIcon = $derived(data.sidebar?.icons?.sidebarMinimizeIcon);
   let sidebarResizeIcon = $derived(data.sidebar?.icons?.sideResizeIcon);
+  let isMobileViewport = $state(false);
+  let showMobileFlow = $derived(isMobileViewport && !!mobile);
 
   let isDeploying = $state(false);
   let isDeploymentFinished = $state(false);
@@ -275,159 +281,181 @@
       document.body.style.userSelect = "";
     };
   });
+
+  onMount(() => {
+    const updateViewportFlag = () => {
+      isMobileViewport = window.matchMedia("(max-width: 980px)").matches;
+    };
+    updateViewportFlag();
+    window.addEventListener("resize", updateViewportFlag);
+    return () => {
+      window.removeEventListener("resize", updateViewportFlag);
+    };
+  });
 </script>
 
 <section class="pep-cloud-deploy-flow">
-  <Navbar
-    {navbar}
-    {isDeploying}
-    onEndDeployment={() => (showEndModal = true)}
-  />
+  {#if !showMobileFlow}
+    <Navbar
+      {navbar}
+      {isDeploying}
+      onEndDeployment={() => (showEndModal = true)}
+    />
+  {/if}
 
-  <div class="workspace" bind:this={workspaceEl}>
-    <div class="main-wrap" class:is-hidden={sidebarState === "fullscreen"}>
-      {#if isDeploymentFinished && navbar.endDeployment}
-        <DeploymentFinished
-          endDeployment={navbar.endDeployment}
-          {backgroundImage}
-          onRedeploy={handleRedeploy}
-          onOpenExternal={handleOpenExternal}
-        />
-      {:else if isDeploying}
-        <PseudoBrowser
-          {externalUrl}
-          iframePages={data.iframePages}
-          {backgroundImage}
-          isBrowserFullscreen={sidebarState === "collapsed" ||
-            sidebarState === "floating"}
-          onSwitchToSideMode={handleBrowserSwitchToSideMode}
-          onFullscreen={openFloating}
-          onClose={minimizeBrowserAndShowSidebar}
-        />
-      {:else}
-        <MainPanel
-          {mainContent}
-          {backgroundImage}
-          onDeploy={handleDeployStart}
-          onOpenExternal={handleOpenExternal}
-        />
-      {/if}
-    </div>
-
-    {#if sidebarState !== "floating"}
-      <div
-        class="sidebar-wrap"
-        class:is-fullscreen={sidebarState === "fullscreen"}
-        class:is-collapsed={sidebarState === "collapsed"}
-        class:is-resizing={isDragging}
-        style={sidebarState === "normal"
-          ? `width:${sidebarWidth}px;min-width:25vw`
-          : undefined}
-      >
-        <SidebarPanel
-          {sidebar}
-          onOpenExternal={handleOpenExternal}
-          onFloat={openFloating}
-          onRestoreSide={() => (sidebarState = "normal")}
-          onCollapse={() => (sidebarState = "collapsed")}
-          isFullscreen={sidebarState === "fullscreen"}
-        />
-        {#if sidebarState === "normal"}
-          <div class="sidebar-resize-hover-zone" aria-hidden="true"></div>
-          <button
-            type="button"
-            class="sidebar-resize-handle"
-            class:is-visible={isDragging}
-            aria-label="调整主区与侧栏宽度"
-            title="拖拽调整侧栏宽度"
-            onmousedown={handleResizeStart}
-          >
-            {#if sidebarResizeIcon}
-              <img src={sidebarResizeIcon} alt="" />
-            {:else}
-              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none">
-                <path
-                  d="M9 6v12"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                />
-                <path
-                  d="M15 6v12"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                />
-              </svg>
-            {/if}
-          </button>
+  <div class="workspace" class:is-mobile-only={showMobileFlow} bind:this={workspaceEl}>
+    {#if showMobileFlow && mobile}
+      <MobileFlow
+        mobile={mobile}
+        texts={sidebar.texts}
+        stepCheckedIcon={sidebar?.icons?.stepCheckedIcon}
+        onOpenExternal={handleOpenExternal}
+      />
+    {:else}
+      <div class="main-wrap" class:is-hidden={sidebarState === "fullscreen"}>
+        {#if isDeploymentFinished && navbar.endDeployment}
+          <DeploymentFinished
+            endDeployment={navbar.endDeployment}
+            {backgroundImage}
+            onRedeploy={handleRedeploy}
+            onOpenExternal={handleOpenExternal}
+          />
+        {:else if isDeploying}
+          <PseudoBrowser
+            {externalUrl}
+            iframePages={data.iframePages}
+            {backgroundImage}
+            isBrowserFullscreen={sidebarState === "collapsed" ||
+              sidebarState === "floating"}
+            onSwitchToSideMode={handleBrowserSwitchToSideMode}
+            onFullscreen={openFloating}
+            onClose={minimizeBrowserAndShowSidebar}
+          />
+        {:else}
+          <MainPanel
+            {mainContent}
+            {backgroundImage}
+            onDeploy={handleDeployStart}
+            onOpenExternal={handleOpenExternal}
+          />
         {/if}
       </div>
-    {/if}
 
-    {#if sidebarState === "collapsed"}
-      <Tooltip content={sidebar?.texts?.miniIconHoverText ?? ""}>
-        <button
-          class="restore-btn restore-btn--right"
-          type="button"
-          aria-label="恢复侧边栏"
-          onclick={() => (sidebarState = "normal")}
-        >
-          {#if sidebarMinimizeIcon}
-            <img src={sidebarMinimizeIcon} alt="" />
-          {:else}
-            &lt;
-          {/if}
-        </button>
-      </Tooltip>
-    {/if}
-
-    {#if sidebarState === "floating"}
-      <div
-        class="float-panel"
-        style="left:{floatX}px; top:{floatY}px; width:{floatW}px; height:{floatH}px;"
-      >
+      {#if sidebarState !== "floating"}
         <div
-          class="float-panel__drag-handle"
-          role="button"
-          tabindex="0"
-          aria-label="拖动悬浮面板"
-          onmousedown={handleFloatDragStart}
-          onkeydown={() => {}}
-        ></div>
-        <SidebarPanel
-          {sidebar}
-          onOpenExternal={handleOpenExternal}
-          onFloat={() => (sidebarState = "normal")}
-          onRestoreSide={() => (sidebarState = "normal")}
-          onCollapse={() => (sidebarState = "collapsed")}
-          isFloating={true}
-        />
-        <button
-          type="button"
-          class="float-panel__resize float-panel__resize--w"
-          aria-label="调整左侧宽度"
-          onmousedown={(e) => handleFloatResizeStart(e, "w")}
-        ></button>
-        <button
-          type="button"
-          class="float-panel__resize float-panel__resize--e"
-          aria-label="调整宽度"
-          onmousedown={(e) => handleFloatResizeStart(e, "e")}
-        ></button>
-        <button
-          type="button"
-          class="float-panel__resize float-panel__resize--s"
-          aria-label="调整高度"
-          onmousedown={(e) => handleFloatResizeStart(e, "s")}
-        ></button>
-        <button
-          type="button"
-          class="float-panel__resize float-panel__resize--se"
-          aria-label="调整大小"
-          onmousedown={(e) => handleFloatResizeStart(e, "se")}
-        ></button>
-      </div>
+          class="sidebar-wrap"
+          class:is-fullscreen={sidebarState === "fullscreen"}
+          class:is-collapsed={sidebarState === "collapsed"}
+          class:is-resizing={isDragging}
+          style={sidebarState === "normal"
+            ? `width:${sidebarWidth}px;min-width:25vw`
+            : undefined}
+        >
+          <SidebarPanel
+            {sidebar}
+            onOpenExternal={handleOpenExternal}
+            onFloat={openFloating}
+            onRestoreSide={() => (sidebarState = "normal")}
+            onCollapse={() => (sidebarState = "collapsed")}
+            isFullscreen={sidebarState === "fullscreen"}
+          />
+          {#if sidebarState === "normal"}
+            <div class="sidebar-resize-hover-zone" aria-hidden="true"></div>
+            <button
+              type="button"
+              class="sidebar-resize-handle"
+              class:is-visible={isDragging}
+              aria-label="调整主区与侧栏宽度"
+              title="拖拽调整侧栏宽度"
+              onmousedown={handleResizeStart}
+            >
+              {#if sidebarResizeIcon}
+                <img src={sidebarResizeIcon} alt="" />
+              {:else}
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none">
+                  <path
+                    d="M9 6v12"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M15 6v12"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              {/if}
+            </button>
+          {/if}
+        </div>
+      {/if}
+
+      {#if sidebarState === "collapsed"}
+        <Tooltip content={sidebar?.texts?.miniIconHoverText ?? ""}>
+          <button
+            class="restore-btn restore-btn--right"
+            type="button"
+            aria-label="恢复侧边栏"
+            onclick={() => (sidebarState = "normal")}
+          >
+            {#if sidebarMinimizeIcon}
+              <img src={sidebarMinimizeIcon} alt="" />
+            {:else}
+              &lt;
+            {/if}
+          </button>
+        </Tooltip>
+      {/if}
+
+      {#if sidebarState === "floating"}
+        <div
+          class="float-panel"
+          style="left:{floatX}px; top:{floatY}px; width:{floatW}px; height:{floatH}px;"
+        >
+          <div
+            class="float-panel__drag-handle"
+            role="button"
+            tabindex="0"
+            aria-label="拖动悬浮面板"
+            onmousedown={handleFloatDragStart}
+            onkeydown={() => {}}
+          ></div>
+          <SidebarPanel
+            {sidebar}
+            onOpenExternal={handleOpenExternal}
+            onFloat={() => (sidebarState = "normal")}
+            onRestoreSide={() => (sidebarState = "normal")}
+            onCollapse={() => (sidebarState = "collapsed")}
+            isFloating={true}
+          />
+          <button
+            type="button"
+            class="float-panel__resize float-panel__resize--w"
+            aria-label="调整左侧宽度"
+            onmousedown={(e) => handleFloatResizeStart(e, "w")}
+          ></button>
+          <button
+            type="button"
+            class="float-panel__resize float-panel__resize--e"
+            aria-label="调整宽度"
+            onmousedown={(e) => handleFloatResizeStart(e, "e")}
+          ></button>
+          <button
+            type="button"
+            class="float-panel__resize float-panel__resize--s"
+            aria-label="调整高度"
+            onmousedown={(e) => handleFloatResizeStart(e, "s")}
+          ></button>
+          <button
+            type="button"
+            class="float-panel__resize float-panel__resize--se"
+            aria-label="调整大小"
+            onmousedown={(e) => handleFloatResizeStart(e, "se")}
+          ></button>
+        </div>
+      {/if}
     {/if}
   </div>
 </section>
@@ -692,6 +720,12 @@
     .workspace {
       flex-direction: column;
       min-height: auto;
+    }
+
+    .workspace.is-mobile-only {
+      min-height: 100vh;
+      height: 100vh;
+      overflow: hidden;
     }
 
     .sidebar-resize-handle {
