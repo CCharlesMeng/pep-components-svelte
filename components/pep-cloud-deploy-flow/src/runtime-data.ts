@@ -11,7 +11,7 @@ export type SidebarStepWithPreload = {
 };
 
 export type SidebarApplicationWithPreload = {
-    title: string;
+    title?: string;
     steps: SidebarStepWithPreload[];
 };
 

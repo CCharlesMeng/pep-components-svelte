@@ -17,7 +17,7 @@
     mobile: ResolvedMobileConfig;
     texts: SidebarTexts;
     stepCheckedIcon?: string;
-    linkWhitelistPatterns?: string[];
+    domainWhitelistPatterns?: string[];
     onOpenExternal?: (url: string, title: string) => void;
   }
 
@@ -25,7 +25,7 @@
     mobile,
     texts,
     stepCheckedIcon,
-    linkWhitelistPatterns = [],
+    domainWhitelistPatterns = [],
     onOpenExternal,
   }: Props = $props();
 
@@ -79,7 +79,7 @@
     applyLinkOpenPolicy({
       url,
       title,
-      whitelistPatterns: linkWhitelistPatterns,
+      whitelistPatterns: domainWhitelistPatterns,
       onOpenEmbedded: onOpenExternal,
       onOpenExternal: (nextUrl) => {
         if (typeof window !== "undefined") {

@@ -319,7 +319,7 @@
         mobile={mobile}
         texts={sidebar.texts}
         stepCheckedIcon={sidebar.icons?.stepCheckedIcon}
-        linkWhitelistPatterns={sidebar.linkWhitelistPatterns}
+        domainWhitelistPatterns={iframePages.domainWhitelistPatterns}
         onOpenExternal={handleOpenExternal}
       />
     {:else}

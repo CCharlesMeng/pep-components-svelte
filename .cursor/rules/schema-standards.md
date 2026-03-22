@@ -33,7 +33,7 @@
 | **富文本**    | `"type": "string", "ui:widget": "richtext"`                | /                                                                                      |
 | **布尔开关**  | `"type": "boolean", "ui:widget": "switch"`                 | /                                                                                      |
 | **单选/下拉** | `"ui:widget": "radio"` 或 `"select"`                       | **绝对禁止**使用 `enum`/`enumNames`。必须使用 `ui:options.options: [{label, value}]`。 |
-| **Tab 列表**  | `"type": "array", "ui:widget": "tab"`                      | 必须声明 `items`，必须在 `ui:options` 中配置 `tabTitle`、`min`、`max` 以防止数组溢出。 |
+| **Tab 列表**  | `"type": "array"`                                          | 必须声明 `items`，必须在 `ui:options` 中配置 `tabTitle`、`min`、`max` 以防止数组溢出。 |
 
 ## Negative Constraints (红线与禁止项)
 
@@ -72,7 +72,6 @@
     "tabs": {
       "title": "配置页签信息",
       "type": "array",
-      "ui:widget": "tab",
       "default": [],
       "ui:options": {
         "tabTitle": "title",

@@ -7,6 +7,11 @@
   import { openLinkByPolicy as applyLinkOpenPolicy } from "../utils/link-open-policy";
   import { fetchWithCache } from "../utils/remoteContentCache";
   import type { RemoteContentData } from "../utils/phase2";
+  import {
+    getApplicationDisplayTitle,
+    resolveSidebarTabSteps,
+    shouldShowApplicationDropdown,
+  } from "../utils/sidebar-tab-mode";
   import type { SidebarConfig } from "../types";
   import { loadRemoteContentForStep } from "../utils/remote-content-loader";
   import { buildRemoteIframeSrcdoc } from "../utils/remoteShadowSandbox";
@@ -47,17 +52,10 @@
 
   let activeTab = $derived(sidebar.tabs[activeTabIndex] ?? sidebar.tabs[0]);
   let hasApplications = $derived((activeTab?.applications?.length ?? 0) > 0);
-  // Only show app selector when at least one application has a visible title.
-  let showAppDropdown = $derived(
-    hasApplications &&
-      (activeTab?.applications?.some(
-        (app) => (app.title ?? "").trim().length > 0,
-      ) ??
-        false),
-  );
+  let showAppDropdown = $derived(shouldShowApplicationDropdown(activeTab));
   let currentSteps = $derived(
-    hasApplications && activeTab?.applications
-      ? (activeTab.applications[activeApplicationIndex]?.steps ?? [])
+    hasApplications
+      ? resolveSidebarTabSteps(activeTab, activeApplicationIndex)
       : (activeTab?.steps ?? []),
   );
   let activeStep = $derived(currentSteps[activeStepIndex] ?? currentSteps[0]);
@@ -266,7 +264,7 @@
   }
 
   function openLinkByPolicy(url: string, title: string): void {
-    const whitelistPatterns = sidebar.linkWhitelistPatterns ?? [];
+    const whitelistPatterns = sidebar.domainWhitelistPatterns ?? [];
     applyLinkOpenPolicy({
       url,
       title,
@@ -464,11 +462,17 @@
             aria-label="选择应用"
             aria-expanded={appDropdownOpen}
             aria-haspopup="listbox"
-            title={activeTab.applications[activeApplicationIndex]?.title ?? ""}
+            title={getApplicationDisplayTitle(
+              activeTab.applications[activeApplicationIndex],
+              activeApplicationIndex,
+            )}
             onclick={() => (appDropdownOpen = !appDropdownOpen)}
           >
             <span class="pep-cloud-deploy-flow-sidebar__app-trigger-text">
-              {activeTab.applications[activeApplicationIndex]?.title ?? ""}
+              {getApplicationDisplayTitle(
+                activeTab.applications[activeApplicationIndex],
+                activeApplicationIndex,
+              )}
             </span>
             <span
               class="pep-cloud-deploy-flow-sidebar__app-trigger-arrow"
@@ -500,7 +504,7 @@
                   class:active={activeApplicationIndex === idx}
                   onclick={() => handleApplicationChange(idx)}
                 >
-                  {app.title}
+                  {getApplicationDisplayTitle(app, idx)}
                 </button>
               {/each}
             </div>

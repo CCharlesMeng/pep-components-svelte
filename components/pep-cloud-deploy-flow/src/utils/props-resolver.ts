@@ -18,10 +18,7 @@ export function resolveSidebarForPanel(data: PepCloudDeployFlowRuntimeProps): Si
         ...data.sidebar,
         icons: data.theme.icons.sidebar,
         texts: data.theme.texts,
-        linkWhitelistPatterns:
-            data.sidebar.linkWhitelistPatterns ??
-            data.iframePages.domainWhitelistPatterns ??
-            [],
+        domainWhitelistPatterns: data.iframePages.domainWhitelistPatterns ?? [],
     };
 }
 

@@ -85,29 +85,37 @@
       },
       {
         "title": "云产品资源",
-        "steps": [
+        "applications": [
           {
-            "title": "资源列表",
-            "remoteContent": {
-              "source": {
-                "htmlUrl": "https://support.huaweicloud.com/bestpractice-flexusl/flexusl_bp_0002.html",
-                "cssUrl": "https://res-static.hc-cdn.cn/aem/content/dam/cloudbu-site/archive/china/zh-cn/support/resource/framework/v3/css/index_revision.css?20240716&sttl=3.0.67"
+            "steps": [
+              {
+                "title": "资源列表",
+                "remoteContent": {
+                  "source": {
+                    "htmlUrl": "https://support.huaweicloud.com/bestpractice-flexusl/flexusl_bp_0002.html",
+                    "cssUrl": "https://res-static.hc-cdn.cn/aem/content/dam/cloudbu-site/archive/china/zh-cn/support/resource/framework/v3/css/index_revision.css?20240716&sttl=3.0.67"
+                  }
+                }
               }
-            }
+            ]
           }
         ]
       },
       {
         "title": "部署记录",
-        "steps": [
+        "applications": [
           {
-            "title": "历史记录",
-            "remoteContent": {
-              "source": {
-                "htmlUrl": "https://support.huaweicloud.com/bestpractice-flexusl/practice_application_0005.html",
-                "cssUrl": "https://res-static.hc-cdn.cn/aem/content/dam/cloudbu-site/archive/china/zh-cn/support/resource/framework/v3/css/index_revision.css?20240716&sttl=3.0.67"
+            "steps": [
+              {
+                "title": "历史记录",
+                "remoteContent": {
+                  "source": {
+                    "htmlUrl": "https://support.huaweicloud.com/bestpractice-flexusl/practice_application_0005.html",
+                    "cssUrl": "https://res-static.hc-cdn.cn/aem/content/dam/cloudbu-site/archive/china/zh-cn/support/resource/framework/v3/css/index_revision.css?20240716&sttl=3.0.67"
+                  }
+                }
               }
-            }
+            ]
           }
         ]
       }

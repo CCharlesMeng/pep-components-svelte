@@ -57,7 +57,7 @@ export interface SidebarStep {
 }
 
 export interface SidebarApplication {
-    title: string;
+    title?: string;
     steps: SidebarStep[];
 }
 
@@ -97,8 +97,8 @@ export interface SidebarConfig {
     tabs: SidebarTab[];
     footer: SidebarFooter;
     texts: SidebarTexts;
-    /** 白名单域名 patterns，命中则在伪浏览器中打开，否则新开页签。支持 *.example.com 通配符。 */
-    linkWhitelistPatterns?: string[];
+    /** 域名白名单 patterns，命中则在伪浏览器中打开，否则新开页签。支持 *.example.com 通配符。 */
+    domainWhitelistPatterns?: string[];
 }
 
 export interface CloudProductItem {
@@ -255,7 +255,6 @@ export interface PepCloudDeployFlowSchemaProps {
     sidebar: {
         tabs: SidebarTab[];
         footer: SidebarFooter;
-        linkWhitelistPatterns?: string[];
     };
     mainContent: Omit<MainContentConfig, 'cloudProducts'>;
     backgroundImage: string;

@@ -51,7 +51,9 @@
               "url": {
                 "title": "链接",
                 "type": "string",
-                "ui:options": { "format": "url" }
+                "ui:options": {
+                  "format": "url"
+                }
               }
             }
           }
@@ -74,7 +76,9 @@
               "url": {
                 "title": "点击跳转链接",
                 "type": "string",
-                "ui:options": { "format": "url" }
+                "ui:options": {
+                  "format": "url"
+                }
               },
               "icon": {
                 "title": "按钮图标地址",
@@ -155,50 +159,106 @@
       "properties": {
         "tabs": {
           "title": "标签页列表",
-          "description": "每个标签页对应侧边栏顶部的一个 Tab。支持两种模式：①单应用模式：直接在 steps 中填写步骤；②多应用模式：在 applications 中填写多个应用，每个应用各有一套步骤（适合同一 Tab 下有多个子产品的场景）。两种模式不可混用",
+          "description": "每个标签页通过 applications 统一配置步骤。若 applications 仅有一项且未填写 title，则在 UX 与逻辑上等同于旧版「直接配置 steps」场景（不展示应用下拉）。",
           "type": "array",
           "default": [],
           "items": {
             "title": "标签页",
             "type": "object",
             "additionalProperties": false,
-            "required": ["title"],
+            "required": ["title", "applications"],
             "properties": {
               "title": {
                 "title": "标签页标题",
                 "type": "string"
               },
               "applications": {
-                "title": "应用列表（多应用模式）",
-                "description": "填写此字段时为多应用模式，每个应用对应一套独立步骤，侧边栏顶部会出现应用切换下拉框。与 steps 二选一，不可同时填写",
+                "title": "应用列表",
+                "description": "统一步骤配置入口。每个应用对应一套独立步骤；当仅一项且 title 为空时，视为单应用步骤模式（不显示下拉切换）。",
                 "type": "array",
                 "default": [],
                 "items": {
                   "title": "应用",
                   "type": "object",
                   "additionalProperties": false,
-                  "required": ["title", "steps"],
+                  "required": ["steps"],
                   "properties": {
                     "title": {
                       "title": "应用名称",
-                      "description": "显示在应用切换下拉框中",
+                      "description": "显示在应用切换下拉框中。仅单应用且需隐藏下拉时可留空。",
                       "type": "string"
                     },
                     "steps": {
                       "title": "步骤列表",
                       "type": "array",
                       "default": [],
-                      "items": { "$ref": "#/definitions/sidebarStep" }
+                      "items": {
+                        "title": "步骤项",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["title", "remoteContent"],
+                        "properties": {
+                          "title": {
+                            "title": "步骤标题",
+                            "type": "string"
+                          },
+                          "remoteContent": {
+                            "title": "步骤内容配置",
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": ["source"],
+                            "properties": {
+                              "source": {
+                                "title": "内容来源",
+                                "description": "二选一：直接编写 Markdown（推荐，所见即所得）；或提供远程 HTML 页面地址（适合已有文档页面的场景）",
+                                "oneOf": [
+                                  {
+                                    "title": "直接编写 Markdown",
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": ["markdownContent"],
+                                    "properties": {
+                                      "markdownContent": {
+                                        "title": "Markdown 内容",
+                                        "description": "支持标准 Markdown 语法，包括标题、列表、代码块、链接等",
+                                        "type": "string",
+                                        "ui:widget": "textarea"
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "title": "使用远程 HTML",
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": ["htmlUrl"],
+                                    "properties": {
+                                      "htmlUrl": {
+                                        "title": "远程 HTML 页面地址",
+                                        "description": "填写已有文档页面的完整 URL，系统会提取正文内容展示",
+                                        "type": "string",
+                                        "ui:options": {
+                                          "format": "url"
+                                        }
+                                      },
+                                      "cssUrl": {
+                                        "title": "远程 CSS 样式地址（可选）",
+                                        "description": "不填则不注入额外样式，使用组件默认样式",
+                                        "type": "string",
+                                        "ui:options": {
+                                          "format": "url"
+                                        }
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
                     }
                   }
                 }
-              },
-              "steps": {
-                "title": "步骤列表（单应用模式）",
-                "description": "填写此字段时为单应用模式，直接列出步骤。与 applications 二选一，不可同时填写",
-                "type": "array",
-                "default": [],
-                "items": { "$ref": "#/definitions/sidebarStep" }
               }
             }
           }
@@ -217,15 +277,6 @@
               "title": "「下一步」按钮文案",
               "type": "string"
             }
-          }
-        },
-        "linkWhitelistPatterns": {
-          "title": "侧边栏链接白名单（可选，通常无需填写）",
-          "description": "命中白名单的链接在伪浏览器中打开，否则新开页签。支持通配符，如 *.huaweicloud.com。留空时自动继承「伪浏览器配置 iframePages.domainWhitelistPatterns」",
-          "type": "array",
-          "items": {
-            "title": "白名单匹配规则",
-            "type": "string"
           }
         }
       }
@@ -291,7 +342,9 @@
               "title": "部署跳转链接",
               "description": "点击按钮后在伪浏览器中打开的地址，通常为资源编排服务控制台链接",
               "type": "string",
-              "ui:options": { "format": "url" }
+              "ui:options": {
+                "format": "url"
+              }
             },
             "launchTitle": {
               "title": "伪浏览器页签标题",
@@ -359,7 +412,9 @@
                   "url": {
                     "title": "链接",
                     "type": "string",
-                    "ui:options": { "format": "url" }
+                    "ui:options": {
+                      "format": "url"
+                    }
                   }
                 }
               }
@@ -381,7 +436,9 @@
             "url": {
               "title": "点击跳转链接",
               "type": "string",
-              "ui:options": { "format": "url" }
+              "ui:options": {
+                "format": "url"
+              }
             }
           }
         },
@@ -390,7 +447,70 @@
           "description": "不填时自动继承侧边栏（sidebar）第一个标签页的步骤内容。如需移动端展示不同内容，可在此单独配置",
           "type": "array",
           "default": [],
-          "items": { "$ref": "#/definitions/sidebarStep" }
+          "items": {
+            "title": "步骤项",
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["title", "remoteContent"],
+            "properties": {
+              "title": {
+                "title": "步骤标题",
+                "type": "string"
+              },
+              "remoteContent": {
+                "title": "步骤内容配置",
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["source"],
+                "properties": {
+                  "source": {
+                    "title": "内容来源",
+                    "description": "二选一：直接编写 Markdown（推荐，所见即所得）；或提供远程 HTML 页面地址（适合已有文档页面的场景）",
+                    "oneOf": [
+                      {
+                        "title": "直接编写 Markdown",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["markdownContent"],
+                        "properties": {
+                          "markdownContent": {
+                            "title": "Markdown 内容",
+                            "description": "支持标准 Markdown 语法，包括标题、列表、代码块、链接等",
+                            "type": "string",
+                            "ui:widget": "textarea"
+                          }
+                        }
+                      },
+                      {
+                        "title": "使用远程 HTML",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["htmlUrl"],
+                        "properties": {
+                          "htmlUrl": {
+                            "title": "远程 HTML 页面地址",
+                            "description": "填写已有文档页面的完整 URL，系统会提取正文内容展示",
+                            "type": "string",
+                            "ui:options": {
+                              "format": "url"
+                            }
+                          },
+                          "cssUrl": {
+                            "title": "远程 CSS 样式地址（可选）",
+                            "description": "不填则不注入额外样式，使用组件默认样式",
+                            "type": "string",
+                            "ui:options": {
+                              "format": "url"
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -648,7 +768,30 @@
               "title": "云产品列表",
               "type": "array",
               "default": [],
-              "items": { "$ref": "#/definitions/shortcutItem" }
+              "items": {
+                "title": "快捷入口项",
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["icon", "text", "url"],
+                "properties": {
+                  "icon": {
+                    "title": "图标地址",
+                    "type": "string",
+                    "ui:widget": "imageSelector"
+                  },
+                  "text": {
+                    "title": "名称",
+                    "type": "string"
+                  },
+                  "url": {
+                    "title": "跳转链接",
+                    "type": "string",
+                    "ui:options": {
+                      "format": "url"
+                    }
+                  }
+                }
+              }
             }
           }
         },
@@ -668,7 +811,30 @@
               "title": "推荐入口列表",
               "type": "array",
               "default": [],
-              "items": { "$ref": "#/definitions/shortcutItem" }
+              "items": {
+                "title": "快捷入口项",
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["icon", "text", "url"],
+                "properties": {
+                  "icon": {
+                    "title": "图标地址",
+                    "type": "string",
+                    "ui:widget": "imageSelector"
+                  },
+                  "text": {
+                    "title": "名称",
+                    "type": "string"
+                  },
+                  "url": {
+                    "title": "跳转链接",
+                    "type": "string",
+                    "ui:options": {
+                      "format": "url"
+                    }
+                  }
+                }
+              }
             }
           }
         },
@@ -687,91 +853,30 @@
               "title": "快捷入口列表",
               "type": "array",
               "default": [],
-              "items": { "$ref": "#/definitions/shortcutItem" }
-            }
-          }
-        }
-      }
-    }
-  },
-  "definitions": {
-    "shortcutItem": {
-      "title": "快捷入口项",
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["icon", "text", "url"],
-      "properties": {
-        "icon": {
-          "title": "图标地址",
-          "type": "string",
-          "ui:widget": "imageSelector"
-        },
-        "text": {
-          "title": "名称",
-          "type": "string"
-        },
-        "url": {
-          "title": "跳转链接",
-          "type": "string",
-          "ui:options": { "format": "url" }
-        }
-      }
-    },
-    "sidebarStep": {
-      "title": "步骤项",
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["title", "remoteContent"],
-      "properties": {
-        "title": {
-          "title": "步骤标题",
-          "type": "string"
-        },
-        "remoteContent": {
-          "title": "步骤内容配置",
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["source"],
-          "properties": {
-            "source": {
-              "title": "内容来源",
-              "description": "二选一：直接编写 Markdown（推荐，所见即所得）；或提供远程 HTML 页面地址（适合已有文档页面的场景）",
-              "oneOf": [
-                {
-                  "title": "直接编写 Markdown",
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": ["markdownContent"],
-                  "properties": {
-                    "markdownContent": {
-                      "title": "Markdown 内容",
-                      "description": "支持标准 Markdown 语法，包括标题、列表、代码块、链接等",
-                      "type": "string",
-                      "ui:widget": "textarea"
-                    }
-                  }
-                },
-                {
-                  "title": "使用远程 HTML",
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": ["htmlUrl"],
-                  "properties": {
-                    "htmlUrl": {
-                      "title": "远程 HTML 页面地址",
-                      "description": "填写已有文档页面的完整 URL，系统会提取正文内容展示",
-                      "type": "string",
-                      "ui:options": { "format": "url" }
-                    },
-                    "cssUrl": {
-                      "title": "远程 CSS 样式地址（可选）",
-                      "description": "不填则不注入额外样式，使用组件默认样式",
-                      "type": "string",
-                      "ui:options": { "format": "url" }
+              "items": {
+                "title": "快捷入口项",
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["icon", "text", "url"],
+                "properties": {
+                  "icon": {
+                    "title": "图标地址",
+                    "type": "string",
+                    "ui:widget": "imageSelector"
+                  },
+                  "text": {
+                    "title": "名称",
+                    "type": "string"
+                  },
+                  "url": {
+                    "title": "跳转链接",
+                    "type": "string",
+                    "ui:options": {
+                      "format": "url"
                     }
                   }
                 }
-              ]
+              }
             }
           }
         }
