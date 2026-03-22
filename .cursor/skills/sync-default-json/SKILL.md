@@ -60,10 +60,16 @@ description: 当用户修改组件的 default.json（新增、更新、删除字
 
 ### Step 2：读取现有文件
 
+**数据 mock 路径**（按组件目录实际存在者读取，勿假设单一位置）：
+
+- 常见：`mocks/default.json`（及可选的 `mocks/index.ts`）
+- 子目录拆分（如 `pep-cloud-deploy-flow`）：`mocks/props/default.json` 与/或 `mocks/props/index.ts`  
+  开发与 Vite 中 `$data` 别名会优先解析 `mocks/props/*`，再回退 `mocks/*`，见 `shared/config/vite.factory.ts`。
+
 同时读取以下文件，了解当前状态：
 
 ```
-mocks/default.json      # 数据示例
+（上列 mock 路径之一）    # 数据示例
 schema.json             # JSON Schema 类型约束定义
 src/types.ts            # TypeScript 接口定义（若存在）
 src/index.svelte        # 主入口，$props() 接收与 $derived() 派生
@@ -232,7 +238,7 @@ let newField = $derived(data.newField);
 - 字段路径：`...`
 
 ## 修改文件
-- `mocks/default.json`：...
+- `mocks/default.json` 或 `mocks/props/default.json`（及涉及的 `mocks/**/index.ts`，若存在）：...
 - `schema.json`：...
 - `src/types.ts`：...
 - `src/components/...`：...
@@ -249,11 +255,14 @@ let newField = $derived(data.newField);
 
 ## 本项目结构说明
 
-以 `pep-cloud-deploy-flow` 组件为例（其他组件类似）：
+以 `pep-cloud-deploy-flow` 组件为例（其他组件多为 `mocks/default.json` 直接在 `mocks/` 下）：
 
 ```
 components/pep-cloud-deploy-flow/
-├── mocks/default.json          # 数据 mock
+├── mocks/
+│   └── props/
+│       ├── default.json        # 数据 mock
+│       └── index.ts            # 可选：导出/组装 mock（$data 优先）
 ├── schema.json                 # JSON Schema 字段约束定义
 └── src/
     ├── types.ts                # TypeScript 接口定义（PepCloudDeployFlowProps 等）
@@ -269,7 +278,7 @@ components/pep-cloud-deploy-flow/
 
 **数据流向：**
 ```
-default.json
+default.json（或 props/default.json / props/index.ts 作为 $data 入口）
   → index.svelte ($props() 接收 data)
     → $derived() 派生各子 prop（navbar / sidebar / mainContent / backgroundImage 等）
       → 子组件 $props() 接收对应 prop

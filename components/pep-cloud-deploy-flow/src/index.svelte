@@ -21,7 +21,13 @@
 
   let data: PepCloudDeployFlowRuntimeProps = $props();
   let navbar = $derived(data.navbar);
-  let sidebar = $derived(data.sidebar);
+  let sidebar = $derived({
+    ...data.sidebar,
+    linkWhitelistPatterns:
+      data.sidebar?.linkWhitelistPatterns ??
+      data.iframePages?.domainWhitelistPatterns ??
+      [],
+  });
   let mainContent = $derived(data.mainContent);
   let mobile = $derived(resolveMobileConfig(data));
   let backgroundImage = $derived(data.backgroundImage);
@@ -101,10 +107,11 @@
     sidebarState = "normal";
   }
 
-  function handleResizeStart(): void {
+  function handleResizeStart(event: MouseEvent): void {
     if (sidebarState !== "normal") {
       return;
     }
+    event.preventDefault();
     isDragging = true;
   }
 
@@ -294,7 +301,7 @@
   });
 </script>
 
-<section class="pep-cloud-deploy-flow">
+<section class="pep-cloud-deploy-flow" class:is-sidebar-resizing={isDragging}>
   {#if !showMobileFlow}
     <Navbar
       {navbar}
@@ -309,6 +316,7 @@
         mobile={mobile}
         texts={sidebar.texts}
         stepCheckedIcon={sidebar?.icons?.stepCheckedIcon}
+        linkWhitelistPatterns={sidebar.linkWhitelistPatterns}
         onOpenExternal={handleOpenExternal}
       />
     {:else}
@@ -480,6 +488,10 @@
     background: var(--bg-secondary);
     color: #1f2329;
     font-family: Arial, sans-serif;
+  }
+
+  :global(.pep-cloud-deploy-flow.is-sidebar-resizing iframe) {
+    pointer-events: none !important;
   }
 
   :global(.pep-cloud-deploy-flow) ::-webkit-scrollbar {

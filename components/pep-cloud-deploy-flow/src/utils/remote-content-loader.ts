@@ -1,4 +1,5 @@
 import type { SidebarStepWithPreload } from '../runtime-data';
+import { marked } from 'marked';
 import {
     createFallbackRemoteContent,
     extractArticleContent,
@@ -33,9 +34,22 @@ export async function loadRemoteContentForStep(
     } = params;
 
     try {
+        const markdownContent = step.remoteContent.source.markdownContent?.trim();
+        if (markdownContent) {
+            return {
+                html: marked.parse(markdownContent, { async: false }) as string,
+                css: '',
+                sourceType: 'markdown'
+            };
+        }
+
         const preloadedHtml = step.remoteContent.preloaded?.html;
         const preloadedCss = step.remoteContent.preloaded?.css ?? '';
-        const html = preloadedHtml ?? (await fetchText(step.remoteContent.source.htmlUrl));
+        const htmlUrl = step.remoteContent.source.htmlUrl;
+        if (!preloadedHtml && !htmlUrl) {
+            throw new Error('Missing htmlUrl and markdownContent');
+        }
+        const html = preloadedHtml ?? (await fetchText(htmlUrl ?? ''));
         const css = preloadedHtml
             ? preloadedCss
             : step.remoteContent.source.cssUrl
@@ -44,7 +58,8 @@ export async function loadRemoteContentForStep(
 
         return {
             html: extractArticleHtml(html),
-            css
+            css,
+            sourceType: 'remote'
         };
     } catch {
         return createFallbackRemoteContent(

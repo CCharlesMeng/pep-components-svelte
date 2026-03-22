@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import schema from '../../schema.json';
-import defaultData from '../../mocks/default.json';
+import defaultData from '../../mocks/props/default.json';
 import type { PepCloudDeployFlowProps } from '../../src/types';
 
 describe('Schema & Data Consistency', () => {

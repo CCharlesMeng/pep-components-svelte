@@ -274,17 +274,27 @@
                                 "title": "远程内容来源",
                                 "type": "object",
                                 "additionalProperties": false,
-                                "required": ["htmlUrl"],
                                 "properties": {
+                                  "markdownContent": {
+                                    "title": "Markdown 内容（配置后优先使用）",
+                                    "type": "string",
+                                    "ui:widget": "textarea"
+                                  },
                                   "htmlUrl": {
                                     "title": "远程 HTML 地址",
                                     "type": "string",
-                                    "ui:options": { "format": "url" }
+                                    "ui:options": {
+                                      "format": "url",
+                                      "hidden": "rootValue.markdownContent"
+                                    }
                                   },
                                   "cssUrl": {
                                     "title": "远程 CSS 地址",
                                     "type": "string",
-                                    "ui:options": { "format": "url" }
+                                    "ui:options": {
+                                      "format": "url",
+                                      "hidden": "rootValue.markdownContent"
+                                    }
                                   }
                                 }
                               }
@@ -320,17 +330,27 @@
                           "title": "远程内容来源",
                           "type": "object",
                           "additionalProperties": false,
-                          "required": ["htmlUrl"],
                           "properties": {
+                            "markdownContent": {
+                              "title": "Markdown 内容（配置后优先使用）",
+                              "type": "string",
+                              "ui:widget": "textarea"
+                            },
                             "htmlUrl": {
                               "title": "远程 HTML 地址",
                               "type": "string",
-                              "ui:options": { "format": "url" }
+                              "ui:options": {
+                                "format": "url",
+                                "hidden": "rootValue.markdownContent"
+                              }
                             },
                             "cssUrl": {
                               "title": "远程 CSS 地址",
                               "type": "string",
-                              "ui:options": { "format": "url" }
+                              "ui:options": {
+                                "format": "url",
+                                "hidden": "rootValue.markdownContent"
+                              }
                             }
                           }
                         }
@@ -621,17 +641,27 @@
                     "title": "远程内容来源",
                     "type": "object",
                     "additionalProperties": false,
-                    "required": ["htmlUrl"],
                     "properties": {
+                      "markdownContent": {
+                        "title": "Markdown 内容（配置后优先使用）",
+                        "type": "string",
+                        "ui:widget": "textarea"
+                      },
                       "htmlUrl": {
                         "title": "远程 HTML 地址",
                         "type": "string",
-                        "ui:options": { "format": "url" }
+                        "ui:options": {
+                          "format": "url",
+                          "hidden": "rootValue.markdownContent"
+                        }
                       },
                       "cssUrl": {
                         "title": "远程 CSS 地址",
                         "type": "string",
-                        "ui:options": { "format": "url" }
+                        "ui:options": {
+                          "format": "url",
+                          "hidden": "rootValue.markdownContent"
+                        }
                       }
                     }
                   }

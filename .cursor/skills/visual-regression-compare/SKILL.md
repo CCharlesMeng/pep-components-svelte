@@ -104,7 +104,7 @@ py -3 .cursor/skills/visual-regression-compare/scripts/compare.py \
 **在截图之前**，必须确保设计稿和实现使用完全相同的 mock 数据，否则文字内容差异会污染像素对比结果。
 
 检查步骤：
-1. 找到实现侧的 mock 文件（通常是 `mocks/default.json`）
+1. 找到实现侧的 mock 文件：多数组件为 `mocks/default.json`；若组件将 mock 放在子目录（如 `pep-cloud-deploy-flow`），则为 `mocks/props/default.json`，或实际入口为 `mocks/props/index.ts`（与 `shared/config/vite.factory.ts` 中 `$data` 解析顺序一致：先 `mocks/props/*`，再回退 `mocks/*`）
 2. 找到设计稿侧的配置文件（通常是 `design/src/config.ts` 或类似文件）
 3. 逐字段对比关键数据，**以 `default.json` 为准修改设计稿配置**。
 

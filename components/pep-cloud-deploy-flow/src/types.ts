@@ -45,7 +45,8 @@ export interface NavbarConfig {
 
 export interface RemoteContentConfig {
     source: {
-        htmlUrl: string;
+        markdownContent?: string;
+        htmlUrl?: string;
         cssUrl?: string;
     };
 }
@@ -95,6 +96,8 @@ export interface SidebarConfig {
     tabs: SidebarTab[];
     footer: SidebarFooter;
     texts: SidebarTexts;
+    /** 白名单域名 patterns，命中则在伪浏览器中打开，否则新开页签。支持 *.example.com 通配符。 */
+    linkWhitelistPatterns?: string[];
 }
 
 export interface CloudProductItem {

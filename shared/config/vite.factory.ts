@@ -21,16 +21,17 @@ export function createComponentConfig(options: { cwd: string; name: string }) {
     const sharedCoreDir = resolve(projectRoot, 'shared/core');
 
     // Common aliases for all modes
-    // Priority: mocks/index.ts > mocks/index.js > mocks/default.json
-    let dataPath = resolve(cwd, 'mocks/default.json');
-    const mockIndexPath = resolve(cwd, 'mocks/index.ts');
-    const mockIndexJsPath = resolve(cwd, 'mocks/index.js');
-
-    if (fs.existsSync(mockIndexPath)) {
-        dataPath = mockIndexPath;
-    } else if (fs.existsSync(mockIndexJsPath)) {
-        dataPath = mockIndexJsPath;
-    }
+    // Priority: mocks/props/* then mocks/* — props/ 用于拆分 mock 的组件（如 pep-cloud-deploy-flow）
+    const mockCandidates = [
+        resolve(cwd, 'mocks/props/index.ts'),
+        resolve(cwd, 'mocks/props/index.js'),
+        resolve(cwd, 'mocks/props/default.json'),
+        resolve(cwd, 'mocks/index.ts'),
+        resolve(cwd, 'mocks/index.js'),
+        resolve(cwd, 'mocks/default.json')
+    ];
+    const dataPath =
+        mockCandidates.find((p) => fs.existsSync(p)) ?? resolve(cwd, 'mocks/default.json');
 
     const commonAliases = {
         '$lib': resolve(cwd, 'src/lib'),

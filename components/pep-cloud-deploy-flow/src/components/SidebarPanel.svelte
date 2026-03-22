@@ -4,6 +4,7 @@
     getPrevStepIndex,
     shouldHijackLink,
   } from "../utils/phase2";
+  import { openLinkByPolicy as applyLinkOpenPolicy } from "../utils/link-open-policy";
   import { fetchWithCache } from "../utils/remoteContentCache";
   import type { RemoteContentData } from "../utils/phase2";
   import type { SidebarConfig } from "../types";
@@ -42,6 +43,7 @@
   let isLoading = $state(false);
   let remoteContentData = $state<RemoteContentData | null>(null);
   let remoteIframeEl = $state<HTMLIFrameElement | null>(null);
+  let inlineContentEl = $state<HTMLDivElement | null>(null);
 
   let activeTab = $derived(sidebar.tabs[activeTabIndex] ?? sidebar.tabs[0]);
   let hasApplications = $derived((activeTab?.applications?.length ?? 0) > 0);
@@ -61,6 +63,9 @@
   let activeStep = $derived(currentSteps[activeStepIndex] ?? currentSteps[0]);
   let canPrev = $derived(activeStepIndex > 0);
   let canNext = $derived(activeStepIndex < currentSteps.length - 1);
+  let isMarkdownContent = $derived(
+    remoteContentData?.sourceType === "markdown",
+  );
 
   async function loadRemoteContent(): Promise<void> {
     if (!activeTab || !activeStep) {
@@ -91,6 +96,20 @@
   });
 
   $effect(() => {
+    const el = inlineContentEl;
+    if (!el || !isMarkdownContent) {
+      return;
+    }
+    const onClick = (event: MouseEvent) => {
+      handleInlineContentClick(event);
+    };
+    el.addEventListener("click", onClick, true);
+    return () => {
+      el.removeEventListener("click", onClick, true);
+    };
+  });
+
+  $effect(() => {
     const iframe = remoteIframeEl;
     const data = remoteContentData;
     const loading = isLoading;
@@ -111,13 +130,15 @@
         return;
       }
       const href = anchor.getAttribute("href");
-      if (shouldHijackLink(href) && onOpenExternal) {
-        event.preventDefault();
-        onOpenExternal(
-          href ?? "",
-          anchor.innerText || sidebar.texts.openExternalDefaultTitle,
-        );
+      if (!shouldHijackLink(href)) {
+        return;
       }
+      event.preventDefault();
+      const url = href ?? "";
+      openLinkByPolicy(
+        url,
+        anchor.innerText || sidebar.texts.openExternalDefaultTitle,
+      );
     };
 
     const adjustHeight = () => {
@@ -242,6 +263,39 @@
 
   function handleNextClick(): void {
     activeStepIndex = getNextStepIndex(activeStepIndex, currentSteps.length);
+  }
+
+  function openLinkByPolicy(url: string, title: string): void {
+    const whitelistPatterns = sidebar.linkWhitelistPatterns ?? [];
+    applyLinkOpenPolicy({
+      url,
+      title,
+      whitelistPatterns,
+      onOpenEmbedded: onOpenExternal,
+      onOpenExternal: (nextUrl) => {
+        if (typeof window !== "undefined") {
+          window.open(nextUrl, "_blank", "noopener,noreferrer");
+        }
+      },
+    });
+  }
+
+  function handleInlineContentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement | null;
+    const anchor = target?.closest("a");
+    if (!anchor) {
+      return;
+    }
+    const href = anchor.getAttribute("href");
+    if (!shouldHijackLink(href)) {
+      return;
+    }
+    event.preventDefault();
+    const url = href ?? "";
+    openLinkByPolicy(
+      url,
+      anchor.innerText || sidebar.texts.openExternalDefaultTitle,
+    );
   }
 
 </script>
@@ -497,12 +551,21 @@
     {#if isLoading}
       <p class="loading">{sidebar.texts.remoteLoadingText}</p>
     {:else if remoteContentData}
-      <iframe
-        class="pep-cloud-deploy-flow-remote-iframe"
-        bind:this={remoteIframeEl}
-        title={activeStep?.title ?? "文档内容"}
-        scrolling="no"
-      ></iframe>
+      {#if isMarkdownContent}
+        <div
+          class="pep-cloud-deploy-flow-sidebar__inline-content rich-text"
+          bind:this={inlineContentEl}
+        >
+          {@html remoteContentData.html}
+        </div>
+      {:else}
+        <iframe
+          class="pep-cloud-deploy-flow-remote-iframe"
+          bind:this={remoteIframeEl}
+          title={activeStep?.title ?? "文档内容"}
+          scrolling="no"
+        ></iframe>
+      {/if}
     {:else}
       <p class="loading">{sidebar.texts.remoteLoadFailedText}</p>
     {/if}
@@ -866,6 +929,11 @@
     border: none;
     display: block;
     min-height: 120px;
+    min-width: 0;
+  }
+
+  .pep-cloud-deploy-flow-sidebar__inline-content {
+    width: 100%;
     min-width: 0;
   }
 

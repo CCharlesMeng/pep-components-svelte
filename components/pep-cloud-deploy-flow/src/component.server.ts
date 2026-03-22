@@ -53,6 +53,11 @@ async function preloadRemoteContent(
     const preloadSteps = async (steps: SidebarStep[]): Promise<SidebarStepWithPreload[]> =>
         Promise.all(
             steps.map(async (step) => {
+                if (step.remoteContent.source.markdownContent?.trim()) {
+                    return {
+                        ...step
+                    };
+                }
                 const [html, css] = await Promise.all([
                     fetchOnce(step.remoteContent.source.htmlUrl),
                     fetchOnce(step.remoteContent.source.cssUrl)

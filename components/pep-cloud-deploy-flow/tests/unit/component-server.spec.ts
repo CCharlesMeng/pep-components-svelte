@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, afterEach } from 'vitest';
 import { loader } from '../../src/component.server';
 import type { PepCloudDeployFlowProps } from '../../src/types';
-import defaultData from '../../mocks/default.json';
+import defaultData from '../../mocks/props/default.json';
 
 const cloneDefault = (): PepCloudDeployFlowProps =>
     JSON.parse(JSON.stringify(defaultData)) as PepCloudDeployFlowProps;

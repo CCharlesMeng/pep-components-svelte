@@ -4,7 +4,9 @@ import {
     getNextStepIndex,
     getPrevStepIndex,
     injectExternalTab,
-    shouldHijackLink
+    shouldHijackLink,
+    isUrlInWhitelist,
+    resolveLinkOpenMode
 } from '../../src/utils/phase2';
 import type { BrowserTab } from '../../src/utils/phase2';
 
@@ -61,5 +63,21 @@ describe('phase2 utils', () => {
         expect(content.html).toContain('当前位于 操作手册 第 2 步：立即部署');
         expect(content.html).toContain('href="https://console.huaweicloud.com/aos/"');
         expect(content.html).toContain('打开链接');
+    });
+
+    it('should match whitelist patterns for exact and wildcard hostnames', () => {
+        const patterns = ['*.huaweicloud.com', 'example.org'];
+        expect(isUrlInWhitelist('https://support.huaweicloud.com/doc', patterns)).toBe(true);
+        // 现有规则中，*.domain.com 也匹配根域 domain.com
+        expect(isUrlInWhitelist('https://huaweicloud.com/doc', patterns)).toBe(true);
+        expect(isUrlInWhitelist('https://example.org/path', patterns)).toBe(true);
+        expect(isUrlInWhitelist('https://evil.com/path', patterns)).toBe(false);
+    });
+
+    it('should resolve link open mode by whitelist', () => {
+        const patterns = ['*.huaweicloud.com'];
+        expect(resolveLinkOpenMode('https://console.huaweicloud.com/aos', patterns)).toBe('embedded');
+        expect(resolveLinkOpenMode('https://github.com', patterns)).toBe('external');
+        expect(resolveLinkOpenMode('not-a-valid-url', patterns)).toBe('external');
     });
 });

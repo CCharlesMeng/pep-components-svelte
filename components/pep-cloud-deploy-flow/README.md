@@ -18,7 +18,7 @@
 
 ## Data Contract Mapping
 
-`mocks/default.json` 直接映射 `design/src/config.ts` 三大块：
+`mocks/props/default.json` 直接映射 `design/src/config.ts` 三大块：
 
 - `navbar`
   - `logo`

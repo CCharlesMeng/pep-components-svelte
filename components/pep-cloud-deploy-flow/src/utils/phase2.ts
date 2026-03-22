@@ -14,12 +14,15 @@ export interface BrowserTab {
 export interface RemoteContentData {
     html: string;
     css?: string;
+    sourceType?: 'remote' | 'markdown';
 }
 
 export interface RemoteContentFallbackTexts {
     messageTemplate: string;
     linkText: string;
 }
+
+export type LinkOpenMode = 'embedded' | 'external';
 
 const ARTICLE_BOX_SELECTOR = '.articleBoxWithoutHead';
 const TABLE_SCROLL_WRAP_CLASS = 'pep-cloud-deploy-flow-sidebar__table-wrap';
@@ -65,6 +68,44 @@ export function shouldHijackLink(href: string | null | undefined): boolean {
         return false;
     }
     return href.trim().length > 0 && !href.startsWith('#');
+}
+
+/**
+ * 判断 URL 的 hostname 是否在白名单 patterns 中。
+ * pattern 支持通配符前缀，如 "*.example.com" 匹配 "foo.example.com" 和 "example.com"。
+ */
+export function isUrlInWhitelist(url: string, patterns: string[]): boolean {
+    if (!patterns.length) {
+        return false;
+    }
+    let hostname: string;
+    try {
+        hostname = new URL(url).hostname;
+    } catch {
+        return false;
+    }
+    for (const pattern of patterns) {
+        if (!pattern) continue;
+        if (pattern.includes('*')) {
+            const base = pattern.replace(/^\*\./, '');
+            if (!base) continue;
+            if (hostname === base || hostname.endsWith(`.${base}`)) {
+                return true;
+            }
+        } else if (hostname === pattern) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * 根据白名单规则判断链接打开方式：
+ * - embedded: 在伪浏览器中打开（白名单内）
+ * - external: 新开页签打开（非白名单）
+ */
+export function resolveLinkOpenMode(url: string, patterns: string[]): LinkOpenMode {
+    return isUrlInWhitelist(url, patterns) ? 'embedded' : 'external';
 }
 
 export function getPrevStepIndex(activeStepIndex: number): number {

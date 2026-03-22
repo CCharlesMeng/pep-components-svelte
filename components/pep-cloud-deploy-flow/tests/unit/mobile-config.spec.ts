@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { PepCloudDeployFlowProps } from '../../src/types';
 import { resolveMobileConfig } from '../../src/utils/mobile-config';
-import defaultData from '../../mocks/default.json';
+import defaultData from '../../mocks/props/default.json';
 
 describe('resolveMobileConfig', () => {
     it('merges PC title and sidebar footer into resolved mobile config', () => {
