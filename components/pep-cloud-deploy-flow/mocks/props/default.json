@@ -120,14 +120,10 @@
   "mainContent": {
     "title": "【部署教程】快速搭建Dify-LLM应用开发平台",
     "notice": {
-      "title": "部署须知",
-      "contentHtml": "<ol style='padding-left:20px;list-style-position: outside;'><li>开始实操前，请先完成<a href=\"https://www.huaweicloud.com\">实名认证</a></li><li>如果您使用RAM子账号进行实操，需确保已完成<a href=\"https://www.huaweicloud.com\">权限策略授权</a></li><li>实操结束后，若您无需保留资源。请参考教程进行资源释放</li></ol>"
+      "contentHtml": "<h3>部署须知</h3><ol style='padding-left:20px;list-style-position: outside;'><li>开始实操前，请先完成<a href=\"https://www.huaweicloud.com\">实名认证</a></li><li>如果您使用RAM子账号进行实操，需确保已完成<a href=\"https://www.huaweicloud.com\">权限策略授权</a></li><li>实操结束后，若您无需保留资源。请参考教程进行资源释放</li></ol>"
     },
     "deploymentEstimate": {
-      "price": "¥ 0.43",
-      "priceNote": "（实际产生费用因规格，版本不同可能产生变化，以控制台显示为准。）",
-      "duration": "1小时",
-      "durationLabel": "部署时长："
+      "contentHtml": "<h3>预估费用</h3><p style='display:flex;align-items:baseline;flex-wrap:wrap;gap:8px;margin:0 0 12px 0;'><span style='font-size:32px;font-weight:700;color:#f53f3f;margin:0;'>¥ 0.43</span><span style='font-size:12px;color:#86909c;margin:0;'>（实际产生费用因规格，版本不同可能产生变化，以控制台显示为准。）</span></p><p style='display:flex;align-items:center;gap:16px;margin:0;font-size:14px;color:#4e5969;'><strong style='color:#1d2129;font-weight:700;'>部署时长：</strong><span style='color:#1d2129;font-weight:700;'>1小时</span></p>"
     },
     "action": {
       "buttonText": "开始部署",

@@ -297,7 +297,6 @@
       anchor.innerText || sidebar.texts.openExternalDefaultTitle,
     );
   }
-
 </script>
 
 <aside class="pep-cloud-deploy-flow-sidebar" class:is-floating={isFloating}>
@@ -972,8 +971,8 @@
   }
 
   .pep-cloud-deploy-flow-sidebar__footer button.is-primary {
-    background: #111827;
-    border-color: #111827;
+    background: #191919;
+    border-color: #191919;
     color: #fff;
   }
 

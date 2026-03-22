@@ -110,7 +110,6 @@ export interface CloudProductItem {
 export interface MainContentConfig {
     title: string;
     notice: {
-        title: string;
         contentHtml: string;
     };
     cloudProducts: {
@@ -118,10 +117,7 @@ export interface MainContentConfig {
         products: CloudProductItem[];
     };
     deploymentEstimate: {
-        price: string;
-        priceNote: string;
-        duration: string;
-        durationLabel: string;
+        contentHtml: string;
     };
     action: {
         buttonText: string;

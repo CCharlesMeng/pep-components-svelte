@@ -249,45 +249,31 @@
         },
         "notice": {
           "title": "部署须知",
+          "description": "整块为富文本 HTML，可将标题（如 h3）、列表、链接等一并写入",
           "type": "object",
           "additionalProperties": false,
-          "required": ["title", "contentHtml"],
+          "required": ["contentHtml"],
           "properties": {
-            "title": {
-              "title": "须知标题",
-              "type": "string"
-            },
             "contentHtml": {
-              "title": "须知正文（富文本 HTML）",
-              "type": "string"
+              "title": "须知内容（富文本 HTML）",
+              "description": "可包含标题、加粗、颜色、字号、列表与链接等",
+              "type": "string",
+              "ui:widget": "richtext"
             }
           }
         },
         "deploymentEstimate": {
           "title": "部署预估信息",
+          "description": "整块为富文本 HTML，可将「预估费用」标题、价格、说明、部署时长等一并排版",
           "type": "object",
           "additionalProperties": false,
-          "required": ["price", "priceNote", "duration", "durationLabel"],
+          "required": ["contentHtml"],
           "properties": {
-            "price": {
-              "title": "预估价格",
-              "description": "例如：¥ 0.43",
-              "type": "string"
-            },
-            "priceNote": {
-              "title": "价格说明",
-              "description": "例如：（实际费用以控制台为准）",
-              "type": "string"
-            },
-            "duration": {
-              "title": "部署时长",
-              "description": "例如：1小时",
-              "type": "string"
-            },
-            "durationLabel": {
-              "title": "部署时长标签文案",
-              "description": "例如：部署时长：",
-              "type": "string"
+            "contentHtml": {
+              "title": "预估与时长（富文本 HTML）",
+              "description": "可包含标题、价格强调样式、说明小字、时长行等，按需使用内联样式或标签",
+              "type": "string",
+              "ui:widget": "richtext"
             }
           }
         },
@@ -322,7 +308,8 @@
           "properties": {
             "contentHtml": {
               "title": "协议文案（富文本 HTML，可包含链接）",
-              "type": "string"
+              "type": "string",
+              "ui:widget": "richtext"
             }
           }
         }

@@ -39,7 +39,6 @@
     <h2 class="pep-cloud-deploy-flow-main__title">{mainContent.title}</h2>
 
     <section class="pep-cloud-deploy-flow-main__block">
-      <h3>{mainContent.notice.title}</h3>
       <div class="pep-cloud-deploy-flow-main__rich-text rich-text">
         {@html mainContent.notice.contentHtml}
       </div>
@@ -53,7 +52,6 @@
             icon={product.icon}
             label={product.text}
             href={product.url}
-            fullWidth={true}
             onClick={() => {
               if (onOpenExternal) {
                 onOpenExternal(product.url, product.text);
@@ -67,16 +65,8 @@
     </section>
 
     <section class="pep-cloud-deploy-flow-main__block">
-      <h3>预估费用</h3>
-      <div class="pep-cloud-deploy-flow-main__estimate-line">
-        <p class="price">{mainContent.deploymentEstimate.price}</p>
-        <p class="pep-cloud-deploy-flow-main__estimate-note">
-          {mainContent.deploymentEstimate.priceNote}
-        </p>
-      </div>
-      <div class="pep-cloud-deploy-flow-main__duration">
-        <span>{mainContent.deploymentEstimate.durationLabel}</span>
-        <span>{mainContent.deploymentEstimate.duration}</span>
+      <div class="pep-cloud-deploy-flow-main__rich-text rich-text">
+        {@html mainContent.deploymentEstimate.contentHtml}
       </div>
     </section>
 
@@ -104,15 +94,12 @@
     flex: 1;
     overflow-y: auto;
     background: linear-gradient(180deg, #eaf2fa 0%, #f5f7fa 100%);
-    padding: 32px;
     min-height: 760px;
     height: 100%;
   }
 
   .pep-cloud-deploy-flow-main__container {
-    width: 100%;
-    max-width: 1024px;
-    margin: 0 auto;
+    margin: 8% 7%;
   }
 
   .pep-cloud-deploy-flow-main__title {
@@ -121,7 +108,7 @@
     font-weight: 700;
     margin: 0;
     margin-bottom: 32px;
-    color: #111827;
+    color: #191919;
   }
 
   .pep-cloud-deploy-flow-main__block {
@@ -132,7 +119,7 @@
     margin: 0 0 16px 0;
     font-size: 18px;
     font-weight: 700;
-    color: #111827;
+    color: #191919;
   }
 
   .pep-cloud-deploy-flow-main__rich-text {
@@ -142,43 +129,11 @@
   }
 
   .pep-cloud-deploy-flow-main__products {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
-  }
-
-  .pep-cloud-deploy-flow-main__estimate-line {
     display: flex;
-    align-items: baseline;
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-
-  .price {
-    font-size: 32px;
-    font-weight: 700;
-    margin: 0;
-    color: #f53f3f;
-  }
-
-  .pep-cloud-deploy-flow-main__estimate-note {
-    margin: 0;
-    font-size: 12px;
-    color: #86909c;
-  }
-
-  .pep-cloud-deploy-flow-main__duration {
-    display: flex;
-    align-items: center;
+    flex-wrap: wrap;
     gap: 16px;
-    font-size: 14px;
-    color: #4e5969;
-  }
-
-  .pep-cloud-deploy-flow-main__duration span {
-    margin-right: 12px;
-    color: #1d2129;
-    font-weight: 700;
+    justify-content: flex-start;
+    gap: 16px;
   }
 
   .pep-cloud-deploy-flow-main__block button {
@@ -189,7 +144,7 @@
     border: none;
     border-radius: 999px;
     color: #fff;
-    background: #111827;
+    background: #191919;
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
@@ -226,7 +181,7 @@
     }
 
     .pep-cloud-deploy-flow-main__products {
-      grid-template-columns: 1fr;
+      flex-direction: column;
     }
   }
 </style>
