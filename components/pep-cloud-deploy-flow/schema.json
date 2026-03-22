@@ -210,47 +210,55 @@
                             "properties": {
                               "source": {
                                 "title": "内容来源",
-                                "description": "二选一：直接编写 Markdown（推荐，所见即所得）；或提供远程 HTML 页面地址（适合已有文档页面的场景）",
-                                "oneOf": [
-                                  {
-                                    "title": "直接编写 Markdown",
-                                    "type": "object",
-                                    "additionalProperties": false,
-                                    "required": ["markdownContent"],
-                                    "properties": {
-                                      "markdownContent": {
-                                        "title": "Markdown 内容",
-                                        "description": "支持标准 Markdown 语法，包括标题、列表、代码块、链接等",
-                                        "type": "string",
-                                        "ui:widget": "textarea"
-                                      }
+                                "description": "通过「内容来源类型」选择：直接编写 Markdown（推荐，所见即所得）；或提供远程 HTML 页面地址（适合已有文档页面的场景）",
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": ["contentType"],
+                                "properties": {
+                                  "contentType": {
+                                    "title": "内容来源类型",
+                                    "description": "决定下方展示的表单项；Markdown 与远程 HTML 二选一填写有效内容即可",
+                                    "type": "string",
+                                    "ui:widget": "radio",
+                                    "default": "markdown",
+                                    "ui:options": {
+                                      "options": [
+                                        { "label": "直接编写 Markdown", "value": "markdown" },
+                                        { "label": "使用远程 HTML", "value": "remoteHtml" }
+                                      ]
                                     }
                                   },
-                                  {
-                                    "title": "使用远程 HTML",
-                                    "type": "object",
-                                    "additionalProperties": false,
-                                    "required": ["htmlUrl"],
-                                    "properties": {
-                                      "htmlUrl": {
-                                        "title": "远程 HTML 页面地址",
-                                        "description": "填写已有文档页面的完整 URL，系统会提取正文内容展示",
-                                        "type": "string",
-                                        "ui:options": {
-                                          "format": "url"
-                                        }
-                                      },
-                                      "cssUrl": {
-                                        "title": "远程 CSS 样式地址（可选）",
-                                        "description": "不填则不注入额外样式，使用组件默认样式",
-                                        "type": "string",
-                                        "ui:options": {
-                                          "format": "url"
-                                        }
-                                      }
+                                  "markdownContent": {
+                                    "title": "Markdown 内容",
+                                    "description": "支持标准 Markdown 语法，包括标题、列表、代码块、链接等",
+                                    "type": "string",
+                                    "ui:widget": "textarea",
+                                    "default": "",
+                                    "ui:options": {
+                                      "hidden": "rootValue.contentType !== 'markdown'"
+                                    }
+                                  },
+                                  "htmlUrl": {
+                                    "title": "远程 HTML 页面地址",
+                                    "description": "填写已有文档页面的完整 URL，系统会提取正文内容展示",
+                                    "type": "string",
+                                    "default": "",
+                                    "ui:options": {
+                                      "format": "url",
+                                      "hidden": "rootValue.contentType !== 'remoteHtml'"
+                                    }
+                                  },
+                                  "cssUrl": {
+                                    "title": "远程 CSS 样式地址（可选）",
+                                    "description": "不填则不注入额外样式，使用组件默认样式",
+                                    "type": "string",
+                                    "default": "",
+                                    "ui:options": {
+                                      "format": "url",
+                                      "hidden": "rootValue.contentType !== 'remoteHtml'"
                                     }
                                   }
-                                ]
+                                }
                               }
                             }
                           }
@@ -465,47 +473,55 @@
                 "properties": {
                   "source": {
                     "title": "内容来源",
-                    "description": "二选一：直接编写 Markdown（推荐，所见即所得）；或提供远程 HTML 页面地址（适合已有文档页面的场景）",
-                    "oneOf": [
-                      {
-                        "title": "直接编写 Markdown",
-                        "type": "object",
-                        "additionalProperties": false,
-                        "required": ["markdownContent"],
-                        "properties": {
-                          "markdownContent": {
-                            "title": "Markdown 内容",
-                            "description": "支持标准 Markdown 语法，包括标题、列表、代码块、链接等",
-                            "type": "string",
-                            "ui:widget": "textarea"
-                          }
+                    "description": "通过「内容来源类型」选择：直接编写 Markdown（推荐，所见即所得）；或提供远程 HTML 页面地址（适合已有文档页面的场景）",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["contentType"],
+                    "properties": {
+                      "contentType": {
+                        "title": "内容来源类型",
+                        "description": "决定下方展示的表单项；Markdown 与远程 HTML 二选一填写有效内容即可",
+                        "type": "string",
+                        "ui:widget": "radio",
+                        "default": "markdown",
+                        "ui:options": {
+                          "options": [
+                            { "label": "直接编写 Markdown", "value": "markdown" },
+                            { "label": "使用远程 HTML", "value": "remoteHtml" }
+                          ]
                         }
                       },
-                      {
-                        "title": "使用远程 HTML",
-                        "type": "object",
-                        "additionalProperties": false,
-                        "required": ["htmlUrl"],
-                        "properties": {
-                          "htmlUrl": {
-                            "title": "远程 HTML 页面地址",
-                            "description": "填写已有文档页面的完整 URL，系统会提取正文内容展示",
-                            "type": "string",
-                            "ui:options": {
-                              "format": "url"
-                            }
-                          },
-                          "cssUrl": {
-                            "title": "远程 CSS 样式地址（可选）",
-                            "description": "不填则不注入额外样式，使用组件默认样式",
-                            "type": "string",
-                            "ui:options": {
-                              "format": "url"
-                            }
-                          }
+                      "markdownContent": {
+                        "title": "Markdown 内容",
+                        "description": "支持标准 Markdown 语法，包括标题、列表、代码块、链接等",
+                        "type": "string",
+                        "ui:widget": "textarea",
+                        "default": "",
+                        "ui:options": {
+                          "hidden": "rootValue.contentType !== 'markdown'"
+                        }
+                      },
+                      "htmlUrl": {
+                        "title": "远程 HTML 页面地址",
+                        "description": "填写已有文档页面的完整 URL，系统会提取正文内容展示",
+                        "type": "string",
+                        "default": "",
+                        "ui:options": {
+                          "format": "url",
+                          "hidden": "rootValue.contentType !== 'remoteHtml'"
+                        }
+                      },
+                      "cssUrl": {
+                        "title": "远程 CSS 样式地址（可选）",
+                        "description": "不填则不注入额外样式，使用组件默认样式",
+                        "type": "string",
+                        "default": "",
+                        "ui:options": {
+                          "format": "url",
+                          "hidden": "rootValue.contentType !== 'remoteHtml'"
                         }
                       }
-                    ]
+                    }
                   }
                 }
               }

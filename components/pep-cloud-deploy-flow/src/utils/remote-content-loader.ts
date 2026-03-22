@@ -6,6 +6,7 @@ import {
     type RemoteContentData
 } from './phase2';
 import { fetchWithCache } from './remoteContentCache';
+import { isRemoteContentMarkdownMode } from './remote-source-mode';
 
 export interface RemoteFallbackTexts {
     messageTemplate: string;
@@ -34,8 +35,12 @@ export async function loadRemoteContentForStep(
     } = params;
 
     try {
-        const markdownContent = step.remoteContent.source.markdownContent?.trim();
-        if (markdownContent) {
+        const src = step.remoteContent.source;
+        if (isRemoteContentMarkdownMode(src)) {
+            const markdownContent = src.markdownContent?.trim();
+            if (!markdownContent) {
+                throw new Error('Missing markdownContent');
+            }
             return {
                 html: marked.parse(markdownContent, { async: false }) as string,
                 css: '',

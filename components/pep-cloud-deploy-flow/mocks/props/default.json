@@ -51,6 +51,7 @@
                 "title": "方案概述",
                 "remoteContent": {
                   "source": {
+                    "contentType": "markdown",
                     "markdownContent": "## 方案概述\n\n本方案基于 **Flexus 云服务器 X 实例** 快速搭建 Dify LLM 应用开发平台。\n\n### 前提条件\n\n- 已完成实名认证\n- 账号余额充足\n- 具备基础 Linux 操作能力\n\n### 核心组件\n\n- Flexus 云服务器\n- 弹性公网 IP（EIP）\n- Docker 运行环境\n\n> 预计部署时长约 1 小时，费用请以控制台为准。"
                   }
                 }
@@ -59,6 +60,7 @@
                 "title": "立即部署",
                 "remoteContent": {
                   "source": {
+                    "contentType": "markdown",
                     "markdownContent": "## 立即部署\n\n请按以下步骤完成部署：\n\n1. 登录云服务器\n2. 安装 Docker\n3. 拉取并启动 Dify 容器[超链接](https://www.huaweicloud.com)\n4. 访问控制台完成初始化\n\n```bash\nssh root@<your-server-ip>\ncurl -fsSL https://get.docker.com | bash\nsystemctl enable docker && systemctl start docker\n```\n\n完成后可通过 `http://<your-server-ip>` 访问。"
                   }
                 }
@@ -67,6 +69,7 @@
                 "title": "方案验证",
                 "remoteContent": {
                   "source": {
+                    "contentType": "markdown",
                     "markdownContent": "## 方案验证\n\n部署完成后建议做以下检查：\n\n- 执行 `docker compose ps`，确认核心容器状态为 Up\n- 浏览器访问部署地址，确认页面可打开\n- 登录后创建一个测试应用，验证基础功能\n\n如需排查，请查看日志：\n\n```bash\ndocker compose logs -f dify-api\n```"
                   }
                 }
@@ -75,6 +78,7 @@
                 "title": "清理资源",
                 "remoteContent": {
                   "source": {
+                    "contentType": "markdown",
                     "markdownContent": "## 清理资源\n\n> 重要：本场景资源不会自动释放，请按需手动清理。\n\n建议顺序：\n\n1. 停止并删除 Dify 容器\n2. 释放弹性公网 IP\n3. 删除 Flexus 云服务器实例\n4. 在费用中心核对账单\n\n如需保留数据，请先完成备份。"
                   }
                 }
@@ -92,6 +96,7 @@
                 "title": "资源列表",
                 "remoteContent": {
                   "source": {
+                    "contentType": "remoteHtml",
                     "htmlUrl": "https://support.huaweicloud.com/bestpractice-flexusl/flexusl_bp_0002.html",
                     "cssUrl": "https://res-static.hc-cdn.cn/aem/content/dam/cloudbu-site/archive/china/zh-cn/support/resource/framework/v3/css/index_revision.css?20240716&sttl=3.0.67"
                   }
@@ -110,6 +115,7 @@
                 "title": "历史记录",
                 "remoteContent": {
                   "source": {
+                    "contentType": "remoteHtml",
                     "htmlUrl": "https://support.huaweicloud.com/bestpractice-flexusl/practice_application_0005.html",
                     "cssUrl": "https://res-static.hc-cdn.cn/aem/content/dam/cloudbu-site/archive/china/zh-cn/support/resource/framework/v3/css/index_revision.css?20240716&sttl=3.0.67"
                   }

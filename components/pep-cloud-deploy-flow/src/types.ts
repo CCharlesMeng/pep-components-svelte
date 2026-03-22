@@ -43,12 +43,16 @@ export interface NavbarConfig {
     endDeployment: EndDeploymentConfig;
 }
 
+export interface RemoteContentSource {
+    /** 编配表单项；未传时仍按是否填写 markdown 推断（兼容旧数据） */
+    contentType?: 'markdown' | 'remoteHtml';
+    markdownContent?: string;
+    htmlUrl?: string;
+    cssUrl?: string;
+}
+
 export interface RemoteContentConfig {
-    source: {
-        markdownContent?: string;
-        htmlUrl?: string;
-        cssUrl?: string;
-    };
+    source: RemoteContentSource;
 }
 
 export interface SidebarStep {

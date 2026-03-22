@@ -1,5 +1,6 @@
 import type { PepCloudDeployFlowProps, SidebarStep } from './types';
 import type { PepCloudDeployFlowRuntimeProps, SidebarStepWithPreload } from './runtime-data';
+import { isRemoteContentMarkdownMode } from './utils/remote-source-mode';
 
 interface LoaderMethod {
     requestClient?: {
@@ -53,7 +54,7 @@ async function preloadRemoteContent(
     const preloadSteps = async (steps: SidebarStep[]): Promise<SidebarStepWithPreload[]> =>
         Promise.all(
             steps.map(async (step) => {
-                if (step.remoteContent.source.markdownContent?.trim()) {
+                if (isRemoteContentMarkdownMode(step.remoteContent.source)) {
                     return {
                         ...step
                     };

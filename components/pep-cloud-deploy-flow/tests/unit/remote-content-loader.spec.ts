@@ -46,6 +46,40 @@ describe('loadRemoteContentForStep', () => {
         expect(extractArticleHtml).not.toHaveBeenCalled();
     });
 
+    it('when contentType is remoteHtml, loads remote even if markdown is filled', async () => {
+        const fetchText = vi.fn(async (url: string) =>
+            url.endsWith('.css') ? '' : '<html>remote-only</html>'
+        );
+        const extractArticleHtml = vi.fn((html: string) => html);
+        const step: SidebarStepWithPreload = {
+            title: '步骤1',
+            remoteContent: {
+                source: {
+                    contentType: 'remoteHtml',
+                    markdownContent: '## 应被忽略',
+                    htmlUrl: 'https://example.com/page.html',
+                    cssUrl: 'https://example.com/page.css'
+                }
+            }
+        };
+
+        const result = await loadRemoteContentForStep({
+            tabTitle: '操作手册',
+            step,
+            stepIndex: 0,
+            texts: {
+                messageTemplate: '{tabLabel}-{stepId}-{stepLabel}',
+                linkText: '打开'
+            },
+            fetchText,
+            extractArticleHtml
+        });
+
+        expect(fetchText).toHaveBeenCalled();
+        expect(result.html).toBe('<html>remote-only</html>');
+        expect(result.sourceType).toBe('remote');
+    });
+
     it('uses preloaded html/css when provided', async () => {
         const step: SidebarStepWithPreload = {
             ...createStep(),
