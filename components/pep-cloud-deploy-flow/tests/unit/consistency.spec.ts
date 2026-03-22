@@ -5,12 +5,12 @@ import type { PepCloudDeployFlowProps } from '../../src/types';
 
 describe('Schema & Data Consistency', () => {
     it('default mock should satisfy authoring types', () => {
-        const typedData: PepCloudDeployFlowProps = defaultData as PepCloudDeployFlowProps;
+        const typedData: PepCloudDeployFlowProps = defaultData as unknown as PepCloudDeployFlowProps;
         expect(typedData.navbar.logo.img).toBeTypeOf('string');
         expect('text' in typedData.navbar.logo).toBe(false);
         expect(typedData.sidebar.tabs.length).toBeGreaterThan(0);
-        expect(typedData.sidebar.texts.miniIconHoverText).toBeTypeOf('string');
-        expect(typedData.mainContent.cloudProducts.products.length).toBeGreaterThan(0);
+        expect(typedData.theme.texts.miniIconHoverText).toBeTypeOf('string');
+        expect(typedData.shortcuts.deployPage.items.length).toBeGreaterThan(0);
     });
 
     it('schema should define all top-level keys present in default.json', () => {
@@ -59,7 +59,7 @@ describe('Schema & Data Consistency', () => {
         expect(defaultData.mainContent.action.launchTitle).toBeTypeOf('string');
     });
 
-    it('schema should require iframePages domain whitelist, icons and new-tab fields', () => {
+    it('schema should require iframePages domain whitelist and new-tab fields (icons moved to theme)', () => {
         const root = schema as {
             properties: {
                 iframePages: {
@@ -69,7 +69,6 @@ describe('Schema & Data Consistency', () => {
                             required?: string[];
                             properties: {
                                 title: { required?: string[] };
-                                shortcuts: { required?: string[] };
                             };
                         };
                     };
@@ -77,45 +76,88 @@ describe('Schema & Data Consistency', () => {
             };
         };
         expect(root.properties.iframePages.required ?? []).toEqual(
-            expect.arrayContaining(['domainWhitelistPatterns', 'icons', 'newTabPage'])
+            expect.arrayContaining(['domainWhitelistPatterns', 'newTabPage'])
         );
+        expect(root.properties.iframePages.required ?? []).not.toContain('icons');
         expect(root.properties.iframePages.properties.newTabPage.required ?? []).toEqual(
-            expect.arrayContaining(['tabTitle', 'title', 'addressPlaceholder', 'shortcuts'])
+            expect.arrayContaining(['tabTitle', 'title', 'addressPlaceholder'])
         );
         expect(
             root.properties.iframePages.properties.newTabPage.properties.title.required ?? []
         ).toEqual(expect.arrayContaining(['icon', 'text']));
-        expect(
-            root.properties.iframePages.properties.newTabPage.properties.shortcuts.required ?? []
-        ).toEqual(expect.arrayContaining(['title', 'items']));
     });
 
-    it('schema should require sidebar icons, tabs, footer, texts including miniIconHoverText', () => {
+    it('schema should require sidebar tabs and footer (icons and texts moved to theme)', () => {
         const sidebarSchema = (
             schema as {
                 properties: {
                     sidebar: {
                         required?: string[];
-                        properties: {
-                            texts: { required?: string[] };
-                        };
+                        properties: Record<string, unknown>;
                     };
                 };
             }
         ).properties.sidebar;
 
         expect(sidebarSchema.required ?? []).toEqual(
-            expect.arrayContaining(['icons', 'tabs', 'footer', 'texts'])
+            expect.arrayContaining(['tabs', 'footer'])
         );
-        expect(sidebarSchema.properties.texts.required ?? []).toEqual(
+        expect(sidebarSchema.required ?? []).not.toContain('icons');
+        expect(sidebarSchema.required ?? []).not.toContain('texts');
+    });
+
+    it('schema theme should require icons.sidebar, icons.browser and texts', () => {
+        const themeSchema = (
+            schema as {
+                properties: {
+                    theme: {
+                        required?: string[];
+                        properties: {
+                            icons: {
+                                required?: string[];
+                                properties: {
+                                    sidebar: { required?: string[] };
+                                    browser: { required?: string[] };
+                                };
+                            };
+                            texts: { required?: string[] };
+                        };
+                    };
+                };
+            }
+        ).properties.theme;
+
+        expect(themeSchema.required ?? []).toEqual(expect.arrayContaining(['icons', 'texts']));
+        expect(themeSchema.properties.icons.required ?? []).toEqual(
+            expect.arrayContaining(['sidebar', 'browser'])
+        );
+        expect(themeSchema.properties.icons.properties.sidebar.required ?? []).toEqual(
+            expect.arrayContaining(['floatIcon', 'collapseIcon', 'stepCheckedIcon', 'sidebarMinimizeIcon'])
+        );
+        expect(themeSchema.properties.texts.required ?? []).toEqual(
             expect.arrayContaining([
                 'openExternalDefaultTitle',
+                'browserFrameLoadingText',
                 'remoteLoadingText',
                 'remoteLoadFailedText',
                 'remoteFallbackMessageTemplate',
                 'remoteFallbackLinkText',
                 'miniIconHoverText'
             ])
+        );
+    });
+
+    it('schema shortcuts should require deployPage, finishPage and browserNewTab', () => {
+        const shortcutsSchema = (
+            schema as {
+                properties: {
+                    shortcuts: { required?: string[] };
+                };
+            }
+        ).properties.shortcuts;
+
+        expect(shortcutsSchema.required ?? []).toEqual(
+            expect.arrayContaining(['deployPage', 'finishPage', 'browserNewTab'])
         );
     });
 });

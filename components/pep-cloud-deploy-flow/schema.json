@@ -9,7 +9,9 @@
     "mainContent",
     "backgroundImage",
     "iframePages",
-    "mobile"
+    "mobile",
+    "theme",
+    "shortcuts"
   ],
   "properties": {
     "navbar": {
@@ -33,6 +35,7 @@
         },
         "breadcrumbs": {
           "title": "面包屑",
+          "description": "从左到右依次填写，最后一项通常为当前页，可不填链接",
           "type": "array",
           "default": [],
           "items": {
@@ -54,26 +57,27 @@
           }
         },
         "rightActions": {
-          "title": "右侧操作",
+          "title": "右侧操作按钮列表",
+          "description": "显示在导航栏右侧的操作入口，例如「退出操作模式」",
           "type": "array",
           "default": [],
           "items": {
-            "title": "右侧操作项",
+            "title": "操作项",
             "type": "object",
             "additionalProperties": false,
             "required": ["text", "icon"],
             "properties": {
               "text": {
-                "title": "文案",
+                "title": "按钮文案",
                 "type": "string"
               },
               "url": {
-                "title": "链接",
+                "title": "点击跳转链接",
                 "type": "string",
                 "ui:options": { "format": "url" }
               },
               "icon": {
-                "title": "图标地址",
+                "title": "按钮图标地址",
                 "type": "string",
                 "ui:widget": "imageSelector"
               }
@@ -87,16 +91,17 @@
           "required": ["buttonText", "icon", "modal", "successPage"],
           "properties": {
             "buttonText": {
-              "title": "按钮文案",
+              "title": "「结束部署」按钮文案",
               "type": "string"
             },
             "icon": {
-              "title": "按钮图标地址",
+              "title": "「结束部署」按钮图标地址",
               "type": "string",
               "ui:widget": "imageSelector"
             },
             "modal": {
-              "title": "结束部署弹窗",
+              "title": "结束部署确认弹窗",
+              "description": "用户点击「结束部署」后弹出的二次确认弹窗",
               "type": "object",
               "additionalProperties": false,
               "required": ["title", "icon", "content", "confirmText"],
@@ -106,12 +111,12 @@
                   "type": "string"
                 },
                 "icon": {
-                  "title": "提示图标地址",
+                  "title": "弹窗提示图标地址",
                   "type": "string",
                   "ui:widget": "imageSelector"
                 },
                 "content": {
-                  "title": "弹窗内容",
+                  "title": "弹窗正文内容",
                   "type": "string"
                 },
                 "confirmText": {
@@ -122,47 +127,17 @@
             },
             "successPage": {
               "title": "结束部署成功页",
+              "description": "用户确认结束部署后展示的结束页。快捷入口卡片列表请在「快捷入口配置 shortcuts.finishPage」中统一配置",
               "type": "object",
               "additionalProperties": false,
-              "required": ["title", "description", "items", "redeployText"],
+              "required": ["title", "redeployText"],
               "properties": {
                 "title": {
                   "title": "结束页主标题",
                   "type": "string"
                 },
-                "description": {
-                  "title": "结束页描述文案",
-                  "type": "string"
-                },
-                "items": {
-                  "title": "快捷入口卡片列表",
-                  "type": "array",
-                  "default": [],
-                  "items": {
-                    "title": "快捷入口项",
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": ["icon", "text", "url"],
-                    "properties": {
-                      "icon": {
-                        "title": "图标地址",
-                        "type": "string",
-                        "ui:widget": "imageSelector"
-                      },
-                      "text": {
-                        "title": "文案",
-                        "type": "string"
-                      },
-                      "url": {
-                        "title": "跳转链接",
-                        "type": "string",
-                        "ui:options": { "format": "url" }
-                      }
-                    }
-                  }
-                },
                 "redeployText": {
-                  "title": "重新部署按钮文案",
+                  "title": "「重新部署」按钮文案",
                   "type": "string"
                 }
               }
@@ -173,67 +148,18 @@
     },
     "sidebar": {
       "title": "侧边栏配置",
+      "description": "侧边栏的标签页、步骤内容和底部翻页按钮。图标和文案配置请在「主题配置 theme」中统一管理",
       "type": "object",
       "additionalProperties": false,
-      "required": ["icons", "tabs", "footer", "texts"],
+      "required": ["tabs", "footer"],
       "properties": {
-        "icons": {
-          "title": "侧栏头部工具区图标地址",
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "floatIcon",
-            "switchToSideModeIcon",
-            "minimizeToSideIcon",
-            "collapseIcon",
-            "stepCheckedIcon",
-            "sideResizeIcon",
-            "sidebarMinimizeIcon"
-          ],
-          "properties": {
-            "floatIcon": {
-              "title": "切换悬浮态图标",
-              "type": "string",
-              "ui:widget": "imageSelector"
-            },
-            "switchToSideModeIcon": {
-              "title": "悬浮态切回侧边模式图标",
-              "type": "string",
-              "ui:widget": "imageSelector"
-            },
-            "minimizeToSideIcon": {
-              "title": "全屏态切回侧边模式图标",
-              "type": "string",
-              "ui:widget": "imageSelector"
-            },
-            "collapseIcon": {
-              "title": "折叠侧边栏图标",
-              "type": "string",
-              "ui:widget": "imageSelector"
-            },
-            "stepCheckedIcon": {
-              "title": "步骤条已完成状态图标",
-              "type": "string",
-              "ui:widget": "imageSelector"
-            },
-            "sideResizeIcon": {
-              "title": "侧栏左侧拖拽手柄图标",
-              "type": "string",
-              "ui:widget": "imageSelector"
-            },
-            "sidebarMinimizeIcon": {
-              "title": "侧栏折叠后恢复图标（视口右侧纵向居中）",
-              "type": "string",
-              "ui:widget": "imageSelector"
-            }
-          }
-        },
         "tabs": {
           "title": "标签页列表",
+          "description": "每个标签页对应侧边栏顶部的一个 Tab。支持两种模式：①单应用模式：直接在 steps 中填写步骤；②多应用模式：在 applications 中填写多个应用，每个应用各有一套步骤（适合同一 Tab 下有多个子产品的场景）。两种模式不可混用",
           "type": "array",
           "default": [],
           "items": {
-            "title": "标签页项",
+            "title": "标签页",
             "type": "object",
             "additionalProperties": false,
             "required": ["title"],
@@ -243,121 +169,36 @@
                 "type": "string"
               },
               "applications": {
-                "title": "应用列表，每个应用对应一套 steps",
+                "title": "应用列表（多应用模式）",
+                "description": "填写此字段时为多应用模式，每个应用对应一套独立步骤，侧边栏顶部会出现应用切换下拉框。与 steps 二选一，不可同时填写",
                 "type": "array",
                 "default": [],
                 "items": {
-                  "title": "应用项",
+                  "title": "应用",
                   "type": "object",
                   "additionalProperties": false,
                   "required": ["title", "steps"],
                   "properties": {
-                    "title": { "title": "应用名称", "type": "string" },
+                    "title": {
+                      "title": "应用名称",
+                      "description": "显示在应用切换下拉框中",
+                      "type": "string"
+                    },
                     "steps": {
                       "title": "步骤列表",
                       "type": "array",
                       "default": [],
-                      "items": {
-                        "title": "步骤项",
-                        "type": "object",
-                        "additionalProperties": false,
-                        "required": ["title", "remoteContent"],
-                        "properties": {
-                          "title": { "title": "步骤标题", "type": "string" },
-                          "remoteContent": {
-                            "title": "远程内容配置",
-                            "type": "object",
-                            "additionalProperties": false,
-                            "required": ["source"],
-                            "properties": {
-                              "source": {
-                                "title": "远程内容来源",
-                                "type": "object",
-                                "additionalProperties": false,
-                                "properties": {
-                                  "markdownContent": {
-                                    "title": "Markdown 内容（配置后优先使用）",
-                                    "type": "string",
-                                    "ui:widget": "textarea"
-                                  },
-                                  "htmlUrl": {
-                                    "title": "远程 HTML 地址",
-                                    "type": "string",
-                                    "ui:options": {
-                                      "format": "url",
-                                      "hidden": "rootValue.markdownContent"
-                                    }
-                                  },
-                                  "cssUrl": {
-                                    "title": "远程 CSS 地址",
-                                    "type": "string",
-                                    "ui:options": {
-                                      "format": "url",
-                                      "hidden": "rootValue.markdownContent"
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
+                      "items": { "$ref": "#/definitions/sidebarStep" }
                     }
                   }
                 }
               },
               "steps": {
-                "title": "步骤列表（无 applications 时使用）",
+                "title": "步骤列表（单应用模式）",
+                "description": "填写此字段时为单应用模式，直接列出步骤。与 applications 二选一，不可同时填写",
                 "type": "array",
                 "default": [],
-                "items": {
-                  "title": "步骤项",
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": ["title", "remoteContent"],
-                  "properties": {
-                    "title": {
-                      "title": "步骤标题",
-                      "type": "string"
-                    },
-                    "remoteContent": {
-                      "title": "远程内容配置",
-                      "type": "object",
-                      "additionalProperties": false,
-                      "required": ["source"],
-                      "properties": {
-                        "source": {
-                          "title": "远程内容来源",
-                          "type": "object",
-                          "additionalProperties": false,
-                          "properties": {
-                            "markdownContent": {
-                              "title": "Markdown 内容（配置后优先使用）",
-                              "type": "string",
-                              "ui:widget": "textarea"
-                            },
-                            "htmlUrl": {
-                              "title": "远程 HTML 地址",
-                              "type": "string",
-                              "ui:options": {
-                                "format": "url",
-                                "hidden": "rootValue.markdownContent"
-                              }
-                            },
-                            "cssUrl": {
-                              "title": "远程 CSS 地址",
-                              "type": "string",
-                              "ui:options": {
-                                "format": "url",
-                                "hidden": "rootValue.markdownContent"
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
+                "items": { "$ref": "#/definitions/sidebarStep" }
               }
             }
           }
@@ -369,71 +210,41 @@
           "required": ["prevText", "nextText"],
           "properties": {
             "prevText": {
-              "title": "上一步按钮文案",
+              "title": "「上一步」按钮文案",
               "type": "string"
             },
             "nextText": {
-              "title": "下一步按钮文案",
+              "title": "「下一步」按钮文案",
               "type": "string"
             }
           }
         },
-        "texts": {
-          "title": "侧边栏文案配置",
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "openExternalDefaultTitle",
-            "remoteLoadingText",
-            "remoteLoadFailedText",
-            "remoteFallbackMessageTemplate",
-            "remoteFallbackLinkText",
-            "miniIconHoverText"
-          ],
-          "properties": {
-            "openExternalDefaultTitle": {
-              "title": "链接缺失标题时的默认标题",
-              "type": "string"
-            },
-            "remoteLoadingText": {
-              "title": "远程内容加载中文案",
-              "type": "string"
-            },
-            "remoteLoadFailedText": {
-              "title": "远程内容加载失败文案",
-              "type": "string"
-            },
-            "remoteFallbackMessageTemplate": {
-              "title": "远程内容降级文案模板（支持 {tabLabel}/{stepId}/{stepLabel}）",
-              "type": "string"
-            },
-            "remoteFallbackLinkText": {
-              "title": "远程内容降级链接文案",
-              "type": "string"
-            },
-            "miniIconHoverText": {
-              "title": "侧栏最小化图标悬停提示",
-              "type": "string"
-            }
+        "linkWhitelistPatterns": {
+          "title": "侧边栏链接白名单（可选，通常无需填写）",
+          "description": "命中白名单的链接在伪浏览器中打开，否则新开页签。支持通配符，如 *.huaweicloud.com。留空时自动继承「伪浏览器配置 iframePages.domainWhitelistPatterns」",
+          "type": "array",
+          "items": {
+            "title": "白名单匹配规则",
+            "type": "string"
           }
         }
       }
     },
     "mainContent": {
-      "title": "主内容区配置",
+      "title": "部署引导页配置",
+      "description": "用户点击「开始部署」前看到的引导页内容。云产品快捷入口请在「快捷入口配置 shortcuts.deployPage」中统一配置",
       "type": "object",
       "additionalProperties": false,
       "required": [
         "title",
         "notice",
-        "cloudProducts",
         "deploymentEstimate",
         "action",
         "agreement"
       ],
       "properties": {
         "title": {
-          "title": "主标题",
+          "title": "页面主标题",
           "type": "string"
         },
         "notice": {
@@ -447,47 +258,8 @@
               "type": "string"
             },
             "contentHtml": {
-              "title": "须知富文本内容",
+              "title": "须知正文（富文本 HTML）",
               "type": "string"
-            }
-          }
-        },
-        "cloudProducts": {
-          "title": "云产品资源区",
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["title", "products"],
-          "properties": {
-            "title": {
-              "title": "云产品区标题",
-              "type": "string"
-            },
-            "products": {
-              "title": "云产品列表",
-              "type": "array",
-              "default": [],
-              "items": {
-                "title": "云产品项",
-                "type": "object",
-                "additionalProperties": false,
-                "required": ["icon", "text", "url"],
-                "properties": {
-                  "icon": {
-                    "title": "云产品图标",
-                    "type": "string",
-                    "ui:widget": "imageSelector"
-                  },
-                  "text": {
-                    "title": "云产品名称",
-                    "type": "string"
-                  },
-                  "url": {
-                    "title": "云产品链接",
-                    "type": "string",
-                    "ui:options": { "format": "url" }
-                  }
-                }
-              }
             }
           }
         },
@@ -499,51 +271,57 @@
           "properties": {
             "price": {
               "title": "预估价格",
+              "description": "例如：¥ 0.43",
               "type": "string"
             },
             "priceNote": {
               "title": "价格说明",
+              "description": "例如：（实际费用以控制台为准）",
               "type": "string"
             },
             "duration": {
               "title": "部署时长",
+              "description": "例如：1小时",
               "type": "string"
             },
             "durationLabel": {
-              "title": "部署时长标签",
+              "title": "部署时长标签文案",
+              "description": "例如：部署时长：",
               "type": "string"
             }
           }
         },
         "action": {
-          "title": "部署动作区",
+          "title": "部署按钮区",
           "type": "object",
           "additionalProperties": false,
           "required": ["buttonText", "url", "launchTitle"],
           "properties": {
             "buttonText": {
-              "title": "部署按钮文案",
+              "title": "「开始部署」按钮文案",
               "type": "string"
             },
             "url": {
               "title": "部署跳转链接",
+              "description": "点击按钮后在伪浏览器中打开的地址，通常为资源编排服务控制台链接",
               "type": "string",
               "ui:options": { "format": "url" }
             },
             "launchTitle": {
-              "title": "部署启动后页签标题",
+              "title": "伪浏览器页签标题",
+              "description": "部署启动后，伪浏览器顶部显示的页签名称",
               "type": "string"
             }
           }
         },
         "agreement": {
-          "title": "协议确认",
+          "title": "用户协议确认",
           "type": "object",
           "additionalProperties": false,
           "required": ["contentHtml"],
           "properties": {
             "contentHtml": {
-              "title": "协议文案",
+              "title": "协议文案（富文本 HTML，可包含链接）",
               "type": "string"
             }
           }
@@ -552,21 +330,22 @@
     },
     "mobile": {
       "title": "移动端配置",
+      "description": "移动端（屏幕宽度 ≤ 980px）的专属配置。logo、面包屑、步骤内容均支持留空，留空时自动继承 PC 端对应配置",
       "type": "object",
       "additionalProperties": false,
-      "required": ["navbar", "linkImage", "steps"],
+      "required": ["linkImage"],
       "properties": {
         "navbar": {
-          "title": "移动端顶部导航",
+          "title": "移动端顶部导航（可选）",
+          "description": "不填时自动继承顶部导航（navbar）的 logo 和面包屑配置",
           "type": "object",
           "additionalProperties": false,
-          "required": ["logo", "breadcrumbs"],
           "properties": {
             "logo": {
-              "title": "Logo 配置",
+              "title": "移动端 Logo（可选）",
+              "description": "不填时自动继承 navbar.logo",
               "type": "object",
               "additionalProperties": false,
-              "required": ["img"],
               "properties": {
                 "img": {
                   "title": "Logo 图片地址",
@@ -576,7 +355,8 @@
               }
             },
             "breadcrumbs": {
-              "title": "面包屑",
+              "title": "移动端面包屑（可选）",
+              "description": "不填时自动继承 navbar.breadcrumbs",
               "type": "array",
               "default": [],
               "items": {
@@ -600,7 +380,8 @@
           }
         },
         "linkImage": {
-          "title": "标题下方图片卡片",
+          "title": "移动端标题下方图片卡片",
+          "description": "移动端页面标题下方展示的可点击图片，通常用于展示方案架构图或引导图",
           "type": "object",
           "additionalProperties": false,
           "required": ["image", "url"],
@@ -618,127 +399,50 @@
           }
         },
         "steps": {
-          "title": "步骤列表",
+          "title": "移动端步骤列表（可选）",
+          "description": "不填时自动继承侧边栏（sidebar）第一个标签页的步骤内容。如需移动端展示不同内容，可在此单独配置",
           "type": "array",
           "default": [],
-          "items": {
-            "title": "步骤项",
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["title", "remoteContent"],
-            "properties": {
-              "title": {
-                "title": "步骤标题",
-                "type": "string"
-              },
-              "remoteContent": {
-                "title": "远程内容配置",
-                "type": "object",
-                "additionalProperties": false,
-                "required": ["source"],
-                "properties": {
-                  "source": {
-                    "title": "远程内容来源",
-                    "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                      "markdownContent": {
-                        "title": "Markdown 内容（配置后优先使用）",
-                        "type": "string",
-                        "ui:widget": "textarea"
-                      },
-                      "htmlUrl": {
-                        "title": "远程 HTML 地址",
-                        "type": "string",
-                        "ui:options": {
-                          "format": "url",
-                          "hidden": "rootValue.markdownContent"
-                        }
-                      },
-                      "cssUrl": {
-                        "title": "远程 CSS 地址",
-                        "type": "string",
-                        "ui:options": {
-                          "format": "url",
-                          "hidden": "rootValue.markdownContent"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+          "items": { "$ref": "#/definitions/sidebarStep" }
         }
       }
     },
     "backgroundImage": {
-      "title": "全局背景图片地址，应用于部署引导页、实操结束页和伪浏览器空白页",
+      "title": "全局背景图片",
+      "description": "应用于部署引导页、实操结束页和伪浏览器空白页的背景图",
       "type": "string",
       "ui:widget": "imageSelector"
     },
     "iframePages": {
-      "title": "伪浏览器与新建页配置",
+      "title": "伪浏览器配置",
+      "description": "内嵌伪浏览器的行为配置。图标资源请在「主题配置 theme.icons.browser」中统一管理；新标签页快捷入口请在「快捷入口配置 shortcuts.browserNewTab」中统一管理",
       "type": "object",
       "additionalProperties": false,
-      "required": ["domainWhitelistPatterns", "icons", "newTabPage"],
+      "required": ["domainWhitelistPatterns", "newTabPage"],
       "properties": {
         "domainWhitelistPatterns": {
-          "title": "伪浏览器域名白名单（pattern 列表）",
+          "title": "伪浏览器域名白名单",
+          "description": "命中白名单的链接在伪浏览器内打开，否则新开浏览器页签。支持通配符，如 *.huaweicloud.com。通常只需填写所属云平台的主域名",
           "type": "array",
           "items": {
-            "title": "白名单匹配项",
+            "title": "域名匹配规则",
+            "description": "支持通配符 *，例如 *.huaweicloud.com 可匹配所有华为云子域名",
             "type": "string"
           }
         },
-        "icons": {
-          "title": "伪浏览器图标资源",
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "headerLogo",
-            "addTab",
-            "fullscreen",
-            "closeTab",
-            "switchToSideIcon"
-          ],
-          "properties": {
-            "headerLogo": {
-              "title": "地址栏前缀图标地址",
-              "type": "string",
-              "ui:widget": "imageSelector"
-            },
-            "addTab": {
-              "title": "新建页签图标",
-              "type": "string",
-              "ui:widget": "imageSelector"
-            },
-            "fullscreen": {
-              "title": "全屏伪浏览器图标",
-              "type": "string",
-              "ui:widget": "imageSelector"
-            },
-            "closeTab": {
-              "title": "页签关闭图标",
-              "type": "string",
-              "ui:widget": "imageSelector"
-            },
-            "switchToSideIcon": {
-              "title": "全屏时切回侧边模式图标",
-              "type": "string",
-              "ui:widget": "imageSelector"
-            }
-          }
-        },
         "newTabPage": {
-          "title": "新建页配置",
+          "title": "新标签页配置",
+          "description": "用户在伪浏览器中新建标签页时显示的内容。快捷入口列表请在「快捷入口配置 shortcuts.browserNewTab」中统一管理",
           "type": "object",
           "additionalProperties": false,
-          "required": ["tabTitle", "title", "addressPlaceholder", "shortcuts"],
+          "required": ["tabTitle", "title", "addressPlaceholder"],
           "properties": {
-            "tabTitle": { "title": "新标签页页签标题", "type": "string" },
+            "tabTitle": {
+              "title": "新标签页的页签标题",
+              "type": "string"
+            },
             "title": {
-              "title": "新建页主标题",
+              "title": "新标签页主标题",
               "type": "object",
               "additionalProperties": false,
               "required": ["icon", "text"],
@@ -748,45 +452,339 @@
                   "type": "string",
                   "ui:widget": "imageSelector"
                 },
-                "text": { "title": "主标题文案", "type": "string" }
+                "text": {
+                  "title": "主标题文案",
+                  "type": "string"
+                }
               }
             },
             "addressPlaceholder": {
-              "title": "新建标签页地址栏 placeholder 文案",
+              "title": "地址栏 placeholder 文案",
+              "description": "新标签页地址输入框的提示文字",
               "type": "string"
-            },
-            "shortcuts": {
-              "title": "快捷入口配置",
+            }
+          }
+        }
+      }
+    },
+    "theme": {
+      "title": "主题配置（图标与系统文案）",
+      "description": "集中管理所有 UI 图标资源和系统提示文案，分为侧边栏图标、伪浏览器图标和系统文案三个子模块",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["icons", "texts"],
+      "properties": {
+        "icons": {
+          "title": "图标资源",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sidebar", "browser"],
+          "properties": {
+            "sidebar": {
+              "title": "侧边栏图标",
+              "description": "侧边栏各交互按钮的图标资源，建议使用 SVG 格式，尺寸 16×16 或 24×24",
               "type": "object",
               "additionalProperties": false,
-              "required": ["title", "items"],
+              "required": [
+                "floatIcon",
+                "switchToSideModeIcon",
+                "minimizeToSideIcon",
+                "collapseIcon",
+                "stepCheckedIcon",
+                "sideResizeIcon",
+                "sidebarMinimizeIcon"
+              ],
               "properties": {
-                "title": { "title": "快捷入口区域标题", "type": "string" },
-                "items": {
-                  "title": "快捷入口列表",
-                  "type": "array",
-                  "default": [],
-                  "items": {
-                    "title": "快捷入口项",
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": ["icon", "text", "url"],
-                    "properties": {
-                      "icon": {
-                        "title": "快捷入口图标地址",
-                        "type": "string",
-                        "ui:widget": "imageSelector"
-                      },
-                      "text": { "title": "快捷入口名称", "type": "string" },
-                      "url": {
-                        "title": "快捷入口跳转链接",
-                        "type": "string",
-                        "ui:options": { "format": "url" }
-                      }
+                "floatIcon": {
+                  "title": "切换为悬浮窗图标",
+                  "description": "侧边栏右上角：点击后侧边栏变为可拖动的悬浮窗",
+                  "type": "string",
+                  "ui:widget": "imageSelector"
+                },
+                "switchToSideModeIcon": {
+                  "title": "悬浮窗切回侧边栏图标",
+                  "description": "悬浮窗模式下：点击后恢复为固定侧边栏",
+                  "type": "string",
+                  "ui:widget": "imageSelector"
+                },
+                "minimizeToSideIcon": {
+                  "title": "全屏模式切回侧边栏图标",
+                  "description": "侧边栏全屏展开时：点击后恢复为侧边栏模式",
+                  "type": "string",
+                  "ui:widget": "imageSelector"
+                },
+                "collapseIcon": {
+                  "title": "折叠侧边栏图标",
+                  "description": "侧边栏右上角：点击后侧边栏收起，主内容区扩展为全宽",
+                  "type": "string",
+                  "ui:widget": "imageSelector"
+                },
+                "stepCheckedIcon": {
+                  "title": "步骤已完成状态图标",
+                  "description": "步骤条中已完成步骤旁显示的勾选图标",
+                  "type": "string",
+                  "ui:widget": "imageSelector"
+                },
+                "sideResizeIcon": {
+                  "title": "侧边栏宽度拖拽手柄图标",
+                  "description": "侧边栏左侧边缘的拖拽调宽图标",
+                  "type": "string",
+                  "ui:widget": "imageSelector"
+                },
+                "sidebarMinimizeIcon": {
+                  "title": "侧边栏折叠后的恢复图标",
+                  "description": "侧边栏折叠后，视口右侧纵向居中显示的恢复按钮图标",
+                  "type": "string",
+                  "ui:widget": "imageSelector"
+                }
+              }
+            },
+            "browser": {
+              "title": "伪浏览器图标",
+              "description": "内嵌伪浏览器各交互按钮的图标资源，建议使用 SVG 格式，尺寸 16×16 或 24×24",
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "headerLogo",
+                "addTab",
+                "fullscreen",
+                "closeTab",
+                "switchToSideIcon"
+              ],
+              "properties": {
+                "headerLogo": {
+                  "title": "地址栏前缀图标",
+                  "description": "伪浏览器地址栏左侧显示的品牌 Logo 图标",
+                  "type": "string",
+                  "ui:widget": "imageSelector"
+                },
+                "addTab": {
+                  "title": "新建页签图标",
+                  "description": "伪浏览器标签栏右侧的「+」新建页签按钮图标",
+                  "type": "string",
+                  "ui:widget": "imageSelector"
+                },
+                "fullscreen": {
+                  "title": "全屏展开图标",
+                  "description": "伪浏览器右上角：点击后伪浏览器全屏展开",
+                  "type": "string",
+                  "ui:widget": "imageSelector"
+                },
+                "closeTab": {
+                  "title": "关闭页签图标",
+                  "description": "每个页签上的关闭按钮图标",
+                  "type": "string",
+                  "ui:widget": "imageSelector"
+                },
+                "switchToSideIcon": {
+                  "title": "全屏时切回侧边模式图标",
+                  "description": "伪浏览器全屏时右上角：点击后恢复为侧边栏+主内容区的分栏布局",
+                  "type": "string",
+                  "ui:widget": "imageSelector"
+                }
+              }
+            }
+          }
+        },
+        "texts": {
+          "title": "系统提示文案",
+          "description": "侧边栏和移动端的系统级提示文案，通常使用默认值即可，如需多语言适配可在此修改",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "openExternalDefaultTitle",
+            "browserFrameLoadingText",
+            "remoteLoadingText",
+            "remoteLoadFailedText",
+            "remoteFallbackMessageTemplate",
+            "remoteFallbackLinkText",
+            "miniIconHoverText"
+          ],
+          "properties": {
+            "openExternalDefaultTitle": {
+              "title": "外部链接默认标题",
+              "description": "点击链接在伪浏览器中打开时，若链接本身没有文字，使用此文案作为页签标题",
+              "type": "string"
+            },
+            "browserFrameLoadingText": {
+              "title": "伪浏览器 iframe 加载提示",
+              "description": "伪浏览器内嵌页面加载完成前，在页签内容区居中显示的提示文案",
+              "type": "string"
+            },
+            "remoteLoadingText": {
+              "title": "内容加载中提示文案",
+              "type": "string"
+            },
+            "remoteLoadFailedText": {
+              "title": "内容加载失败提示文案",
+              "type": "string"
+            },
+            "remoteFallbackMessageTemplate": {
+              "title": "内容加载降级提示模板",
+              "description": "远程内容无法加载时显示的降级提示文案模板。支持以下变量：{tabLabel}=当前标签页标题，{stepId}=当前步骤序号，{stepLabel}=当前步骤标题",
+              "type": "string"
+            },
+            "remoteFallbackLinkText": {
+              "title": "降级提示中的链接文案",
+              "description": "降级提示中「手动打开链接」的链接文字",
+              "type": "string"
+            },
+            "miniIconHoverText": {
+              "title": "侧边栏折叠恢复按钮的悬停提示",
+              "description": "鼠标悬停在侧边栏折叠后的恢复图标上时显示的 tooltip 文字",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "shortcuts": {
+      "title": "快捷入口配置",
+      "description": "集中管理三处快捷入口卡片列表：部署引导页的云产品列表、实操结束页的推荐入口、伪浏览器新标签页的快捷入口",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deployPage", "finishPage", "browserNewTab"],
+      "properties": {
+        "deployPage": {
+          "title": "部署引导页 — 云产品资源列表",
+          "description": "显示在部署引导页中，展示本方案涉及的云产品，点击可跳转至对应产品页",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["title", "items"],
+          "properties": {
+            "title": {
+              "title": "区域标题",
+              "description": "例如：包含云产品资源",
+              "type": "string"
+            },
+            "items": {
+              "title": "云产品列表",
+              "type": "array",
+              "default": [],
+              "items": { "$ref": "#/definitions/shortcutItem" }
+            }
+          }
+        },
+        "finishPage": {
+          "title": "实操结束页 — 推荐入口列表",
+          "description": "用户结束部署后展示的结束页中，推荐用户访问的云服务控制台入口",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["description", "items"],
+          "properties": {
+            "description": {
+              "title": "列表区域说明文案",
+              "description": "例如：相关云服务产品控制台快速入口",
+              "type": "string"
+            },
+            "items": {
+              "title": "推荐入口列表",
+              "type": "array",
+              "default": [],
+              "items": { "$ref": "#/definitions/shortcutItem" }
+            }
+          }
+        },
+        "browserNewTab": {
+          "title": "伪浏览器新标签页 — 快捷入口列表",
+          "description": "用户在伪浏览器中新建标签页时，展示的快捷入口卡片",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["title", "items"],
+          "properties": {
+            "title": {
+              "title": "快捷入口区域标题",
+              "type": "string"
+            },
+            "items": {
+              "title": "快捷入口列表",
+              "type": "array",
+              "default": [],
+              "items": { "$ref": "#/definitions/shortcutItem" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "shortcutItem": {
+      "title": "快捷入口项",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["icon", "text", "url"],
+      "properties": {
+        "icon": {
+          "title": "图标地址",
+          "type": "string",
+          "ui:widget": "imageSelector"
+        },
+        "text": {
+          "title": "名称",
+          "type": "string"
+        },
+        "url": {
+          "title": "跳转链接",
+          "type": "string",
+          "ui:options": { "format": "url" }
+        }
+      }
+    },
+    "sidebarStep": {
+      "title": "步骤项",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "remoteContent"],
+      "properties": {
+        "title": {
+          "title": "步骤标题",
+          "type": "string"
+        },
+        "remoteContent": {
+          "title": "步骤内容配置",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source"],
+          "properties": {
+            "source": {
+              "title": "内容来源",
+              "description": "二选一：直接编写 Markdown（推荐，所见即所得）；或提供远程 HTML 页面地址（适合已有文档页面的场景）",
+              "oneOf": [
+                {
+                  "title": "直接编写 Markdown",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["markdownContent"],
+                  "properties": {
+                    "markdownContent": {
+                      "title": "Markdown 内容",
+                      "description": "支持标准 Markdown 语法，包括标题、列表、代码块、链接等",
+                      "type": "string",
+                      "ui:widget": "textarea"
+                    }
+                  }
+                },
+                {
+                  "title": "使用远程 HTML",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["htmlUrl"],
+                  "properties": {
+                    "htmlUrl": {
+                      "title": "远程 HTML 页面地址",
+                      "description": "填写已有文档页面的完整 URL，系统会提取正文内容展示",
+                      "type": "string",
+                      "ui:options": { "format": "url" }
+                    },
+                    "cssUrl": {
+                      "title": "远程 CSS 样式地址（可选）",
+                      "description": "不填则不注入额外样式，使用组件默认样式",
+                      "type": "string",
+                      "ui:options": { "format": "url" }
                     }
                   }
                 }
-              }
+              ]
             }
           }
         }

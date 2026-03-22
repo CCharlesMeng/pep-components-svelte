@@ -23,5 +23,5 @@ export type SidebarTabWithPreload = {
 
 export type PepCloudDeployFlowRuntimeProps = Omit<PepCloudDeployFlowProps, 'sidebar' | 'mobile'> & {
     sidebar: Omit<PepCloudDeployFlowProps['sidebar'], 'tabs'> & { tabs: SidebarTabWithPreload[] };
-    mobile: Omit<PepCloudDeployFlowProps['mobile'], 'steps'> & { steps: SidebarStepWithPreload[] };
+    mobile: Omit<PepCloudDeployFlowProps['mobile'], 'steps'> & { steps?: SidebarStepWithPreload[] };
 };

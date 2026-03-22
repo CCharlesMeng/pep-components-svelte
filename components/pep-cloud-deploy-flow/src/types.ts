@@ -74,6 +74,7 @@ export interface SidebarFooter {
 
 export interface SidebarTexts {
     openExternalDefaultTitle: string;
+    browserFrameLoadingText: string;
     remoteLoadingText: string;
     remoteLoadFailedText: string;
     remoteFallbackMessageTemplate: string;
@@ -167,6 +168,7 @@ export interface IframePagesConfig {
     domainWhitelistPatterns: string[];
     icons: IframePageIconConfig;
     newTabPage: NewTabPageConfig;
+    frameLoadingText: string;
 }
 
 export interface MobileNavbarConfig {
@@ -185,11 +187,96 @@ export interface MobileConfig {
     steps: SidebarStep[];
 }
 
-export interface PepCloudDeployFlowProps {
-    navbar: NavbarConfig;
-    sidebar: SidebarConfig;
-    mainContent: MainContentConfig;
-    iframePages: IframePagesConfig;
-    backgroundImage: string;
-    mobile: MobileConfig;
+// ─── 新增：theme 模块 ───────────────────────────────────────────────────────
+
+export interface ThemeIconsSidebar {
+    floatIcon: string;
+    switchToSideModeIcon: string;
+    minimizeToSideIcon: string;
+    collapseIcon: string;
+    stepCheckedIcon: string;
+    sideResizeIcon: string;
+    sidebarMinimizeIcon: string;
 }
+
+export interface ThemeIconsBrowser {
+    headerLogo: string;
+    addTab: string;
+    fullscreen: string;
+    closeTab: string;
+    switchToSideIcon: string;
+}
+
+export interface ThemeTexts {
+    openExternalDefaultTitle: string;
+    browserFrameLoadingText: string;
+    remoteLoadingText: string;
+    remoteLoadFailedText: string;
+    remoteFallbackMessageTemplate: string;
+    remoteFallbackLinkText: string;
+    miniIconHoverText: string;
+}
+
+export interface ThemeConfig {
+    icons: {
+        sidebar: ThemeIconsSidebar;
+        browser: ThemeIconsBrowser;
+    };
+    texts: ThemeTexts;
+}
+
+// ─── 新增：shortcuts 模块 ──────────────────────────────────────────────────
+
+export interface ShortcutItem {
+    icon: string;
+    text: string;
+    url: string;
+}
+
+export interface ShortcutsConfig {
+    deployPage: {
+        title: string;
+        items: ShortcutItem[];
+    };
+    finishPage: {
+        description: string;
+        items: ShortcutItem[];
+    };
+    browserNewTab: {
+        title: string;
+        items: ShortcutItem[];
+    };
+}
+
+// ─── 新增：schema 层的原始 props（字段为新结构，icons/texts 在 theme，快捷入口在 shortcuts）
+
+export interface PepCloudDeployFlowSchemaProps {
+    navbar: Omit<NavbarConfig, 'endDeployment'> & {
+        endDeployment: Omit<EndDeploymentConfig, 'successPage'> & {
+            successPage: Pick<EndDeploymentConfig['successPage'], 'title' | 'redeployText'>;
+        };
+    };
+    sidebar: {
+        tabs: SidebarTab[];
+        footer: SidebarFooter;
+        linkWhitelistPatterns?: string[];
+    };
+    mainContent: Omit<MainContentConfig, 'cloudProducts'>;
+    backgroundImage: string;
+    iframePages: {
+        domainWhitelistPatterns: string[];
+        newTabPage: Omit<NewTabPageConfig, 'shortcuts'>;
+    };
+    mobile: {
+        navbar?: {
+            logo?: NavbarLogo;
+            breadcrumbs?: BreadcrumbItem[];
+        };
+        linkImage: MobileLinkImageConfig;
+        steps?: SidebarStep[];
+    };
+    theme: ThemeConfig;
+    shortcuts: ShortcutsConfig;
+}
+
+export interface PepCloudDeployFlowProps extends PepCloudDeployFlowSchemaProps {}

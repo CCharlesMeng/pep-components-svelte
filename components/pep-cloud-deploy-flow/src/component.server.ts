@@ -97,7 +97,7 @@ async function preloadRemoteContent(
         })
     );
 
-    const mobileSteps = await preloadSteps(props.mobile.steps);
+    const mobileSteps = props.mobile.steps ? await preloadSteps(props.mobile.steps) : undefined;
 
     return {
         ...props,

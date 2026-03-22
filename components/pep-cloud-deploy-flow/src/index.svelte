@@ -10,6 +10,14 @@
   import Tooltip from "./components/Tooltip.svelte";
   import type { PepCloudDeployFlowRuntimeProps } from "./runtime-data";
   import { resolveMobileConfig } from "./utils/mobile-config";
+  import {
+    resolveSidebarForPanel,
+    resolveIframePagesForBrowser,
+    resolveMainContent,
+    resolveEndDeployment,
+    resolveNavbarForBar,
+    resolveSidebarHandleIcons,
+  } from "./utils/props-resolver";
   import type { BrowserExternalUrl } from "./utils/phase2";
   import {
     computeMaxSidebarWidthByRightDock,
@@ -20,19 +28,14 @@
   } from "./utils/sidebar-layout";
 
   let data: PepCloudDeployFlowRuntimeProps = $props();
-  let navbar = $derived(data.navbar);
-  let sidebar = $derived({
-    ...data.sidebar,
-    linkWhitelistPatterns:
-      data.sidebar?.linkWhitelistPatterns ??
-      data.iframePages?.domainWhitelistPatterns ??
-      [],
-  });
-  let mainContent = $derived(data.mainContent);
+  let navbar = $derived(resolveNavbarForBar(data));
+  let sidebar = $derived(resolveSidebarForPanel(data));
+  let mainContent = $derived(resolveMainContent(data));
+  let iframePages = $derived(resolveIframePagesForBrowser(data));
+  let endDeployment = $derived(resolveEndDeployment(data));
   let mobile = $derived(resolveMobileConfig(data));
   let backgroundImage = $derived(data.backgroundImage);
-  let sidebarMinimizeIcon = $derived(data.sidebar?.icons?.sidebarMinimizeIcon);
-  let sidebarResizeIcon = $derived(data.sidebar?.icons?.sideResizeIcon);
+  let { sidebarMinimizeIcon, sideResizeIcon: sidebarResizeIcon } = $derived(resolveSidebarHandleIcons(data));
   let isMobileViewport = $state(false);
   let showMobileFlow = $derived(isMobileViewport && !!mobile);
 
@@ -315,15 +318,15 @@
       <MobileFlow
         mobile={mobile}
         texts={sidebar.texts}
-        stepCheckedIcon={sidebar?.icons?.stepCheckedIcon}
+        stepCheckedIcon={sidebar.icons?.stepCheckedIcon}
         linkWhitelistPatterns={sidebar.linkWhitelistPatterns}
         onOpenExternal={handleOpenExternal}
       />
     {:else}
       <div class="main-wrap" class:is-hidden={sidebarState === "fullscreen"}>
-        {#if isDeploymentFinished && navbar.endDeployment}
+        {#if isDeploymentFinished && endDeployment}
           <DeploymentFinished
-            endDeployment={navbar.endDeployment}
+            {endDeployment}
             {backgroundImage}
             onRedeploy={handleRedeploy}
             onOpenExternal={handleOpenExternal}
@@ -331,7 +334,7 @@
         {:else if isDeploying}
           <PseudoBrowser
             {externalUrl}
-            iframePages={data.iframePages}
+            {iframePages}
             {backgroundImage}
             isBrowserFullscreen={sidebarState === "collapsed" ||
               sidebarState === "floating"}
@@ -474,9 +477,9 @@
   aria-hidden="true"
 ></div>
 
-{#if showEndModal && navbar.endDeployment}
+{#if showEndModal && endDeployment}
   <EndDeploymentModal
-    endDeployment={navbar.endDeployment}
+    {endDeployment}
     onCancel={() => (showEndModal = false)}
     onConfirm={handleEndConfirm}
   />

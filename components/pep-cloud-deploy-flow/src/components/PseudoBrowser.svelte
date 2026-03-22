@@ -27,6 +27,7 @@
     let handledTimestamp = $state<number | null>(null);
     let addressInput = $state("");
     let frameVersion = $state(0);
+    let frameLoading = $state(false);
 
     $effect(() => {
         if (externalUrl && externalUrl.timestamp !== handledTimestamp) {
@@ -69,6 +70,21 @@
                 active: true,
             },
     );
+
+    let frameInstanceKey = $derived(
+        activeTab.url
+            ? `${activeTab.id}:${activeTab.url}:${frameVersion}`
+            : "",
+    );
+
+    $effect(() => {
+        if (!frameInstanceKey) {
+            frameLoading = false;
+            return;
+        }
+        void frameInstanceKey;
+        frameLoading = true;
+    });
 
     function selectTab(id: string): void {
         tabs = tabs.map((item) => ({ ...item, active: item.id === id }));
@@ -191,6 +207,42 @@
         }
         event.preventDefault();
         navigateToAddress();
+    }
+
+    /** 同源时可读；跨域恒为 null */
+    function tryReadIframeDocumentTitle(iframe: HTMLIFrameElement): string | null {
+        try {
+            const raw = iframe.contentDocument?.title?.trim();
+            return raw || null;
+        } catch {
+            return null;
+        }
+    }
+
+    function applyLoadedIframeTitle(
+        event: Event,
+        mountedTabId: string,
+        mountedTabUrl: string,
+        mountedVer: number,
+    ): void {
+        if (
+            activeTab.id !== mountedTabId ||
+            activeTab.url !== mountedTabUrl ||
+            frameVersion !== mountedVer
+        ) {
+            return;
+        }
+        frameLoading = false;
+        const iframe = event.currentTarget as HTMLIFrameElement;
+        const docTitle = tryReadIframeDocumentTitle(iframe);
+        if (!docTitle) {
+            return;
+        }
+        tabs = tabs.map((item) =>
+            item.id === mountedTabId && item.url === mountedTabUrl
+                ? { ...item, title: docTitle }
+                : item,
+        );
     }
 
     $effect(() => {
@@ -338,8 +390,36 @@
 
     <div class="pep-cloud-deploy-flow-browser__frame-wrap">
         {#if activeTab.url}
-            {#key `${activeTab.id}:${activeTab.url}:${frameVersion}`}
-                <iframe src={activeTab.url} title={activeTab.title}></iframe>
+            {#key frameInstanceKey}
+                {@const mountedTabId = activeTab.id}
+                {@const mountedTabUrl = activeTab.url}
+                {@const mountedVer = frameVersion}
+                <div class="pep-cloud-deploy-flow-browser__frame-host">
+                    {#if frameLoading}
+                        <div
+                            class="pep-cloud-deploy-flow-browser__frame-loading"
+                            role="status"
+                            aria-live="polite"
+                            aria-busy="true"
+                        >
+                            <span class="pep-cloud-deploy-flow-browser__frame-loading-text"
+                                >{iframePages.frameLoadingText}</span
+                            >
+                        </div>
+                    {/if}
+                    <iframe
+                        src={activeTab.url}
+                        title={activeTab.title}
+                        class="pep-cloud-deploy-flow-browser__frame-iframe"
+                        onload={(e) =>
+                            applyLoadedIframeTitle(
+                                e,
+                                mountedTabId,
+                                mountedTabUrl,
+                                mountedVer,
+                            )}
+                    ></iframe>
+                </div>
             {/key}
         {:else}
             <div
@@ -624,9 +704,36 @@
         display: flex;
     }
 
-    .pep-cloud-deploy-flow-browser__frame-wrap iframe {
+    .pep-cloud-deploy-flow-browser__frame-host {
+        flex: 1;
+        min-height: 0;
         width: 100%;
+        position: relative;
+        display: flex;
+    }
+
+    .pep-cloud-deploy-flow-browser__frame-iframe {
+        flex: 1;
+        width: 100%;
+        min-height: 0;
         border: 0;
+    }
+
+    .pep-cloud-deploy-flow-browser__frame-loading {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f5f5f5;
+        color: #4e5969;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .pep-cloud-deploy-flow-browser__frame-loading-text {
+        font-weight: 500;
     }
 
     .pep-cloud-deploy-flow-browser__blank {

@@ -95,8 +95,8 @@ describe('component.server loader', () => {
 
         const result = await loader({}, data);
 
-        expect(result.mobile.steps[0].remoteContent.preloaded?.html).toBe('<div>mobile</div>');
-        expect(result.mobile.steps[0].remoteContent.preloaded?.css).toBe('body{color:blue;}');
+        expect(result.mobile.steps?.[0].remoteContent.preloaded?.html).toBe('<div>mobile</div>');
+        expect(result.mobile.steps?.[0].remoteContent.preloaded?.css).toBe('body{color:blue;}');
         expect(fetchMock).toHaveBeenCalledTimes(4);
     });
 });

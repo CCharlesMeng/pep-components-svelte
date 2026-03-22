@@ -16,7 +16,7 @@
     "build": "npm run build:client && npm run build:server && npm run build:data && npm run build:editor",
     "build:client": "vite build --mode=client",
     "build:server": "vite build --mode=server",
-    "build:data": "[ -f src/component.server.ts ] && vite build --mode=data || echo 'Skipping data build: src/component.server.ts not found'",
+    "build:data": "vite build --mode=data",
     "build:editor": "vite build --mode=editor",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",

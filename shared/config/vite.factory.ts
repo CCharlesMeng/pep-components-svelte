@@ -41,7 +41,7 @@ export function createComponentConfig(options: { cwd: string; name: string }) {
         '/@shared': resolve(projectRoot, 'shared')
     };
 
-    return defineConfig(({ command, mode }) => {
+    return defineConfig(({ command }) => {
         // Check build mode from command line
         const buildMode = process.argv.find(arg =>
             arg === '--mode=server' ||
@@ -110,8 +110,8 @@ export function createComponentConfig(options: { cwd: string; name: string }) {
             });
         }
 
-        // Client build
-        if (mode === 'production') {
+        // Client build（CLI 为 --mode=client，此处 mode 为 client 而非 production）
+        if (command === 'build' && buildMode === 'client') {
             return defineConfig({
                 plugins: [
                     svelte({ compilerOptions: { runes: true } })
