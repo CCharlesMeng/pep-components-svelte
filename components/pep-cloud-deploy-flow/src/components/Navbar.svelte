@@ -116,11 +116,17 @@
     grid-template-columns: 100px 1fr auto;
     gap: 16px;
     align-items: center;
-    min-height: 48px;
+    min-height: 32px;
     box-sizing: border-box;
     padding: 0 var(--primitive-space-4);
     background: var(--bg-primary);
     border-bottom: 1px solid var(--primitive-gray-200);
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.08);
+    z-index: 2;
+    position: relative;
+  }
+  :global(.pep-cloud-deploy-flow-navbar a:visited) {
+    color: #191919;
   }
 
   .pep-cloud-deploy-flow-navbar__logo {
@@ -147,22 +153,25 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 6px;
-    font-size: var(--primitive-font-sm);
+    font-size: 14px;
+    line-height: 22px;
   }
 
   .pep-cloud-deploy-flow-navbar__breadcrumbs a {
-    color: #4e5969;
+    color: #191919;
     text-decoration: none;
   }
 
   .pep-cloud-deploy-flow-navbar__breadcrumbs a.bold {
     font-weight: 700;
-    color: var(--text-primary);
+    color: #191919;
   }
 
   .pep-cloud-deploy-flow-navbar__sep {
-    color: #86909c;
+    color: #808080;
+    width: 16px;
+    display: flex;
+    justify-content: center;
   }
 
   .pep-cloud-deploy-flow-navbar__actions {
@@ -170,28 +179,23 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    line-height: 22px;
+    font-size: 14px;
+    color: #191919;
   }
 
   .pep-cloud-deploy-flow-navbar__action-link {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    color: #4e5969;
     text-decoration: none;
-    font-size: var(--primitive-font-xs);
-    padding: 4px 2px;
-    line-height: 1.4;
-    transition: color 0.15s;
-  }
-
-  .pep-cloud-deploy-flow-navbar__action-link:hover {
-    color: #1f2329;
+    padding: 5px 0px;
   }
 
   .pep-cloud-deploy-flow-navbar__divider {
     width: 1px;
-    height: 14px;
-    background: #d0d3d8;
+    height: 16px;
+    background: #f0f0f0;
     flex-shrink: 0;
   }
 
@@ -199,12 +203,6 @@
     background: transparent;
     border: none;
     cursor: pointer;
-    color: #1f2329;
-    font-weight: inherit;
-  }
-
-  .pep-cloud-deploy-flow-navbar__end-btn:hover {
-    color: #1f2329;
   }
 
   .pep-cloud-deploy-flow-navbar__btn-icon {
@@ -218,8 +216,8 @@
 
   .pep-cloud-deploy-flow-navbar__btn-icon :global(svg),
   .pep-cloud-deploy-flow-navbar__btn-icon img {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     object-fit: contain;
   }
 

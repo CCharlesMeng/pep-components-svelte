@@ -43,16 +43,15 @@
 <style>
   .pep-cloud-deploy-flow-quick-link-card {
     width: 260px;
-    min-height: 68px;
+    min-height: 72px;
     display: flex;
     align-items: center;
     gap: 12px;
     border-radius: 8px;
     background: #fff;
-    border: 1px solid #e5e7eb;
     color: #1f2937;
     text-decoration: none;
-    padding: 14px 16px;
+    padding: 16px;
     cursor: pointer;
     text-align: left;
     transition:
@@ -85,8 +84,8 @@
 
   .pep-cloud-deploy-flow-quick-link-card__label {
     font-size: 14px;
-    line-height: 1.4;
-    color: #1f2937;
+    line-height: 22px;
+    color: #191919;
     font-weight: 500;
     overflow: hidden;
     text-overflow: ellipsis;

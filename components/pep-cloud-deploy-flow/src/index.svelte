@@ -117,12 +117,12 @@
   }
 
   function handleBrowserSwitchToSideMode(): void {
-    sidebarState = "normal";
+    restoreSidebarSideModeWithDefaultRatio();
   }
 
   function minimizeBrowserAndShowSidebar(): void {
     isDeploying = false;
-    sidebarState = "normal";
+    restoreSidebarSideModeWithDefaultRatio();
   }
 
   function handleResizeStart(event: MouseEvent): void {
@@ -136,6 +136,12 @@
   function openFloating(): void {
     floatX = getRightDockFloatingX(window.innerWidth, floatW);
     sidebarState = "floating";
+  }
+
+  function restoreSidebarSideModeWithDefaultRatio(): void {
+    hasManualSidebarResize = false;
+    sidebarState = "normal";
+    syncSidebarWidthToDefaultRatio();
   }
 
   function syncSidebarWidthToDefaultRatio(): void {
@@ -345,7 +351,11 @@
   onMount(() => {
     const updateViewportFlag = () => {
       isMobileViewport = window.matchMedia("(max-width: 768px)").matches;
-      syncSidebarWidthToDefaultRatio();
+      if (sidebarState === "normal") {
+        // 侧边模式下 resize 视口时，重置到默认 25:75
+        hasManualSidebarResize = false;
+        syncSidebarWidthToDefaultRatio();
+      }
     };
     updateViewportFlag();
     window.addEventListener("resize", updateViewportFlag);
@@ -421,7 +431,7 @@
             {sidebar}
             onOpenExternal={handleOpenExternal}
             onFloat={openFloating}
-            onRestoreSide={() => (sidebarState = "normal")}
+            onRestoreSide={restoreSidebarSideModeWithDefaultRatio}
             onCollapse={() => (sidebarState = "collapsed")}
             isFullscreen={sidebarState === "fullscreen"}
           />
@@ -468,7 +478,7 @@
             class="restore-btn restore-btn--right"
             type="button"
             aria-label="恢复侧边栏"
-            onclick={() => (sidebarState = "normal")}
+            onclick={restoreSidebarSideModeWithDefaultRatio}
           >
             {#if sidebarMinimizeIcon}
               <img src={sidebarMinimizeIcon} alt="" />
@@ -495,8 +505,8 @@
           <SidebarPanel
             {sidebar}
             onOpenExternal={handleOpenExternal}
-            onFloat={() => (sidebarState = "normal")}
-            onRestoreSide={() => (sidebarState = "normal")}
+            onFloat={restoreSidebarSideModeWithDefaultRatio}
+            onRestoreSide={restoreSidebarSideModeWithDefaultRatio}
             onCollapse={() => (sidebarState = "collapsed")}
             isFloating={true}
           />
@@ -593,6 +603,9 @@
     transition:
       width 0.25s ease,
       opacity 0.25s ease;
+    box-shadow: -1px 0px 4px 0 rgba(0, 0, 0, 0.08);
+    z-index: 1;
+    position: relative;
   }
 
   .sidebar-wrap.is-resizing {
@@ -616,7 +629,6 @@
   .main-wrap {
     flex: 1;
     min-width: 0;
-    border-right: 1px solid #e5e6eb;
   }
 
   @media (max-width: 1280px) {
@@ -722,7 +734,7 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
+    height: 16px;
     cursor: grab;
     z-index: 10;
   }
@@ -836,6 +848,8 @@
   }
 
   :global(.pep-cloud-deploy-flow .rich-text li) {
+    font-size: 14px;
+    line-height: 22px;
     margin: 8px 0;
   }
 </style>

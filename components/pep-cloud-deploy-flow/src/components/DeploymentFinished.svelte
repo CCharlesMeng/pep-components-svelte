@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { EndDeploymentConfig } from "../types";
+  import DeployFlowButton from "./DeployFlowButton.svelte";
   import QuickLinkCard from "./QuickLinkCard.svelte";
 
   interface Props {
@@ -49,13 +50,13 @@
       </ul>
     </div>
 
-    <button
-      type="button"
+    <DeployFlowButton
+      variant="primary"
       class="pep-cloud-deploy-flow-success__redeploy"
       onclick={onRedeploy}
     >
       {successPage.redeployText}
-    </button>
+    </DeployFlowButton>
   </div>
 </section>
 
@@ -106,14 +107,8 @@
     list-style: none;
   }
 
-  .pep-cloud-deploy-flow-success__redeploy {
-    margin-top: 20px;
-    border: none;
-    border-radius: 999px;
-    background: #1f2329;
-    color: #fff;
-    padding: 10px 20px;
-    cursor: pointer;
+  :global(.pep-cloud-deploy-flow-success__redeploy) {
+    margin-top: 32px;
   }
 
   @media (max-width: 768px) {

@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { MainContentConfig } from "../types";
+  import DeployFlowButton from "./DeployFlowButton.svelte";
   import QuickLinkCard from "./QuickLinkCard.svelte";
 
   interface DeployLaunchPayload {
@@ -71,13 +72,14 @@
     </section>
 
     <section class="pep-cloud-deploy-flow-main__block">
-      <button
-        type="button"
+      <DeployFlowButton
+        variant="primary"
+        class="pep-cloud-deploy-flow-main__deploy-btn"
         disabled={!isAgreementChecked}
         onclick={handleDeployClick}
       >
         {mainContent.action.buttonText}
-      </button>
+      </DeployFlowButton>
     </section>
 
     <label class="pep-cloud-deploy-flow-main__agreement-row">
@@ -101,7 +103,16 @@
   .pep-cloud-deploy-flow-main__container {
     margin: 8% 7%;
   }
-
+  :global(.pep-cloud-deploy-flow-main__block h3) {
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    line-height: 22px;
+    font-weight: 700;
+    color: #191919;
+  }
+  :global(.pep-cloud-deploy-flow-main__block p) {
+    margin: 0 0 8px 0;
+  }
   .pep-cloud-deploy-flow-main__title {
     font-size: 28px;
     line-height: 1.35;
@@ -112,7 +123,7 @@
   }
 
   .pep-cloud-deploy-flow-main__block {
-    margin-bottom: 36px;
+    margin-bottom: 32px;
   }
 
   .pep-cloud-deploy-flow-main__block h3 {
@@ -136,40 +147,35 @@
     gap: 16px;
   }
 
-  .pep-cloud-deploy-flow-main__block button {
+  :global(.pep-cloud-deploy-flow-main__deploy-btn) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 10px 32px;
-    border: none;
-    border-radius: 999px;
-    color: #fff;
-    background: #191919;
-    cursor: pointer;
     font-size: 14px;
     font-weight: 500;
-    transition: background-color 0.2s;
+    line-height: 1.2;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
-  }
-
-  .pep-cloud-deploy-flow-main__block button:hover:not(:disabled) {
-    background: #1f2937;
-  }
-
-  .pep-cloud-deploy-flow-main__block button:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
+    margin-bottom: -16px;
   }
 
   .pep-cloud-deploy-flow-main__agreement-row {
-    margin-top: 8px;
     display: flex;
     align-items: center;
     gap: 8px;
     font-size: 14px;
     color: #4b5563;
   }
-
+  .pep-cloud-deploy-flow-main__agreement-row input[type="checkbox"] {
+    border: 1px solid #c2c2c2;
+    border-radius: 4px;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin: 0;
+  }
   .pep-cloud-deploy-flow-main__agreement {
     color: #4b5563;
     line-height: 1.6;

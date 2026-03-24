@@ -15,6 +15,7 @@
   import type { SidebarConfig } from "../types";
   import { loadRemoteContentForStep } from "../utils/remote-content-loader";
   import { buildRemoteIframeSrcdoc } from "../utils/remoteShadowSandbox";
+  import DeployFlowButton from "./DeployFlowButton.svelte";
   import Tooltip from "./Tooltip.svelte";
   import StepStatusDot from "./StepStatusDot.svelte";
 
@@ -579,14 +580,14 @@
 
   <div class="pep-cloud-deploy-flow-sidebar__footer">
     {#if canPrev}
-      <button type="button" class="is-secondary" onclick={handlePrevClick}>
+      <DeployFlowButton variant="secondary" onclick={handlePrevClick}>
         {sidebar.footer.prevText}
-      </button>
+      </DeployFlowButton>
     {/if}
     {#if canNext}
-      <button type="button" class="is-primary" onclick={handleNextClick}>
+      <DeployFlowButton variant="primary" onclick={handleNextClick}>
         {sidebar.footer.nextText}
-      </button>
+      </DeployFlowButton>
     {/if}
   </div>
 </aside>
@@ -594,7 +595,6 @@
 <style>
   .pep-cloud-deploy-flow-sidebar {
     background: #ffffff;
-    border: 1px solid #e5e6eb;
     border-radius: 2px;
     padding: 0;
     display: flex;
@@ -665,8 +665,7 @@
     object-fit: contain;
   }
 
-  .pep-cloud-deploy-flow-sidebar__tabs button,
-  .pep-cloud-deploy-flow-sidebar__footer button {
+  .pep-cloud-deploy-flow-sidebar__tabs button {
     border: none;
     background: transparent;
     color: #4e5969;
@@ -957,36 +956,6 @@
     padding: 14px 16px;
     border-top: 1px solid var(--primitive-gray-200);
     background: #fff;
-  }
-
-  .pep-cloud-deploy-flow-sidebar__footer button {
-    text-align: center;
-    border-radius: 999px;
-    border: 1px solid #c9cdd4;
-    font-size: 14px;
-    padding: 8px 24px;
-    cursor: pointer;
-    transition: background-color 0.15s;
-  }
-
-  .pep-cloud-deploy-flow-sidebar__footer button.is-secondary {
-    background: #fff;
-    color: #4e5969;
-  }
-
-  .pep-cloud-deploy-flow-sidebar__footer button.is-secondary:hover {
-    background: #f5f7fa;
-  }
-
-  .pep-cloud-deploy-flow-sidebar__footer button.is-primary {
-    background: #191919;
-    border-color: #191919;
-    color: #fff;
-  }
-
-  .pep-cloud-deploy-flow-sidebar__footer button.is-primary:hover {
-    background: #1f2937;
-    border-color: #1f2937;
   }
 
   :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text h2) {

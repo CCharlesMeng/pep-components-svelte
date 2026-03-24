@@ -11,6 +11,7 @@
   import { fetchWithCache } from "../utils/remoteContentCache";
   import { loadRemoteContentForStep } from "../utils/remote-content-loader";
   import { buildRemoteIframeSrcdoc } from "../utils/remoteShadowSandbox";
+  import DeployFlowButton from "./DeployFlowButton.svelte";
   import StepStatusDot from "./StepStatusDot.svelte";
 
   interface Props {
@@ -34,7 +35,9 @@
   let remoteContentData = $state<RemoteContentData | null>(null);
   let remoteIframeEl = $state<HTMLIFrameElement | null>(null);
   let inlineContentEl = $state<HTMLDivElement | null>(null);
-  let isMarkdownContent = $derived(remoteContentData?.sourceType === "markdown");
+  let isMarkdownContent = $derived(
+    remoteContentData?.sourceType === "markdown",
+  );
   let canPrev = $derived(activeStepIndex > 0);
   let canNext = $derived(activeStepIndex < mobile.steps.length - 1);
   let activeStep = $derived(mobile.steps[activeStepIndex] ?? mobile.steps[0]);
@@ -208,17 +211,11 @@
           target="_self"
           rel="noreferrer"
         >
-          <img
-            src={mobile.navbar.logo.img}
-            alt="品牌 Logo"
-          />
+          <img src={mobile.navbar.logo.img} alt="品牌 Logo" />
         </a>
       {:else}
         <span class="pep-cloud-deploy-flow-mobile__logo">
-          <img
-            src={mobile.navbar.logo.img}
-            alt="品牌 Logo"
-          />
+          <img src={mobile.navbar.logo.img} alt="品牌 Logo" />
         </span>
       {/if}
       {#if mobile.navbar.breadcrumbs.length > 0}
@@ -294,22 +291,22 @@
 
   <footer class="pep-cloud-deploy-flow-mobile__footer" class:has-prev={canPrev}>
     {#if canPrev}
-      <button
-        type="button"
+      <DeployFlowButton
+        variant="secondary"
         class="pep-cloud-deploy-flow-mobile__footer-prev"
         onclick={handlePrevClick}
       >
         {mobile.footer.prevText}
-      </button>
+      </DeployFlowButton>
     {/if}
     {#if canNext}
-      <button
-        type="button"
+      <DeployFlowButton
+        variant="primary"
         class="pep-cloud-deploy-flow-mobile__footer-next"
         onclick={handleNextClick}
       >
         {mobile.footer.nextText}
-      </button>
+      </DeployFlowButton>
     {/if}
   </footer>
 </section>
@@ -621,30 +618,19 @@
     border-top: 1px solid #f0f0f0;
   }
 
-  .pep-cloud-deploy-flow-mobile__footer button {
-    height: 36px;
-    min-width: 114px;
+  .pep-cloud-deploy-flow-mobile__footer
+    :global(.pep-cloud-deploy-flow-mobile__footer-next) {
     border: 1px solid #191919;
-    border-radius: 18px;
-    background: #191919;
-    color: #fff;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 22px;
-    cursor: pointer;
-    padding: 0 18px;
-    max-width: 96px;
   }
 
   .pep-cloud-deploy-flow-mobile__footer
-    button.pep-cloud-deploy-flow-mobile__footer-prev {
-    border-color: #595959;
-    background: #fff;
-    color: #191919;
+    :global(.pep-cloud-deploy-flow-mobile__footer-next:hover:not(:disabled)) {
+    border-color: #1f2937;
   }
 
-  .pep-cloud-deploy-flow-mobile__footer button:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
+  .pep-cloud-deploy-flow-mobile__footer
+    :global(.pep-cloud-deploy-flow-mobile__footer-prev) {
+    border-color: #595959;
+    color: #191919;
   }
 </style>
