@@ -223,7 +223,7 @@
     object-fit: contain;
   }
 
-  @media (max-width: 980px) {
+  @media (max-width: 768px) {
     .pep-cloud-deploy-flow-navbar {
       grid-template-columns: 1fr;
       row-gap: 8px;

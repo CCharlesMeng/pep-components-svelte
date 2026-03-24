@@ -386,7 +386,7 @@
     },
     "mobile": {
       "title": "移动端配置",
-      "description": "移动端（屏幕宽度 ≤ 980px）的专属配置。logo、面包屑、步骤内容均支持留空，留空时自动继承 PC 端对应配置",
+      "description": "移动端（屏幕宽度 ≤ 768px）的专属配置。logo、面包屑、步骤内容均支持留空，留空时自动继承 PC 端对应配置",
       "type": "object",
       "additionalProperties": false,
       "required": ["linkImage"],

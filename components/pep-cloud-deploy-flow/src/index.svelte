@@ -36,7 +36,9 @@
   let endDeployment = $derived(resolveEndDeployment(data));
   let mobile = $derived(resolveMobileConfig(data));
   let backgroundImage = $derived(data.backgroundImage);
-  let { sidebarMinimizeIcon, sideResizeIcon: sidebarResizeIcon } = $derived(resolveSidebarHandleIcons(data));
+  let { sidebarMinimizeIcon, sideResizeIcon: sidebarResizeIcon } = $derived(
+    resolveSidebarHandleIcons(data),
+  );
   let isMobileViewport = $state(false);
   let showMobileFlow = $derived(isMobileViewport && !!mobile);
 
@@ -49,10 +51,13 @@
   );
   let sidebarWidth = $state(420);
   let isDragging = $state(false);
+  let hasManualSidebarResize = $state(false);
   let workspaceEl = $state<HTMLDivElement | null>(null);
 
   /** 悬浮窗贴右缘吸附带宽度（px，与原先左缘吸附阈值相同） */
   const FLOAT_RIGHT_SNAP_THRESHOLD_PX = 24;
+  const SIDEBAR_DEFAULT_RATIO = 0.25;
+  const SIDEBAR_RATIO_MIN_VIEWPORT = 768;
 
   // 悬浮面板状态（默认 X 在首次进入 floating 时用视口计算）
   let floatX = $state(0);
@@ -133,10 +138,41 @@
     sidebarState = "floating";
   }
 
+  function syncSidebarWidthToDefaultRatio(): void {
+    if (typeof window === "undefined") {
+      return;
+    }
+    if (
+      sidebarState !== "normal" ||
+      hasManualSidebarResize ||
+      window.innerWidth < SIDEBAR_RATIO_MIN_VIEWPORT
+    ) {
+      return;
+    }
+    const workspaceWidth =
+      workspaceEl?.getBoundingClientRect().width ?? window.innerWidth;
+    const fallbackMinWidth = workspaceWidth * SIDEBAR_DEFAULT_RATIO;
+    const maxWidth = computeMaxSidebarWidthByRightDock({
+      workspaceWidth,
+      minMainWidth: 240,
+      fallbackMinWidth,
+    });
+    const nextWidth = Math.min(fallbackMinWidth, maxWidth);
+    sidebarWidth = Math.round(nextWidth);
+  }
+
+  $effect(() => {
+    if (sidebarState !== "normal") {
+      return;
+    }
+    syncSidebarWidthToDefaultRatio();
+  });
+
   $effect(() => {
     if (!isDragging) {
       return;
     }
+    let hasMoved = false;
 
     const handleMouseMove = (event: MouseEvent) => {
       if (sidebarState !== "normal") {
@@ -157,10 +193,14 @@
         minWidth,
         maxWidth,
       });
+      hasMoved = true;
     };
 
     const handleMouseUp = () => {
       isDragging = false;
+      if (hasMoved) {
+        hasManualSidebarResize = true;
+      }
       document.body.style.cursor = "default";
       document.body.style.userSelect = "";
     };
@@ -229,7 +269,10 @@
       } else if (isFloatResizing) {
         const minFloatW = 280;
         const minFloatH = 200;
-        const maxFloatW = Math.max(minFloatW, containerWidth - floatDragStartPosX);
+        const maxFloatW = Math.max(
+          minFloatW,
+          containerWidth - floatDragStartPosX,
+        );
         const maxFloatH = Math.max(
           minFloatH,
           containerHeight - floatDragStartPosY,
@@ -239,10 +282,7 @@
           const floatRight = floatResizeStartW + floatDragStartPosX;
           const minX = Math.max(0, floatRight - containerWidth);
           const maxX = floatRight - minFloatW;
-          const nextX = Math.max(
-            minX,
-            Math.min(floatDragStartPosX + dx, maxX),
-          );
+          const nextX = Math.max(minX, Math.min(floatDragStartPosX + dx, maxX));
           floatX = nextX;
           floatW = floatRight - nextX;
         }
@@ -304,7 +344,8 @@
 
   onMount(() => {
     const updateViewportFlag = () => {
-      isMobileViewport = window.matchMedia("(max-width: 980px)").matches;
+      isMobileViewport = window.matchMedia("(max-width: 768px)").matches;
+      syncSidebarWidthToDefaultRatio();
     };
     updateViewportFlag();
     window.addEventListener("resize", updateViewportFlag);
@@ -323,10 +364,14 @@
     />
   {/if}
 
-  <div class="workspace" class:is-mobile-only={showMobileFlow} bind:this={workspaceEl}>
+  <div
+    class="workspace"
+    class:is-mobile-only={showMobileFlow}
+    bind:this={workspaceEl}
+  >
     {#if showMobileFlow && mobile}
       <MobileFlow
-        mobile={mobile}
+        {mobile}
         texts={sidebar.texts}
         stepCheckedIcon={sidebar.icons?.stepCheckedIcon}
         domainWhitelistPatterns={iframePages.domainWhitelistPatterns}
@@ -574,6 +619,12 @@
     border-right: 1px solid #e5e6eb;
   }
 
+  @media (max-width: 1280px) {
+    .sidebar-wrap {
+      width: 360px;
+    }
+  }
+
   .sidebar-resize-handle {
     position: absolute;
     top: 50%;
@@ -741,13 +792,7 @@
     opacity: 1;
   }
 
-  @media (max-width: 1280px) {
-    .sidebar-wrap {
-      width: 360px;
-    }
-  }
-
-  @media (max-width: 980px) {
+  @media (max-width: 768px) {
     .workspace {
       flex-direction: column;
       min-height: auto;

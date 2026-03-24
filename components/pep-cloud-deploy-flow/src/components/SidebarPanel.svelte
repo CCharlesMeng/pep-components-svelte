@@ -249,7 +249,10 @@
 
   function handleStepButtonClick(event: MouseEvent, index: number): void {
     const target = event.target as HTMLElement | null;
-    if (target?.closest(".pep-cloud-deploy-flow-sidebar__step-dot-hitbox")) {
+    if (
+      !isCompactSteps &&
+      target?.closest(".pep-cloud-deploy-flow-sidebar__step-dot-hitbox")
+    ) {
       return;
     }
     handleStepClick(index);

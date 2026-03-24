@@ -175,7 +175,7 @@
     line-height: 1.6;
   }
 
-  @media (max-width: 980px) {
+  @media (max-width: 768px) {
     .pep-cloud-deploy-flow-main {
       padding: 20px 16px;
     }

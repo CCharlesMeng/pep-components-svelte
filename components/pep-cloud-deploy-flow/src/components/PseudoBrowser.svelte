@@ -26,8 +26,9 @@
   let tabs = $state<BrowserTab[]>([]);
   let handledTimestamp = $state<number | null>(null);
   let addressInput = $state("");
-  let frameVersion = $state(0);
   let frameLoading = $state(false);
+  let tabFrameVersions = $state<Record<string, number>>({});
+  let loadedFrameKeys = $state<Record<string, true>>({});
 
   $effect(() => {
     if (externalUrl && externalUrl.timestamp !== handledTimestamp) {
@@ -61,18 +62,43 @@
       },
   );
 
-  let frameInstanceKey = $derived(
-    activeTab.url ? `${activeTab.id}:${activeTab.url}:${frameVersion}` : "",
+  let activeFrameKey = $derived(
+    activeTab.url
+      ? `${activeTab.id}:${activeTab.url}:${tabFrameVersions[activeTab.id] ?? 0}`
+      : "",
   );
 
   $effect(() => {
-    if (!frameInstanceKey) {
+    if (!activeFrameKey) {
       frameLoading = false;
       return;
     }
-    void frameInstanceKey;
-    frameLoading = true;
+    frameLoading = !Boolean(loadedFrameKeys[activeFrameKey]);
   });
+
+  function getTabFrameVersion(tabId: string): number {
+    return tabFrameVersions[tabId] ?? 0;
+  }
+
+  function getTabFrameKey(tab: BrowserTab): string {
+    if (!tab.url) {
+      return "";
+    }
+    return `${tab.id}:${tab.url}:${getTabFrameVersion(tab.id)}`;
+  }
+
+  function clearTabFrameCache(tabId: string): void {
+    const keyPrefix = `${tabId}:`;
+    const nextLoaded: Record<string, true> = {};
+    for (const key of Object.keys(loadedFrameKeys)) {
+      if (!key.startsWith(keyPrefix)) {
+        nextLoaded[key] = true;
+      }
+    }
+    loadedFrameKeys = nextLoaded;
+    const { [tabId]: _ignored, ...restVersions } = tabFrameVersions;
+    tabFrameVersions = restVersions;
+  }
 
   function selectTab(id: string): void {
     tabs = tabs.map((item) => ({ ...item, active: item.id === id }));
@@ -96,6 +122,7 @@
       filtered[0].active = true;
     }
     tabs = filtered;
+    clearTabFrameCache(id);
   }
 
   function normalizeUrl(raw: string): string {
@@ -166,7 +193,10 @@
         ? { ...item, url: nextUrl, title: toTabTitle(nextUrl) }
         : item,
     );
-    frameVersion += 1;
+    tabFrameVersions = {
+      ...tabFrameVersions,
+      [activeTab.id]: getTabFrameVersion(activeTab.id) + 1,
+    };
   }
 
   function navigateToAddress(): void {
@@ -183,7 +213,10 @@
         ? { ...item, url: nextUrl, title: toTabTitle(nextUrl) }
         : item,
     );
-    frameVersion += 1;
+    tabFrameVersions = {
+      ...tabFrameVersions,
+      [activeTab.id]: getTabFrameVersion(activeTab.id) + 1,
+    };
   }
 
   function handleAddressKeydown(event: KeyboardEvent): void {
@@ -210,15 +243,16 @@
     event: Event,
     mountedTabId: string,
     mountedTabUrl: string,
-    mountedVer: number,
+    mountedFrameKey: string,
   ): void {
     if (
       activeTab.id !== mountedTabId ||
       activeTab.url !== mountedTabUrl ||
-      frameVersion !== mountedVer
+      activeFrameKey !== mountedFrameKey
     ) {
       return;
     }
+    loadedFrameKeys = { ...loadedFrameKeys, [mountedFrameKey]: true };
     frameLoading = false;
     const iframe = event.currentTarget as HTMLIFrameElement;
     const docTitle = tryReadIframeDocumentTitle(iframe);
@@ -378,39 +412,45 @@
   {/if}
 
   <div class="pep-cloud-deploy-flow-browser__frame-wrap">
-    {#if activeTab.url}
-      {#key frameInstanceKey}
-        {@const mountedTabId = activeTab.id}
-        {@const mountedTabUrl = activeTab.url}
-        {@const mountedVer = frameVersion}
-        <div class="pep-cloud-deploy-flow-browser__frame-host">
-          {#if frameLoading}
-            <div
-              class="pep-cloud-deploy-flow-browser__frame-loading"
-              role="status"
-              aria-live="polite"
-              aria-busy="true"
-            >
-              <span class="pep-cloud-deploy-flow-browser__frame-loading-text"
-                >{iframePages.frameLoadingText}</span
+    {#each tabs as tab (tab.id)}
+      {#if tab.url}
+        {@const mountedTabId = tab.id}
+        {@const mountedTabUrl = tab.url}
+        {@const mountedFrameKey = getTabFrameKey(tab)}
+        {#key mountedFrameKey}
+          <div
+            class="pep-cloud-deploy-flow-browser__frame-host"
+            class:pep-cloud-deploy-flow-browser__frame-host--hidden={!tab.active}
+          >
+            {#if tab.active && frameLoading}
+              <div
+                class="pep-cloud-deploy-flow-browser__frame-loading"
+                role="status"
+                aria-live="polite"
+                aria-busy="true"
               >
-            </div>
-          {/if}
-          <iframe
-            src={activeTab.url}
-            title={activeTab.title}
-            class="pep-cloud-deploy-flow-browser__frame-iframe"
-            onload={(e) =>
-              applyLoadedIframeTitle(
-                e,
-                mountedTabId,
-                mountedTabUrl,
-                mountedVer,
-              )}
-          ></iframe>
-        </div>
-      {/key}
-    {:else}
+                <span class="pep-cloud-deploy-flow-browser__frame-loading-text"
+                  >{iframePages.frameLoadingText}</span
+                >
+              </div>
+            {/if}
+            <iframe
+              src={tab.url}
+              title={tab.title}
+              class="pep-cloud-deploy-flow-browser__frame-iframe"
+              onload={(e) =>
+                applyLoadedIframeTitle(
+                  e,
+                  mountedTabId,
+                  mountedTabUrl,
+                  mountedFrameKey,
+                )}
+            ></iframe>
+          </div>
+        {/key}
+      {/if}
+    {/each}
+    {#if !activeTab.url}
       <div
         class="pep-cloud-deploy-flow-browser__blank"
         style={backgroundImage
@@ -488,7 +528,7 @@
     border-radius: 8px 8px 0 0;
     background: transparent;
     color: #4e5969;
-    padding: 0 12px;
+    padding: 0 16px;
     height: 32px;
     min-width: 124px;
     display: flex;
@@ -525,7 +565,6 @@
 
   .pep-cloud-deploy-flow-browser__close {
     font-size: 10px;
-    opacity: 0;
     border: none;
     background: transparent;
     color: #f0f0f0;
@@ -536,11 +575,6 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-  }
-
-  .pep-cloud-deploy-flow-browser__tab-item:hover
-    .pep-cloud-deploy-flow-browser__close {
-    opacity: 1;
   }
 
   .pep-cloud-deploy-flow-browser__close:hover {
@@ -582,10 +616,13 @@
 
   .pep-cloud-deploy-flow-browser__tool-btn {
     width: 32px;
-    height: 32px;
+    height: auto;
     min-width: 32px;
     padding: 0;
+    padding-top: 4px;
+    margin-top: -4px;
     border-radius: 0;
+    align-self: stretch;
   }
 
   .pep-cloud-deploy-flow-browser__add-tab svg,
@@ -696,6 +733,10 @@
     display: flex;
   }
 
+  .pep-cloud-deploy-flow-browser__frame-host--hidden {
+    display: none;
+  }
+
   .pep-cloud-deploy-flow-browser__frame-iframe {
     flex: 1;
     width: 100%;
@@ -777,10 +818,6 @@
     letter-spacing: 0.2px;
   }
 
-  .pep-cloud-deploy-flow-browser__shortcut-group {
-    width: min(100%, 760px);
-  }
-
   .pep-cloud-deploy-flow-browser__shortcut-title {
     margin: 0 0 10px 0;
     font-size: 12px;
@@ -795,7 +832,7 @@
     justify-content: flex-start;
   }
 
-  @media (max-width: 980px) {
+  @media (max-width: 768px) {
     .pep-cloud-deploy-flow-browser__shortcut-list {
       grid-template-columns: 1fr;
     }

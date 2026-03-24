@@ -116,7 +116,7 @@
     cursor: pointer;
   }
 
-  @media (max-width: 980px) {
+  @media (max-width: 768px) {
     .pep-cloud-deploy-flow-success__main {
       padding: 32px 0 0 16px;
       max-width: none;
