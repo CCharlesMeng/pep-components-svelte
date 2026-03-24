@@ -938,6 +938,7 @@
   .pep-cloud-deploy-flow-sidebar__inline-content {
     width: 100%;
     min-width: 0;
+    overflow-x: hidden;
   }
 
   .loading {
@@ -1004,6 +1005,45 @@
     font-size: var(--primitive-font-sm);
     line-height: 1.7;
     color: #4e5969;
+  }
+
+  :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text) {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text img) {
+    display: block;
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+  }
+
+  :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text pre) {
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text code) {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: pre-wrap;
+  }
+
+  :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text table) {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text th),
+  :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text td) {
+    white-space: nowrap;
   }
 
   :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text a) {

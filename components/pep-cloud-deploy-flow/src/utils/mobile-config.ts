@@ -10,7 +10,10 @@ export interface ResolvedMobileConfig extends MobileConfig {
 export function resolveMobileConfig(data: PepCloudDeployFlowRuntimeProps): ResolvedMobileConfig {
     return {
         navbar: {
-            logo: data.mobile.navbar?.logo ?? data.navbar.logo,
+            logo: {
+                ...data.navbar.logo,
+                ...(data.mobile.navbar?.logo ?? {}),
+            },
             breadcrumbs: data.mobile.navbar?.breadcrumbs ?? data.navbar.breadcrumbs,
         },
         linkImage: data.mobile.linkImage,

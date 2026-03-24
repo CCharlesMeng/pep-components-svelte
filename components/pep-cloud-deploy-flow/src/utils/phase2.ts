@@ -24,7 +24,7 @@ export interface RemoteContentFallbackTexts {
 
 export type LinkOpenMode = 'embedded' | 'external';
 
-const ARTICLE_BOX_SELECTOR = '.articleBoxWithoutHead';
+const ARTICLE_BOX_SELECTOR = `.help-content [id^='body']`;
 const TABLE_SCROLL_WRAP_CLASS = 'pep-cloud-deploy-flow-sidebar__table-wrap';
 
 /**

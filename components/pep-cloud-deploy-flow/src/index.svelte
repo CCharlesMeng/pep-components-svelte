@@ -26,6 +26,7 @@
     shouldShowRightSnapShadow,
     shouldSnapToRightDock,
   } from "./utils/sidebar-layout";
+  import { shouldOpenEmbeddedByFlowState } from "./utils/deploy-flow-link-state";
 
   let data: PepCloudDeployFlowRuntimeProps = $props();
   let navbar = $derived(resolveNavbarForBar(data));
@@ -79,9 +80,18 @@
   }
 
   function handleOpenExternal(url: string, title: string): void {
-    // 从结束页/引导页点击卡片时，需先退出“结束部署态”再进入伪浏览器态
-    isDeploymentFinished = false;
-    isDeploying = true;
+    const shouldOpenEmbedded = shouldOpenEmbeddedByFlowState({
+      isDeploying,
+      isDeploymentFinished,
+    });
+
+    if (!shouldOpenEmbedded) {
+      if (typeof window !== "undefined") {
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
+      return;
+    }
+
     externalUrl = {
       url,
       title,
@@ -371,7 +381,11 @@
             isFullscreen={sidebarState === "fullscreen"}
           />
           {#if sidebarState === "normal"}
-            <div class="sidebar-resize-hover-zone" aria-hidden="true"></div>
+            <div
+              class="sidebar-resize-hover-zone"
+              aria-hidden="true"
+              onmousedown={handleResizeStart}
+            ></div>
             <button
               type="button"
               class="sidebar-resize-handle"
@@ -587,9 +601,11 @@
     position: absolute;
     left: 0;
     top: 0;
-    width: 10px;
+    width: 12px;
     height: 100%;
     z-index: 14;
+    cursor: col-resize;
+    box-sizing: border-box;
   }
 
   .sidebar-resize-hover-zone:hover + .sidebar-resize-handle,

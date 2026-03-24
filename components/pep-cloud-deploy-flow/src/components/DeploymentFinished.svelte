@@ -62,7 +62,6 @@
 <style>
   .pep-cloud-deploy-flow-success {
     background: #ffffff;
-    border: 1px solid #e5e6eb;
     border-radius: 4px;
     min-height: 760px;
     display: flex;

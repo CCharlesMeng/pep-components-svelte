@@ -7,6 +7,7 @@ import type {
     SidebarStep,
 } from '../types';
 import type { PepCloudDeployFlowRuntimeProps, SidebarStepWithPreload } from '../runtime-data';
+import { resolveSidebarTabSteps } from './sidebar-tab-mode';
 
 /**
  * 为 SidebarPanel 组装完整的 SidebarConfig。
@@ -93,17 +94,13 @@ export function resolveSidebarHandleIcons(data: PepCloudDeployFlowRuntimeProps):
 }
 
 /**
- * 当 mobile.steps 为空时，从 sidebar.tabs[0] 展平步骤作为 fallback。
- * 支持单应用模式（直接有 steps）和多应用模式（有 applications）。
+ * 当 mobile.steps 为空时，从 sidebar.tabs[0] 继承步骤作为 fallback。
+ * 与 PC 侧边栏默认一致：多应用时仅取第一个 application 的 steps，不合并全部应用。
  */
 export function resolveMobileSteps(data: PepCloudDeployFlowRuntimeProps): SidebarStepWithPreload[] {
     if (data.mobile.steps && data.mobile.steps.length > 0) {
         return data.mobile.steps;
     }
     const firstTab = data.sidebar.tabs?.[0];
-    if (!firstTab) return [];
-    if (firstTab.applications && firstTab.applications.length > 0) {
-        return firstTab.applications.flatMap((app) => app.steps);
-    }
-    return firstTab.steps ?? [];
+    return resolveSidebarTabSteps(firstTab, 0) as SidebarStepWithPreload[];
 }

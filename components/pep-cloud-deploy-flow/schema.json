@@ -30,6 +30,14 @@
               "title": "Logo 图片地址",
               "type": "string",
               "ui:widget": "imageSelector"
+            },
+            "url": {
+              "title": "点击 Logo 跳转链接",
+              "description": "填写后 Logo 区域可点击，在当前窗口打开（_self）",
+              "type": "string",
+              "ui:options": {
+                "format": "url"
+              }
             }
           }
         },
@@ -399,6 +407,14 @@
                   "title": "Logo 图片地址",
                   "type": "string",
                   "ui:widget": "imageSelector"
+                },
+                "url": {
+                  "title": "点击 Logo 跳转链接",
+                  "description": "仅覆盖本对象内填写的字段，未填的 url 会继承 PC 端 navbar.logo；有 url 时 Logo 可点击，在当前窗口打开（_self）",
+                  "type": "string",
+                  "ui:options": {
+                    "format": "url"
+                  }
                 }
               }
             },
@@ -452,7 +468,7 @@
         },
         "steps": {
           "title": "移动端步骤列表（可选）",
-          "description": "不填时自动继承侧边栏（sidebar）第一个标签页的步骤内容。如需移动端展示不同内容，可在此单独配置",
+          "description": "不填时自动继承侧边栏（sidebar）第一个标签页下第一个应用（或该标签页直连的 steps）的步骤内容，与 PC 端默认选中的应用一致。如需移动端展示不同内容，可在此单独配置",
           "type": "array",
           "default": [],
           "items": {

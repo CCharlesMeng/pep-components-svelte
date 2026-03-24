@@ -1,5 +1,6 @@
 export interface NavbarLogo {
     img: string;
+    url?: string;
 }
 
 export interface BreadcrumbItem {

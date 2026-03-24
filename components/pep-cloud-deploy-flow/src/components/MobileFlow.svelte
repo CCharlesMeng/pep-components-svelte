@@ -201,12 +201,26 @@
 <section class="pep-cloud-deploy-flow-mobile">
   <header class="pep-cloud-deploy-flow-mobile__header">
     <nav class="pep-cloud-deploy-flow-mobile__breadcrumbs" aria-label="面包屑">
-      <span class="pep-cloud-deploy-flow-mobile__logo">
-        <img
-          src={mobile.navbar.logo.img}
-          alt="品牌 Logo"
-        />
-      </span>
+      {#if mobile.navbar.logo.url}
+        <a
+          class="pep-cloud-deploy-flow-mobile__logo"
+          href={mobile.navbar.logo.url}
+          target="_self"
+          rel="noreferrer"
+        >
+          <img
+            src={mobile.navbar.logo.img}
+            alt="品牌 Logo"
+          />
+        </a>
+      {:else}
+        <span class="pep-cloud-deploy-flow-mobile__logo">
+          <img
+            src={mobile.navbar.logo.img}
+            alt="品牌 Logo"
+          />
+        </span>
+      {/if}
       {#if mobile.navbar.breadcrumbs.length > 0}
         <span class="pep-cloud-deploy-flow-mobile__logo-separator">/</span>
       {/if}
@@ -326,6 +340,11 @@
     gap: 6px;
   }
 
+  a.pep-cloud-deploy-flow-mobile__logo {
+    text-decoration: none;
+    color: inherit;
+  }
+
   .pep-cloud-deploy-flow-mobile__logo img {
     height: 18px;
   }
@@ -389,26 +408,27 @@
   .pep-cloud-deploy-flow-mobile__steps {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 4px;
+    justify-content: flex-start;
+    gap: 8px;
     margin: 0;
     padding: 0;
     list-style: none;
+    min-width: 0;
   }
 
   .pep-cloud-deploy-flow-mobile__steps li {
-    flex: 1;
+    flex: 0 1 auto;
     display: flex;
     align-items: center;
     min-width: 0;
-    gap: 4px;
+    gap: 8px;
   }
 
   .pep-cloud-deploy-flow-mobile__steps li button {
     border: none;
     background: transparent;
     padding: 0;
-    flex: 1;
+    flex: 0 1 auto;
     min-width: 0;
     display: flex;
     flex-direction: row;
@@ -435,7 +455,7 @@
   }
 
   .pep-cloud-deploy-flow-mobile__step-label {
-    max-width: 100%;
+    max-width: 88px;
     text-align: left;
     font-size: 10px;
     line-height: 18px;
@@ -458,10 +478,28 @@
   }
 
   .pep-cloud-deploy-flow-mobile__steps .line {
-    width: 16px;
+    width: 20px;
     height: 1px;
     background: #c4c4c4;
     flex-shrink: 0;
+  }
+
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .pep-cloud-deploy-flow-mobile__steps-wrap {
+      padding: 8px 0 4px;
+    }
+
+    .pep-cloud-deploy-flow-mobile__steps {
+      gap: 10px;
+    }
+
+    .pep-cloud-deploy-flow-mobile__steps li {
+      gap: 10px;
+    }
+
+    .pep-cloud-deploy-flow-mobile__step-label {
+      max-width: 140px;
+    }
   }
 
   :global(.pep-cloud-deploy-flow-mobile__steps .check-fallback) {
@@ -504,6 +542,67 @@
   .pep-cloud-deploy-flow-mobile__inline-content {
     width: 100%;
     min-width: 0;
+    overflow-x: hidden;
+  }
+
+  :global(.pep-cloud-deploy-flow-mobile__remote-content .rich-text) {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  :global(.pep-cloud-deploy-flow-mobile__remote-content .rich-text h2) {
+    font-size: 20px;
+    line-height: 1.4;
+    margin: 0 0 12px;
+    color: #191919;
+  }
+
+  :global(.pep-cloud-deploy-flow-mobile__remote-content .rich-text h3) {
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 0 0 10px;
+    color: #191919;
+  }
+
+  :global(.pep-cloud-deploy-flow-mobile__remote-content .rich-text p),
+  :global(.pep-cloud-deploy-flow-mobile__remote-content .rich-text li) {
+    font-size: 13px;
+    line-height: 1.7;
+    color: #4e5969;
+  }
+
+  :global(.pep-cloud-deploy-flow-mobile__remote-content .rich-text img) {
+    display: block;
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+  }
+
+  :global(.pep-cloud-deploy-flow-mobile__remote-content .rich-text pre) {
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  :global(.pep-cloud-deploy-flow-mobile__remote-content .rich-text code) {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: pre-wrap;
+  }
+
+  :global(.pep-cloud-deploy-flow-mobile__remote-content .rich-text table) {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  :global(.pep-cloud-deploy-flow-mobile__remote-content .rich-text th),
+  :global(.pep-cloud-deploy-flow-mobile__remote-content .rich-text td) {
+    white-space: nowrap;
   }
 
   .pep-cloud-deploy-flow-mobile__loading {
