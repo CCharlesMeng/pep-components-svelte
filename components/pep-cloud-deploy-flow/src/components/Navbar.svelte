@@ -9,27 +9,6 @@
 
   let { navbar, isDeploying = false, onEndDeployment }: Props = $props();
 
-  const ICONS: Record<string, string> = {
-    monitor: `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="1" y="2" width="14" height="10" rx="1.2" stroke="currentColor" stroke-width="1.3"/>
-            <path d="M5.5 14h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-            <path d="M8 12v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-        </svg>`,
-    "log-out": `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M6 14H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M10.667 11.333 14 8l-3.333-3.333" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M14 8H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>`,
-    "stop-circle": `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/>
-            <rect x="5.5" y="5.5" width="5" height="5" rx="0.5" fill="currentColor"/>
-        </svg>`,
-  };
-
-  function getIcon(name: string): string {
-    return ICONS[name?.toLowerCase()] ?? "";
-  }
-
   function isIconUrl(s: string | undefined): boolean {
     return typeof s === "string" && /^https?:\/\//i.test(s.trim());
   }
@@ -79,8 +58,6 @@
           <span class="pep-cloud-deploy-flow-navbar__btn-icon">
             {#if isIconUrl(action.icon)}
               <img src={action.icon} alt="" />
-            {:else if getIcon(action.icon)}
-              {@html getIcon(action.icon)}
             {/if}
           </span>
         {/if}
@@ -99,8 +76,6 @@
           <span class="pep-cloud-deploy-flow-navbar__btn-icon">
             {#if isIconUrl(navbar.endDeployment.icon)}
               <img src={navbar.endDeployment.icon} alt="" />
-            {:else if getIcon(navbar.endDeployment.icon)}
-              {@html getIcon(navbar.endDeployment.icon)}
             {/if}
           </span>
         {/if}
