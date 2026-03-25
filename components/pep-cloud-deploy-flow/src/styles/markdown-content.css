@@ -1,0 +1,164 @@
+.pep-cloud-deploy-flow-md {
+  color: #1f2329;
+  font-size: 14px;
+  line-height: 1.75;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.pep-cloud-deploy-flow-md > :first-child {
+  margin-top: 0;
+}
+
+.pep-cloud-deploy-flow-md > :last-child {
+  margin-bottom: 0;
+}
+
+.pep-cloud-deploy-flow-md h1,
+.pep-cloud-deploy-flow-md h2,
+.pep-cloud-deploy-flow-md h3,
+.pep-cloud-deploy-flow-md h4,
+.pep-cloud-deploy-flow-md h5,
+.pep-cloud-deploy-flow-md h6 {
+  margin: 1.6em 0 0.7em;
+  color: #1f2329;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.pep-cloud-deploy-flow-md h1 {
+  font-size: 26px;
+}
+
+.pep-cloud-deploy-flow-md h2 {
+  font-size: 22px;
+}
+
+.pep-cloud-deploy-flow-md h3 {
+  font-size: 18px;
+}
+
+.pep-cloud-deploy-flow-md h4 {
+  font-size: 16px;
+}
+
+.pep-cloud-deploy-flow-md h5 {
+  font-size: 15px;
+}
+
+.pep-cloud-deploy-flow-md h6 {
+  font-size: 14px;
+  color: #4e5969;
+}
+
+.pep-cloud-deploy-flow-md p {
+  margin: 0 0 1em;
+  color: #4e5969;
+}
+
+.pep-cloud-deploy-flow-md a {
+  color: #165dff;
+  text-decoration: none;
+}
+
+.pep-cloud-deploy-flow-md a:hover,
+.pep-cloud-deploy-flow-md a:focus-visible {
+  text-decoration: underline;
+}
+
+.pep-cloud-deploy-flow-md ul,
+.pep-cloud-deploy-flow-md ol {
+  margin: 0 0 1em;
+  padding-left: 1.5em;
+}
+
+.pep-cloud-deploy-flow-md li {
+  margin: 0.35em 0;
+  color: #4e5969;
+}
+
+.pep-cloud-deploy-flow-md li > p {
+  margin: 0.35em 0;
+}
+
+.pep-cloud-deploy-flow-md blockquote {
+  margin: 1em 0;
+  padding: 0.75em 1em;
+  border-left: 4px solid #d0d7e2;
+  background: #f7f8fa;
+  color: #4e5969;
+}
+
+.pep-cloud-deploy-flow-md hr {
+  margin: 1.4em 0;
+  border: none;
+  border-top: 1px solid #e5e6eb;
+}
+
+.pep-cloud-deploy-flow-md pre {
+  margin: 1em 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #0f172a;
+  color: #e5e7eb;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.65;
+  white-space: pre;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pep-cloud-deploy-flow-md code {
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  background: #f2f3f5;
+  color: #1f2329;
+  font-size: 0.92em;
+  font-family: Consolas, "Courier New", monospace;
+}
+
+.pep-cloud-deploy-flow-md pre code {
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+  white-space: pre;
+}
+
+.pep-cloud-deploy-flow-md table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  margin: 1em 0;
+  overflow-x: auto;
+  border-collapse: collapse;
+  border-spacing: 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pep-cloud-deploy-flow-md thead {
+  background: #f7f8fa;
+}
+
+.pep-cloud-deploy-flow-md th,
+.pep-cloud-deploy-flow-md td {
+  padding: 8px 10px;
+  border: 1px solid #e5e6eb;
+  text-align: left;
+  vertical-align: top;
+  white-space: nowrap;
+  color: #4e5969;
+}
+
+.pep-cloud-deploy-flow-md th {
+  color: #1f2329;
+  font-weight: 600;
+}
+
+.pep-cloud-deploy-flow-md img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1em 0;
+  border-radius: 8px;
+}

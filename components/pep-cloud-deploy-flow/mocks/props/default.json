@@ -53,7 +53,7 @@
                 "remoteContent": {
                   "source": {
                     "contentType": "markdown",
-                    "markdownContent": "## 方案概述\n\n本方案基于 **Flexus 云服务器 X 实例** 快速搭建 Dify LLM 应用开发平台。\n\n### 前提条件\n\n- 已完成实名认证\n- 账号余额充足\n- 具备基础 Linux 操作能力\n\n### 核心组件\n\n- Flexus 云服务器\n- 弹性公网 IP（EIP）\n- Docker 运行环境\n\n> 预计部署时长约 1 小时，费用请以控制台为准。 \n ![image](https://support.huaweicloud.com/bestpractice-flexusl/zh-cn_image_0000002549035071.png)"
+                    "markdownContent": "## 方案概述\n\n本方案基于 **Flexus 云服务器 X 实例** 快速搭建 Dify LLM 应用开发平台。\n\n### 前提条件\n\n- 已完成实名认证\n- 账号余额充足\n- 具备基础 Linux 操作能力\n\n### 核心组件\n\n![image](https://support.huaweicloud.com/bestpractice-flexusl/zh-cn_image_0000002549035071.png) \n\n- Flexus 云服务器\n- 弹性公网 IP（EIP）\n- Docker 运行环境\n\n> 预计部署时长约 1 小时，费用请以控制台为准。 \n\n "
                   }
                 }
               },
@@ -94,7 +94,7 @@
                 "remoteContent": {
                   "source": {
                     "contentType": "markdown",
-                    "markdownContent": "## 方案概述\n\n本方案基于 **Flexus 云服务器 X 实例** 快速搭建 Dify LLM 应用开发平台。\n\n### 前提条件\n\n- 已完成实名认证\n- 账号余额充足\n- 具备基础 Linux 操作能力\n\n### 核心组件\n\n- Flexus 云服务器\n- 弹性公网 IP（EIP）\n- Docker 运行环境\n\n> 预计部署时长约 1 小时，费用请以控制台为准。"
+                    "markdownContent": "## 方案概述\n\n ## 前置条件 \n\n快速搭建Dify-LLM应用平台开发[准备工作](https://support.huaweicloud.com/dify-aislt/dify_04.html)"
                   }
                 }
               },
@@ -103,7 +103,7 @@
                 "remoteContent": {
                   "source": {
                     "contentType": "markdown",
-                    "markdownContent": "## 立即部署\n\n请按以下步骤完成部署：\n\n1. 登录云服务器\n2. 安装 Docker\n3. 拉取并启动 Dify 容器[超链接](https://www.huaweicloud.com)\n4. 访问控制台完成初始化\n\n```bash\nssh root@<your-server-ip>\ncurl -fsSL https://get.docker.com | bash\nsystemctl enable docker && systemctl start docker\n```\n\n完成后可通过 `http://<your-server-ip>` 访问。"
+                    "markdownContent": "## 立即部署\n\n请按以下步骤完成部署：\n\n1. 登录云服务器\n2. 安装 Docker\n3. 拉取并启动 Dify 容器\n4. 访问控制台完成初始化\n\n```bash\nssh root@<your-server-ip>\ncurl -fsSL https://get.docker.com | bash\nsystemctl enable docker && systemctl start docker\n```\n\n完成后可通过 `http://<your-server-ip>` 访问。"
                   }
                 }
               },
@@ -192,7 +192,7 @@
   },
   "backgroundImage": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/design/background.png",
   "iframePages": {
-    "domainWhitelistPatterns": ["*.huaweicloud.com"],
+    "domainWhitelistPatterns": ["*.huaweicloud.com", "*.ulanqab.huawei.com"],
     "newTabPage": {
       "tabTitle": "新标签页",
       "title": {
@@ -205,7 +205,8 @@
   "mobile": {
     "linkImage": {
       "image": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/mobile/linkImage.png",
-      "url": "https://www.huaweicloud.com/product/flexus-x.html"
+      "url": "https://www.huaweicloud.com/product/flexus-x.html",
+      "copyTip": "已复制"
     }
   },
   "theme": {

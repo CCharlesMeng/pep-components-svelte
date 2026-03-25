@@ -180,6 +180,7 @@ export interface MobileNavbarConfig {
 export interface MobileLinkImageConfig {
     image: string;
     url: string;
+    copyTip?: string;
 }
 
 export interface MobileConfig {
