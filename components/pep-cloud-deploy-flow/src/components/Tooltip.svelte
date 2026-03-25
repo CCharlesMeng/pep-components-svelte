@@ -1,10 +1,17 @@
 <script lang="ts">
     import type { Snippet } from "svelte";
+    import {
+        computeTooltipPosition,
+        type TooltipPlacement,
+        type TooltipPositioningOptions
+    } from "../utils/tooltip-position";
 
     interface Props {
         content: string;
-        placement?: "top" | "bottom";
+        placement?: TooltipPlacement;
         disabled?: boolean;
+        positioning?: TooltipPositioningOptions;
+        strategy?: "fixed" | "absolute";
         children?: Snippet;
     }
 
@@ -12,6 +19,8 @@
         content,
         placement = "top",
         disabled = false,
+        positioning = {},
+        strategy = "fixed",
         children,
     }: Props = $props();
 
@@ -19,15 +28,29 @@
     let triggerEl = $state<HTMLSpanElement | null>(null);
     let popupEl = $state<HTMLSpanElement | null>(null);
     let visible = $state(false);
+    let resolvedPlacement = $state<TooltipPlacement>("top");
+    let rafId = $state<number | null>(null);
+
+    function scheduleUpdatePosition(): void {
+        if (rafId !== null) return;
+        rafId = requestAnimationFrame(() => {
+            rafId = null;
+            updatePosition();
+        });
+    }
 
     function show(): void {
         if (isDisabled) return;
         visible = true;
-        requestAnimationFrame(updatePosition);
+        scheduleUpdatePosition();
     }
 
     function hide(): void {
         visible = false;
+        if (rafId !== null) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+        }
     }
 
     function updatePosition(): void {
@@ -37,23 +60,53 @@
             (triggerEl.firstElementChild as HTMLElement | null) ?? triggerEl;
         const rect = anchorEl.getBoundingClientRect();
         const popupRect = popupEl.getBoundingClientRect();
-        const gap = 8;
+        const position = computeTooltipPosition({
+            anchorRect: rect,
+            popupRect,
+            viewportWidth: window.innerWidth,
+            viewportHeight: window.innerHeight,
+            placement,
+            options: positioning
+        });
 
-        let top: number;
-        if (placement === "bottom") {
-            top = rect.bottom + gap;
-        } else {
-            top = rect.top - popupRect.height - gap;
-        }
+        resolvedPlacement = position.placement;
 
-        let left = rect.left + rect.width / 2 - popupRect.width / 2;
-        const minLeft = 4;
-        const maxLeft = window.innerWidth - popupRect.width - 4;
-        left = Math.max(minLeft, Math.min(maxLeft, left));
+        const top =
+            strategy === "absolute" ? position.top + window.scrollY : position.top;
+        const left =
+            strategy === "absolute" ? position.left + window.scrollX : position.left;
 
+        popupEl.style.position = strategy;
         popupEl.style.top = `${top}px`;
         popupEl.style.left = `${left}px`;
+        popupEl.style.setProperty("--pep-tooltip-arrow-x", `${position.arrowOffsetX}px`);
     }
+
+    $effect(() => {
+        if (!visible) {
+            return;
+        }
+        const onViewportChange = () => {
+            scheduleUpdatePosition();
+        };
+        window.addEventListener("resize", onViewportChange);
+        window.addEventListener("scroll", onViewportChange, true);
+        return () => {
+            window.removeEventListener("resize", onViewportChange);
+            window.removeEventListener("scroll", onViewportChange, true);
+        };
+    });
+
+    $effect(() => {
+        placement;
+        positioning;
+        strategy;
+        content;
+        resolvedPlacement = placement;
+        if (visible) {
+            scheduleUpdatePosition();
+        }
+    });
 </script>
 
 <span
@@ -71,7 +124,7 @@
 {#if visible && !isDisabled}
     <span
         class="pep-tooltip__popup"
-        class:bottom={placement === "bottom"}
+        class:bottom={resolvedPlacement === "bottom"}
         class:is-visible={visible}
         bind:this={popupEl}
     >
@@ -114,7 +167,7 @@
     .pep-tooltip__popup::after {
         content: "";
         position: absolute;
-        left: 50%;
+        left: var(--pep-tooltip-arrow-x, 50%);
         top: 100%;
         transform: translateX(-50%);
         border-width: 5px 5px 0 5px;

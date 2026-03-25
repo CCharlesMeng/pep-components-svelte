@@ -12,6 +12,7 @@
     resolveSidebarTabSteps,
     shouldShowApplicationDropdown,
   } from "../utils/sidebar-tab-mode";
+  import "../styles/markdown-content.css";
   import type { SidebarConfig } from "../types";
   import { loadRemoteContentForStep } from "../utils/remote-content-loader";
   import { buildRemoteIframeSrcdoc } from "../utils/remoteShadowSandbox";
@@ -282,8 +283,18 @@
     });
   }
 
+  function getEventTargetElement(target: EventTarget | null): Element | null {
+    if (target instanceof Element) {
+      return target;
+    }
+    if (target instanceof Node) {
+      return target.parentElement;
+    }
+    return null;
+  }
+
   function handleInlineContentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement | null;
+    const target = getEventTargetElement(event.target);
     const anchor = target?.closest("a");
     if (!anchor) {
       return;
@@ -560,7 +571,7 @@
     {:else if remoteContentData}
       {#if isMarkdownContent}
         <div
-          class="pep-cloud-deploy-flow-sidebar__inline-content rich-text"
+          class="pep-cloud-deploy-flow-sidebar__inline-content rich-text pep-cloud-deploy-flow-md"
           bind:this={inlineContentEl}
         >
           {@html remoteContentData.html}
@@ -984,47 +995,6 @@
     max-width: 100%;
     overflow-wrap: anywhere;
     word-break: break-word;
-  }
-
-  :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text img) {
-    display: block;
-    max-width: 100%;
-    width: 100%;
-    height: auto;
-  }
-
-  :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text pre) {
-    max-width: 100%;
-    overflow-x: auto;
-    white-space: pre;
-  }
-
-  :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text code) {
-    overflow-wrap: anywhere;
-    word-break: break-word;
-    white-space: pre-wrap;
-  }
-
-  :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text table) {
-    display: block;
-    max-width: 100%;
-    overflow-x: auto;
-    border-collapse: collapse;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text th),
-  :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text td) {
-    white-space: nowrap;
-  }
-
-  :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text a) {
-    color: #165dff;
-    text-decoration: none;
-  }
-
-  :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text a:hover) {
-    text-decoration: underline;
   }
 
   .pep-cloud-deploy-flow-sidebar__steps.is-compact {

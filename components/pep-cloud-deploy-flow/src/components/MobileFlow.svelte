@@ -11,6 +11,7 @@
   import { fetchWithCache } from "../utils/remoteContentCache";
   import { loadRemoteContentForStep } from "../utils/remote-content-loader";
   import { buildRemoteIframeSrcdoc } from "../utils/remoteShadowSandbox";
+  import "../styles/markdown-content.css";
   import DeployFlowButton from "./DeployFlowButton.svelte";
   import StepStatusDot from "./StepStatusDot.svelte";
 
@@ -35,6 +36,12 @@
   let remoteContentData = $state<RemoteContentData | null>(null);
   let remoteIframeEl = $state<HTMLIFrameElement | null>(null);
   let inlineContentEl = $state<HTMLDivElement | null>(null);
+  let footerEl = $state<HTMLElement | null>(null);
+  let copyTipVisible = $state(false);
+  let copyTipFading = $state(false);
+  let copyTipBottomPx = $state(80);
+  let copyTipFadeTimer: ReturnType<typeof setTimeout> | null = null;
+  let copyTipHideTimer: ReturnType<typeof setTimeout> | null = null;
   let isMarkdownContent = $derived(
     remoteContentData?.sourceType === "markdown",
   );
@@ -63,11 +70,58 @@
     }
   }
 
-  function openLinkImage(): void {
-    if (typeof window === "undefined") {
+  function clearCopyTipTimers(): void {
+    if (copyTipFadeTimer) {
+      clearTimeout(copyTipFadeTimer);
+      copyTipFadeTimer = null;
+    }
+    if (copyTipHideTimer) {
+      clearTimeout(copyTipHideTimer);
+      copyTipHideTimer = null;
+    }
+  }
+
+  function showCopyTip(): void {
+    clearCopyTipTimers();
+    copyTipVisible = true;
+    copyTipFading = false;
+    copyTipFadeTimer = setTimeout(() => {
+      copyTipFading = true;
+    }, 2700);
+    copyTipHideTimer = setTimeout(() => {
+      copyTipVisible = false;
+      copyTipFading = false;
+      clearCopyTipTimers();
+    }, 3000);
+  }
+
+  async function copyLinkToClipboard(text: string): Promise<void> {
+    if (typeof window === "undefined" || typeof document === "undefined") {
       return;
     }
-    window.open(mobile.linkImage.url, "_blank", "noopener,noreferrer");
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return;
+      } catch {
+        // Fallback to execCommand for non-secure contexts.
+      }
+    }
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "true");
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    textarea.style.pointerEvents = "none";
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+  }
+
+  async function openLinkImage(): Promise<void> {
+    await copyLinkToClipboard(mobile.linkImage.url);
+    showCopyTip();
   }
 
   function handlePrevClick(): void {
@@ -92,8 +146,18 @@
     });
   }
 
+  function getEventTargetElement(target: EventTarget | null): Element | null {
+    if (target instanceof Element) {
+      return target;
+    }
+    if (target instanceof Node) {
+      return target.parentElement;
+    }
+    return null;
+  }
+
   function handleInlineContentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement | null;
+    const target = getEventTargetElement(event.target);
     const anchor = target?.closest("a");
     if (!anchor) {
       return;
@@ -199,6 +263,34 @@
       }
     };
   });
+
+  $effect(() => {
+    const footer = footerEl;
+    if (!footer) {
+      copyTipBottomPx = 80;
+      return;
+    }
+    const updateBottom = () => {
+      copyTipBottomPx = footer.getBoundingClientRect().height + 80;
+    };
+    updateBottom();
+    if (typeof ResizeObserver === "undefined") {
+      return;
+    }
+    const resizeObserver = new ResizeObserver(() => {
+      updateBottom();
+    });
+    resizeObserver.observe(footer);
+    return () => {
+      resizeObserver.disconnect();
+    };
+  });
+
+  $effect(() => {
+    return () => {
+      clearCopyTipTimers();
+    };
+  });
 </script>
 
 <section class="pep-cloud-deploy-flow-mobile">
@@ -260,7 +352,7 @@
     type="button"
     class="pep-cloud-deploy-flow-mobile__link-image"
     onclick={openLinkImage}
-    aria-label="打开相关页面"
+    aria-label="复制相关链接"
   >
     <img src={mobile.linkImage.image} alt={mobile.title} />
   </button>
@@ -273,7 +365,7 @@
     {:else if remoteContentData}
       {#if isMarkdownContent}
         <div
-          class="pep-cloud-deploy-flow-mobile__inline-content rich-text"
+          class="pep-cloud-deploy-flow-mobile__inline-content rich-text pep-cloud-deploy-flow-md"
           bind:this={inlineContentEl}
         >
           {@html remoteContentData.html}
@@ -289,7 +381,11 @@
     {/if}
   </section>
 
-  <footer class="pep-cloud-deploy-flow-mobile__footer" class:has-prev={canPrev}>
+  <footer
+    class="pep-cloud-deploy-flow-mobile__footer"
+    class:has-prev={canPrev}
+    bind:this={footerEl}
+  >
     {#if canPrev}
       <DeployFlowButton
         variant="secondary"
@@ -309,6 +405,18 @@
       </DeployFlowButton>
     {/if}
   </footer>
+
+  {#if copyTipVisible}
+    <div
+      class="pep-cloud-deploy-flow-mobile__copy-tip"
+      class:is-fading={copyTipFading}
+      style={`bottom:${copyTipBottomPx}px;`}
+      role="status"
+      aria-live="polite"
+    >
+      {mobile.linkImage.copyTip ?? "已复制"}
+    </div>
+  {/if}
 </section>
 
 <style>
@@ -320,6 +428,7 @@
     height: 100%;
     box-sizing: border-box;
     overflow: hidden;
+    position: relative;
   }
 
   .pep-cloud-deploy-flow-mobile__header {
@@ -549,59 +658,6 @@
     word-break: break-word;
   }
 
-  :global(.pep-cloud-deploy-flow-mobile__remote-content .rich-text h2) {
-    font-size: 20px;
-    line-height: 1.4;
-    margin: 0 0 12px;
-    color: #191919;
-  }
-
-  :global(.pep-cloud-deploy-flow-mobile__remote-content .rich-text h3) {
-    font-size: 16px;
-    line-height: 1.5;
-    margin: 0 0 10px;
-    color: #191919;
-  }
-
-  :global(.pep-cloud-deploy-flow-mobile__remote-content .rich-text p),
-  :global(.pep-cloud-deploy-flow-mobile__remote-content .rich-text li) {
-    font-size: 13px;
-    line-height: 1.7;
-    color: #4e5969;
-  }
-
-  :global(.pep-cloud-deploy-flow-mobile__remote-content .rich-text img) {
-    display: block;
-    max-width: 100%;
-    width: 100%;
-    height: auto;
-  }
-
-  :global(.pep-cloud-deploy-flow-mobile__remote-content .rich-text pre) {
-    max-width: 100%;
-    overflow-x: auto;
-    white-space: pre;
-  }
-
-  :global(.pep-cloud-deploy-flow-mobile__remote-content .rich-text code) {
-    overflow-wrap: anywhere;
-    word-break: break-word;
-    white-space: pre-wrap;
-  }
-
-  :global(.pep-cloud-deploy-flow-mobile__remote-content .rich-text table) {
-    display: block;
-    max-width: 100%;
-    overflow-x: auto;
-    border-collapse: collapse;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  :global(.pep-cloud-deploy-flow-mobile__remote-content .rich-text th),
-  :global(.pep-cloud-deploy-flow-mobile__remote-content .rich-text td) {
-    white-space: nowrap;
-  }
-
   .pep-cloud-deploy-flow-mobile__loading {
     margin: 0;
     color: #4e5969;
@@ -632,5 +688,31 @@
     :global(.pep-cloud-deploy-flow-mobile__footer-prev) {
     border-color: #595959;
     color: #191919;
+  }
+
+  .pep-cloud-deploy-flow-mobile__copy-tip {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 190px;
+    box-sizing: border-box;
+    padding: 7px 16px;
+    border-radius: 48px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    font-size: 14px;
+    line-height: 22px;
+    text-align: center;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 20;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .pep-cloud-deploy-flow-mobile__copy-tip.is-fading {
+    opacity: 0;
   }
 </style>

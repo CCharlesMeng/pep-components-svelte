@@ -156,7 +156,6 @@
     gap: 8px;
     line-height: 22px;
     font-size: 14px;
-    color: #191919;
   }
 
   .pep-cloud-deploy-flow-navbar__action-link {
@@ -165,6 +164,7 @@
     gap: 4px;
     text-decoration: none;
     padding: 5px 0px;
+    color: #191919;
   }
 
   .pep-cloud-deploy-flow-navbar__divider {
