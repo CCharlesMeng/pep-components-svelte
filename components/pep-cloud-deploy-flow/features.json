@@ -1,0 +1,21 @@
+[
+  {
+    "id": "INIT-001",
+    "category": "setup",
+    "priority": "high",
+    "title": "组件基础骨架搭建",
+    "description": "完成基础目录、构建配置、数据入口与服务端 loader 对接",
+    "status": "completed",
+    "estimated_complexity": 1,
+    "actual_complexity": 1
+  },
+  {
+    "id": "FEAT-001",
+    "category": "feature",
+    "priority": "high",
+    "title": "第一阶段数据契约",
+    "description": "按 design/src/config.ts 建立 schema/types/default.json 一致的数据形状",
+    "status": "in_progress",
+    "estimated_complexity": 2
+  }
+]

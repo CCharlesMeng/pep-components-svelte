@@ -1,0 +1,297 @@
+{
+  "navbar": {
+    "logo": {
+      "img": "https://res-static.hc-cdn.cn/cloudbu-site/china/zh-cn/wangxue/header/logo.svg",
+      "url": "https://www.huaweicloud.com"
+    },
+    "breadcrumbs": [
+      {
+        "text": "解决方案实践",
+        "url": "https://www.huaweicloud.com/solution/practice.html"
+      },
+      {
+        "text": "快速搭建Dify-LLM应用开发平台",
+        "url": "https://www.huaweicloud.com"
+      },
+      {
+        "text": "在线部署",
+        "url": "#"
+      }
+    ],
+    "rightActions": [
+      {
+        "text": "退出操作模式",
+        "url": "https://www.huaweicloud.com",
+        "icon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/computer.png"
+      }
+    ],
+    "endDeployment": {
+      "buttonText": "结束部署",
+      "icon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/stopSign.png",
+      "modal": {
+        "title": "提示",
+        "icon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/infoIcon.png",
+        "content": "本场景资源不会自动释放，若无需保留资源，请参考手册手动删除资源，避免产生额外费用。",
+        "confirmText": "确定"
+      },
+      "successPage": {
+        "title": "实操已结束，感谢您的参与",
+        "redeployText": "重新部署"
+      }
+    }
+  },
+  "sidebar": {
+    "tabs": [
+      {
+        "title": "操作手册",
+        "applications": [
+          {
+            "title": "LLM应用开发平台",
+            "steps": [
+              {
+                "title": "方案概述",
+                "remoteContent": {
+                  "source": {
+                    "contentType": "markdown",
+                    "markdownContent": "## 方案概述\n\n本方案基于 **Flexus 云服务器 X 实例** 快速搭建 Dify LLM 应用开发平台。\n\n### 前提条件\n\n- 已完成实名认证\n- 账号余额充足\n- 具备基础 Linux 操作能力\n\n### 核心组件\n\n- Flexus 云服务器\n- 弹性公网 IP（EIP）\n- Docker 运行环境\n\n> 预计部署时长约 1 小时，费用请以控制台为准。 \n ![image](https://support.huaweicloud.com/bestpractice-flexusl/zh-cn_image_0000002549035071.png)"
+                  }
+                }
+              },
+              {
+                "title": "立即部署",
+                "remoteContent": {
+                  "source": {
+                    "contentType": "markdown",
+                    "markdownContent": "## 立即部署\n\n请按以下步骤完成部署：\n\n1. 登录云服务器\n2. 安装 Docker\n3. 拉取并启动 Dify 容器[超链接](https://www.huaweicloud.com)\n4. 访问控制台完成初始化\n\n```bash\nssh root@<your-server-ip>\ncurl -fsSL https://get.docker.com | bash\nsystemctl enable docker && systemctl start docker\n```\n\n完成后可通过 `http://<your-server-ip>` 访问。"
+                  }
+                }
+              },
+              {
+                "title": "方案验证",
+                "remoteContent": {
+                  "source": {
+                    "contentType": "markdown",
+                    "markdownContent": "## 方案验证\n\n部署完成后建议做以下检查：\n\n- 执行 `docker compose ps`，确认核心容器状态为 Up\n- 浏览器访问部署地址，确认页面可打开\n- 登录后创建一个测试应用，验证基础功能\n\n如需排查，请查看日志：\n\n```bash\ndocker compose logs -f dify-api\n```"
+                  }
+                }
+              },
+              {
+                "title": "清理资源",
+                "remoteContent": {
+                  "source": {
+                    "contentType": "markdown",
+                    "markdownContent": "## 清理资源\n\n> 重要：本场景资源不会自动释放，请按需手动清理。\n\n建议顺序：\n\n1. 停止并删除 Dify 容器\n2. 释放弹性公网 IP\n3. 删除 Flexus 云服务器实例\n4. 在费用中心核对账单\n\n如需保留数据，请先完成备份。"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "title": "LLM应用开发平台",
+            "steps": [
+              {
+                "title": "方案概述",
+                "remoteContent": {
+                  "source": {
+                    "contentType": "markdown",
+                    "markdownContent": "## 方案概述\n\n本方案基于 **Flexus 云服务器 X 实例** 快速搭建 Dify LLM 应用开发平台。\n\n### 前提条件\n\n- 已完成实名认证\n- 账号余额充足\n- 具备基础 Linux 操作能力\n\n### 核心组件\n\n- Flexus 云服务器\n- 弹性公网 IP（EIP）\n- Docker 运行环境\n\n> 预计部署时长约 1 小时，费用请以控制台为准。"
+                  }
+                }
+              },
+              {
+                "title": "立即部署",
+                "remoteContent": {
+                  "source": {
+                    "contentType": "markdown",
+                    "markdownContent": "## 立即部署\n\n请按以下步骤完成部署：\n\n1. 登录云服务器\n2. 安装 Docker\n3. 拉取并启动 Dify 容器[超链接](https://www.huaweicloud.com)\n4. 访问控制台完成初始化\n\n```bash\nssh root@<your-server-ip>\ncurl -fsSL https://get.docker.com | bash\nsystemctl enable docker && systemctl start docker\n```\n\n完成后可通过 `http://<your-server-ip>` 访问。"
+                  }
+                }
+              },
+              {
+                "title": "方案验证",
+                "remoteContent": {
+                  "source": {
+                    "contentType": "markdown",
+                    "markdownContent": "## 方案验证\n\n部署完成后建议做以下检查：\n\n- 执行 `docker compose ps`，确认核心容器状态为 Up\n- 浏览器访问部署地址，确认页面可打开\n- 登录后创建一个测试应用，验证基础功能\n\n如需排查，请查看日志：\n\n```bash\ndocker compose logs -f dify-api\n```"
+                  }
+                }
+              },
+              {
+                "title": "清理资源",
+                "remoteContent": {
+                  "source": {
+                    "contentType": "markdown",
+                    "markdownContent": "## 清理资源\n\n> 重要：本场景资源不会自动释放，请按需手动清理。\n\n建议顺序：\n\n1. 停止并删除 Dify 容器\n2. 释放弹性公网 IP\n3. 删除 Flexus 云服务器实例\n4. 在费用中心核对账单\n\n如需保留数据，请先完成备份。"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "云产品资源",
+        "applications": [
+          {
+            "steps": [
+              {
+                "title": "资源列表",
+                "remoteContent": {
+                  "source": {
+                    "contentType": "remoteHtml",
+                    "htmlUrl": "https://support.huaweicloud.com/bestpractice-flexusl/flexusl_bp_0002.html",
+                    "cssUrl": "https://res-static.hc-cdn.cn/aem/content/dam/cloudbu-site/archive/china/zh-cn/support/resource/framework/v3/css/index_revision.css?20240716&sttl=3.0.67"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "部署记录",
+        "applications": [
+          {
+            "steps": [
+              {
+                "title": "历史记录",
+                "remoteContent": {
+                  "source": {
+                    "contentType": "remoteHtml",
+                    "htmlUrl": "https://support.huaweicloud.com/bestpractice-flexusl/practice_application_0005.html",
+                    "cssUrl": "https://res-static.hc-cdn.cn/aem/content/dam/cloudbu-site/archive/china/zh-cn/support/resource/framework/v3/css/index_revision.css?20240716&sttl=3.0.67"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "footer": {
+      "prevText": "上一步",
+      "nextText": "下一步"
+    }
+  },
+  "mainContent": {
+    "title": "【部署教程】快速搭建Dify-LLM应用开发平台",
+    "notice": {
+      "contentHtml": "<h3>部署须知</h3><ol style='padding-left:20px;list-style-position: outside;'><li>开始实操前，请先完成<a href=\"https://www.huaweicloud.com\">实名认证</a></li><li>如果您使用RAM子账号进行实操，需确保已完成<a href=\"https://www.huaweicloud.com\">权限策略授权</a></li><li>实操结束后，若您无需保留资源。请参考教程进行资源释放</li></ol>"
+    },
+    "deploymentEstimate": {
+      "contentHtml": "<h3>预估费用</h3><p style='display:flex;align-items:baseline'><span style='color:#f53f3f;margin:0;font-weight:700'>¥ 0.43</span><span style=''>（实际产生费用因规格，版本不同可能产生变化，以控制台显示为准。）</span></p><p style='display:flex;align-items:center;gap:16px;margin:0;font-size:14px;color:#4e5969;'><strong style='color:#1d2129;font-weight:700;'>部署时长：</strong><span style='color:#1d2129;'>1小时</span></p>"
+    },
+    "action": {
+      "buttonText": "开始部署",
+      "url": "https://www.huaweicloud.com/",
+      "launchTitle": "资源编排服务-控制台"
+    },
+    "agreement": {
+      "contentHtml": "我已阅读并同意<a href=\"#\">《华为云平台服务协议》</a>"
+    }
+  },
+  "backgroundImage": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/design/background.png",
+  "iframePages": {
+    "domainWhitelistPatterns": ["*.huaweicloud.com"],
+    "newTabPage": {
+      "tabTitle": "新标签页",
+      "title": {
+        "icon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/infoIcon.png",
+        "text": "本区域为操作区，请参考右侧操作手册指引进行操作"
+      },
+      "addressPlaceholder": "输入huaweicloud.com域名下的地址，直接访问"
+    }
+  },
+  "mobile": {
+    "linkImage": {
+      "image": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/mobile/linkImage.png",
+      "url": "https://www.huaweicloud.com/product/flexus-x.html"
+    }
+  },
+  "theme": {
+    "icons": {
+      "sidebar": {
+        "floatIcon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/sidebarIcon/switchToFloatMode.svg",
+        "switchToSideModeIcon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/sidebarIcon/switchToSideMode.svg",
+        "minimizeToSideIcon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/sidebarIcon/minimizeToSideMode.svg",
+        "collapseIcon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/sidebarIcon/sidebarClose.svg",
+        "stepCheckedIcon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/sidebarIcon/stepChecked.svg",
+        "sideResizeIcon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/sidebarIcon/resize.svg",
+        "sidebarMinimizeIcon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/commonIcon/miniSidebarIcon.svg"
+      },
+      "browser": {
+        "headerLogo": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/browserIcon/HWCloudLogo.svg",
+        "addTab": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/browserIcon/broswerTagAdd.svg",
+        "fullscreen": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/browserIcon/broserFullScreenIcon.svg",
+        "closeTab": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/browserIcon/broswerTagDelete.svg",
+        "switchToSideIcon": "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/browserIcon/browserSwitchToSide.svg"
+      }
+    },
+    "texts": {
+      "openExternalDefaultTitle": "新页面",
+      "browserFrameLoadingText": "加载中...",
+      "remoteLoadingText": "加载内容中...",
+      "remoteLoadFailedText": "内容加载失败",
+      "remoteFallbackMessageTemplate": "这是来自远程资源的内容占位，当前位于 {tabLabel} 的第 {stepId} 步（{stepLabel}）。链接异常，您可以手动复制打开此链接。",
+      "remoteFallbackLinkText": "打开远程链接",
+      "miniIconHoverText": "帮助手册"
+    }
+  },
+  "shortcuts": {
+    "deployPage": {
+      "title": "包含云产品资源",
+      "items": [
+        {
+          "icon": "https://res-static.hc-cdn.cn/cloudbu-site/public/new-product-icon/AI/VIAS.png",
+          "text": "Flexus云服务器X实例",
+          "url": "https://www.huaweicloud.com/product/flexus-x.html"
+        },
+        {
+          "icon": "https://res-static.hc-cdn.cn/cloudbu-site/public/new-product-icon/AI/VIAS.png",
+          "text": "弹性公网IP EIP",
+          "url": "https://www.huaweicloud.com/product/eip.html"
+        },
+        {
+          "icon": "https://res-static.hc-cdn.cn/cloudbu-site/public/new-product-icon/AI/VIAS.png",
+          "text": "云搜索服务 CSS",
+          "url": "https://www.huaweicloud.com/product/css.html"
+        }
+      ]
+    },
+    "finishPage": {
+      "description": "相关云服务产品控制台快速入口",
+      "items": [
+        {
+          "icon": "https://res-static.hc-cdn.cn/cloudbu-site/public/new-product-icon/Storage/KVS.png",
+          "text": "弹性云服务器 ECS",
+          "url": "https://console.huaweicloud.com/ecm/"
+        },
+        {
+          "icon": "https://res-static.hc-cdn.cn/cloudbu-site/public/new-product-icon/Storage/KVS.png",
+          "text": "云数据库 RDS",
+          "url": "https://console.huaweicloud.com/rds/"
+        },
+        {
+          "icon": "https://res-static.hc-cdn.cn/cloudbu-site/public/new-product-icon/Storage/KVS.png",
+          "text": "云安全中心 HSS",
+          "url": "https://console.huaweicloud.com/hss/"
+        }
+      ]
+    },
+    "browserNewTab": {
+      "title": "相关云服务产品控制台快速入口",
+      "items": [
+        {
+          "icon": "https://res-static.hc-cdn.cn/cloudbu-site/public/new-product-icon/AI/VIAS.png",
+          "text": "Flexus云服务器X实例",
+          "url": "https://www.huaweicloud.com/product/flexus-x.html"
+        },
+        {
+          "icon": "https://res-static.hc-cdn.cn/cloudbu-site/public/new-product-icon/Storage/KVS.png",
+          "text": "弹性公网IP EIP",
+          "url": "https://www.huaweicloud.com/product/eip.html"
+        }
+      ]
+    }
+  }
+}
