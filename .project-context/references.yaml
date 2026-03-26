@@ -1,0 +1,163 @@
+version: 1
+generated_at: 2026-03-25T10:03:07Z
+source_commit: 433f18b26ec3d4b611fff5f70cbe605f5f44e3df
+generator: initialize
+
+reference_patterns:
+  - id: component-vite-factory
+    kind: build_pattern
+    summary: 所有标准组件包都通过 `createComponentConfig()` 统一 client/server/data/editor 四种构建与 dev HTML 注入。
+    refs:
+      - shared/config/vite.factory.ts
+      - components/pep-cloud-deploy-flow/vite.config.ts
+      - components/pep-common-card-v2/vite.config.ts
+      - .ai-workflow/templates/component/package.json
+    use_when:
+      - 新建或改造标准组件包的 `vite.config.ts` 与 build scripts
+      - 需要复用 `src/index.svelte`、`src/component.server.ts`、shared core runtime 这套约定
+    avoid_when:
+      - 修改不走组件构建链路的 Node/Python 工具目录
+    tests: []
+    confidence: high
+    last_verified_at: 2026-03-25
+
+  - id: dev-loader-with-mocks
+    kind: state_pattern
+    summary: 本地开发先载入 mock 数据，再按需调用 `component.server.ts` 的 `loader` 合成最终 props。
+    refs:
+      - shared/core/main.ts
+      - components/pep-common-card-v2/src/component.server.ts
+      - components/pep-cloud-deploy-flow/src/component.server.ts
+      - shared/templates/index.html
+    use_when:
+      - 组件既要支持本地预览，又要保留服务端 loader 扩展位
+      - 需要在 mock 数据之上补异步预处理、远程内容预加载或数据清洗
+    avoid_when:
+      - 纯静态组件完全不需要 loader 介入
+    tests:
+      - components/pep-cloud-deploy-flow/tests/unit/component-server.spec.ts
+    confidence: high
+    last_verified_at: 2026-03-25
+
+  - id: schema-type-data-consistency
+    kind: test_pattern
+    summary: 通过 `schema.json`、`src/types.ts`、default mock 和 consistency spec 共同守住组件数据契约。
+    refs:
+      - components/pep-common-card-v2/schema.json
+      - components/pep-common-card-v2/src/types.ts
+      - components/pep-cloud-deploy-flow/schema.json
+      - components/pep-cloud-deploy-flow/src/types.ts
+      - components/pep-cloud-deploy-flow/mocks/props/default.json
+    use_when:
+      - 修改 `schema.json`
+      - 调整 `types.ts`
+      - 更新 `mocks/default.json` 或 `mocks/props/default.json`
+    avoid_when:
+      - 只改纯样式且不涉及数据结构
+    tests:
+      - components/pep-common-card-v2/tests/unit/consistency.spec.ts
+      - components/pep-cloud-deploy-flow/tests/unit/consistency.spec.ts
+    confidence: high
+    last_verified_at: 2026-03-25
+
+  - id: shared-floor-traits
+    kind: ui_pattern
+    summary: 共享楼层组件通过 trait 类型和 `pickTrait()` 分拣公共 props，避免每个业务组件重复定义标题/间距/可见性字段。
+    refs:
+      - shared/ui/types.ts
+      - shared/ui/traits.ts
+      - components/pep-common-card-v2/src/index.svelte
+    use_when:
+      - 新组件需要复用标题、副标题、更多链接、间距或移动端可见性等通用楼层能力
+    avoid_when:
+      - 组件完全独立于 shared floor UI，不需要共享 props 语义
+    tests:
+      - components/pep-common-card-v2/tests/unit/consistency.spec.ts
+    confidence: high
+    last_verified_at: 2026-03-25
+
+  - id: complex-component-contract
+    kind: business_component
+    summary: "pep-cloud-deploy-flow 是当前最完整的复杂交互组件参考，展示了 README、features、schema、types、mock 和 unit tests 如何围绕同一数据契约组织。"
+    refs:
+      - components/pep-cloud-deploy-flow/README.md
+      - components/pep-cloud-deploy-flow/features.json
+      - components/pep-cloud-deploy-flow/schema.json
+      - components/pep-cloud-deploy-flow/src/types.ts
+      - components/pep-cloud-deploy-flow/src/index.svelte
+    use_when:
+      - 需要实现多状态、远程内容、侧栏/主区联动一类的复杂组件
+      - 需要找一个 repo 内已有测试支撑的高保真组件样例
+    avoid_when:
+      - 只做极简展示组件，不需要完整数据契约和多状态交互
+    tests:
+      - components/pep-cloud-deploy-flow/tests/unit/consistency.spec.ts
+      - components/pep-cloud-deploy-flow/tests/unit/component-server.spec.ts
+      - components/pep-cloud-deploy-flow/tests/unit/sidebar-layout.spec.ts
+    confidence: high
+    last_verified_at: 2026-03-25
+
+anti_examples:
+  - id: placeholder-component-readme
+    reason: "pep-mkp-common-offering/README.md 仍是 Svelte 默认占位文案，不足以作为组件契约、测试入口或开发流程参考。"
+    refs:
+      - components/pep-mkp-common-offering/README.md
+    confidence: high
+
+  - id: root-readme-as-single-source
+    reason: 根 README 的共享包列表和 `@pep/bff` 状态与当前 workspace/manifests 存在漂移，不应单独当作模块边界真相。
+    refs:
+      - README.md
+      - pnpm-workspace.yaml
+      - shared/bff/package.json
+    confidence: high
+
+risk_hotspots:
+  - id: shared-bff-manifest-gap
+    summary: "@pep/bff 被所有组件声明为 workspace 依赖，但当前只看到 manifest/tsconfig，没有对应源码实现，后续改动容易误判其真实职责。"
+    refs:
+      - shared/bff/package.json
+      - components/pep-cloud-deploy-flow/package.json
+      - components/pep-common-card-v2/package.json
+    confidence: high
+
+  - id: shared-config-export-drift
+    summary: "shared/config/package.json 暴露的是 ./vite.config.js，实际被使用的共享工厂是 vite.factory.ts，包导出与落地文件不一致。"
+    refs:
+      - shared/config/package.json
+      - shared/config/vite.factory.ts
+    confidence: high
+
+  - id: workspace-doc-drift
+    summary: 根 README 把 `@pep/core`、`@pep/utils` 写成共享包，并称 `@pep/bff` 已清理，但当前 workspace 结构与 manifest 不是这个状态。
+    refs:
+      - README.md
+      - pnpm-workspace.yaml
+      - shared/bff/package.json
+    confidence: high
+
+  - id: recursive-script-assumptions
+    summary: 根脚本把 `lint`、`format`、`check` 递归下发到各包，但已检查的若干包并未都定义这些脚本，命令语义仍需执行验证。
+    refs:
+      - package.json
+      - components/pep-common-card-v2/package.json
+      - components/pep-cloud-deploy-flow/package.json
+      - shared/config/package.json
+    confidence: medium
+
+test_patterns:
+  - id: component-contract-consistency
+    summary: 以 consistency spec 作为 schema/types/mock 的最小守护测试入口。
+    refs:
+      - components/pep-common-card-v2/tests/unit/consistency.spec.ts
+      - components/pep-cloud-deploy-flow/tests/unit/consistency.spec.ts
+    confidence: high
+
+  - id: complex-component-unit-slices
+    summary: 复杂组件按工具函数和 loader 行为拆成 unit tests，优先覆盖数据加载、布局计算和交互辅助逻辑。
+    refs:
+      - components/pep-cloud-deploy-flow/tests/unit/component-server.spec.ts
+      - components/pep-cloud-deploy-flow/tests/unit/sidebar-layout.spec.ts
+      - components/pep-cloud-deploy-flow/tests/unit/remote-content-loader.spec.ts
+      - components/pep-cloud-deploy-flow/tests/unit/deploy-flow-link-state.spec.ts
+    confidence: high
