@@ -1,0 +1,259 @@
+version: 1
+generated_at: 2026-03-25T10:03:07Z
+source_commit: 433f18b26ec3d4b611fff5f70cbe605f5f44e3df
+generator: initialize
+
+repo:
+  name: pep-components-svelte
+  type: monorepo
+  summary: Svelte 5 组件 monorepo，以 `components/*` 组件包、`shared/*` 共享构建/runtime 源码和脚手架脚本为主，另含一个独立的 Python autonomous coding demo。
+
+context:
+  domains:
+    - component-library
+    - cloud-product-pages
+    - automation-demo
+  stacks:
+    - svelte
+    - vite
+    - typescript
+    - vitest
+    - node
+    - pnpm-workspace
+    - python
+
+modules:
+  - id: shared-config
+    path: shared/config
+    kind: package
+    domain: []
+    stack:
+      - vite
+      - typescript
+      - svelte
+    summary: 共享 TypeScript 基座和 Vite 组件工厂；所有已检查组件都通过它统一 `extends` 和构建模式。
+    entry_points:
+      - shared/config/package.json
+      - shared/config/tsconfig.json
+      - shared/config/vite.factory.ts
+    critical_flows:
+      - component-config-inheritance
+      - multi-mode-build
+      - dev-html-injection
+    confidence: high
+    signals:
+      - reference
+
+  - id: shared-core
+    path: shared/core
+    kind: library
+    domain: []
+    stack:
+      - svelte
+      - vite
+      - typescript
+    summary: 共享 dev 挂载、client hydrate、server entry 和 editor entry；组件运行时入口都围绕这里组织。
+    entry_points:
+      - shared/core/main.ts
+      - shared/core/entry-client.ts
+      - shared/core/entry-server.ts
+      - shared/core/entry-editor.ts
+    critical_flows:
+      - dev-mock-loader
+      - client-hydration
+      - server-entry
+    confidence: high
+    signals:
+      - reference
+
+  - id: shared-ui
+    path: shared/ui
+    kind: library
+    domain:
+      - component-library
+    stack:
+      - svelte
+      - typescript
+    summary: 共享楼层 UI 和 trait 类型系统；`pep-common-card-v2` 直接依赖这里的 `FloorHeader`、`FloorTabs` 和 trait picker。
+    entry_points:
+      - shared/ui/FloorHeader.svelte
+      - shared/ui/FloorTabs.svelte
+      - shared/ui/types.ts
+      - shared/ui/traits.ts
+    critical_flows:
+      - trait-forwarding
+      - shared-floor-ui
+    confidence: high
+    signals:
+      - reference
+
+  - id: shared-bff
+    path: shared/bff
+    kind: package
+    domain: []
+    stack:
+      - node
+      - typescript
+    summary: workspace 包声明了 BFF loader 入口，但当前磁盘上只确认到 `package.json` 和 `tsconfig.json`，真实实现仍待核实。
+    entry_points:
+      - shared/bff/package.json
+      - shared/bff/tsconfig.json
+    critical_flows:
+      - loader-contract
+    confidence: low
+    signals:
+      - uncertain
+      - needs-sync
+
+  - id: scripts
+    path: scripts
+    kind: toolchain
+    domain:
+      - component-library
+    stack:
+      - node
+    summary: 提供单组件开发、模板拷贝、脚手架生成和 feature 文件生成脚本，是组件新增/开发的主要工具入口。
+    entry_points:
+      - scripts/dev-pkg.js
+      - scripts/copy-template.js
+      - scripts/scaffold-component.js
+      - scripts/generate-features.js
+      - scripts/README.md
+    critical_flows:
+      - single-package-dev
+      - scaffold-component
+      - copy-template
+    confidence: high
+    signals:
+      - reference
+
+  - id: pep-common-card-v2
+    path: components/pep-common-card-v2
+    kind: package
+    domain:
+      - component-library
+      - cloud-product-pages
+    stack:
+      - svelte
+      - vite
+      - typescript
+      - vitest
+    summary: 通用卡片楼层组件，复用共享 trait 和 UI 组件，支持 tab、卡片布局、按钮组及过期隐藏逻辑。
+    entry_points:
+      - components/pep-common-card-v2/src/index.svelte
+      - components/pep-common-card-v2/src/component.server.ts
+      - components/pep-common-card-v2/src/types.ts
+      - components/pep-common-card-v2/schema.json
+      - components/pep-common-card-v2/vite.config.ts
+    critical_flows:
+      - tabbed-card-floor
+      - trait-forwarding
+      - schema-type-consistency
+    confidence: high
+    signals:
+      - reference
+
+  - id: pep-navigate-link
+    path: components/pep-navigate-link
+    kind: package
+    domain:
+      - component-library
+      - cloud-product-pages
+    stack:
+      - svelte
+      - vite
+      - typescript
+    summary: 配置驱动的楼层导航组件，支持按 tab 聚合内容、开发态 mock 数据生成以及 SSR/hydrate 构建产物。
+    entry_points:
+      - components/pep-navigate-link/src/index.svelte
+      - components/pep-navigate-link/src/component.server.ts
+      - components/pep-navigate-link/src/types.ts
+      - components/pep-navigate-link/mocks/default.json
+      - components/pep-navigate-link/vite.config.ts
+    critical_flows:
+      - config-driven-nav
+      - mock-tab-data
+      - ssr-hydration
+    confidence: medium
+    signals:
+      - needs-sync
+
+  - id: pep-cloud-deploy-flow
+    path: components/pep-cloud-deploy-flow
+    kind: package
+    domain:
+      - component-library
+      - cloud-product-pages
+    stack:
+      - svelte
+      - vite
+      - typescript
+      - vitest
+    summary: 当前证据最完整的复杂交互组件，围绕部署流程、右侧操作手册、伪浏览器和移动端流程展开。
+    entry_points:
+      - components/pep-cloud-deploy-flow/src/index.svelte
+      - components/pep-cloud-deploy-flow/src/component.server.ts
+      - components/pep-cloud-deploy-flow/src/types.ts
+      - components/pep-cloud-deploy-flow/mocks/props/default.json
+      - components/pep-cloud-deploy-flow/schema.json
+      - components/pep-cloud-deploy-flow/vite.config.ts
+      - components/pep-cloud-deploy-flow/README.md
+    critical_flows:
+      - deploy-launch
+      - remote-content-preload
+      - sidebar-browser-states
+      - mobile-flow
+    confidence: high
+    signals:
+      - hotspot
+      - reference
+
+  - id: pep-mkp-common-offering
+    path: components/pep-mkp-common-offering
+    kind: package
+    domain:
+      - component-library
+      - cloud-product-pages
+    stack:
+      - svelte
+      - vite
+      - typescript
+    summary: 另一套楼层/卡片型组件包，代码入口已确认，但当前缺少 repo 内可靠文档与测试证据，业务边界仍低置信。
+    entry_points:
+      - components/pep-mkp-common-offering/src/index.svelte
+      - components/pep-mkp-common-offering/src/component.server.ts
+      - components/pep-mkp-common-offering/schema.json
+      - components/pep-mkp-common-offering/vite.config.ts
+    critical_flows:
+      - tabbed-card-floor
+    confidence: low
+    signals:
+      - uncertain
+      - needs-sync
+
+  - id: autonomous-coding-demo
+    path: autonomous-coding
+    kind: auxiliary
+    domain:
+      - automation-demo
+    stack:
+      - python
+      - node
+    summary: 独立的 Python 演示 harness，展示长会话 autonomous coding 的双 agent 模式，不属于 pnpm workspace 主构建链路。
+    entry_points:
+      - autonomous-coding/autonomous_agent_demo.py
+      - autonomous-coding/agent.py
+      - autonomous-coding/README.md
+    critical_flows:
+      - two-agent-sessions
+      - sandboxed-automation
+    confidence: medium
+    signals:
+      - auxiliary
+
+uncertainty:
+  - "shared/bff/package.json 指向 ./src/loader.ts，但当前 shared/bff/ 下只确认到 package.json 与 tsconfig.json。"
+  - "shared/config/package.json 导出的是 ./vite.config.js，而仓库内实际可用共享工厂是 shared/config/vite.factory.ts。"
+  - "根 README.md 把 @pep/core 和 @pep/utils 写成共享包，但当前 workspace 明确能确认的包只有 shared/config 与 shared/bff。"
+  - "components/pep-mkp-common-offering 缺少 repo 内可靠 README/spec/test 证据，当前只确认到其基础楼层型实现。"
+  - "根级 pnpm -r lint / pnpm -r format 是否对所有包真实可用，仍需命令级验证。"
