@@ -15,9 +15,7 @@
       ]
     },
     "openclaw-feishu-multi-agent": {
-      "roots": [
-        "openclaw-feishu-multi-agent"
-      ]
+      "roots": ["openclaw-feishu-multi-agent"]
     }
   },
   "skills": {
@@ -34,9 +32,7 @@
     "immune-debug": {
       "source": "skills/immune-debug",
       "category": "workflow",
-      "dependencies": [
-        "systematic-debugging"
-      ]
+      "dependencies": ["systematic-debugging"]
     },
     "audit": {
       "source": "skills/audit",
@@ -64,9 +60,7 @@
       "category": "superpowers",
       "officialPackage": "obra/superpowers",
       "officialSkill": "brainstorming",
-      "dependencies": [
-        "writing-plans"
-      ]
+      "dependencies": ["writing-plans"]
     },
     "systematic-debugging": {
       "source": "vendor/superpowers/systematic-debugging",
@@ -85,10 +79,7 @@
       "category": "superpowers",
       "officialPackage": "obra/superpowers",
       "officialSkill": "writing-plans",
-      "dependencies": [
-        "subagent-driven-development",
-        "executing-plans"
-      ]
+      "dependencies": ["subagent-driven-development", "executing-plans"]
     },
     "subagent-driven-development": {
       "source": "vendor/superpowers/subagent-driven-development",
@@ -110,10 +101,7 @@
       "category": "superpowers",
       "officialPackage": "obra/superpowers",
       "officialSkill": "executing-plans",
-      "dependencies": [
-        "using-git-worktrees",
-        "finishing-a-development-branch"
-      ]
+      "dependencies": ["using-git-worktrees", "finishing-a-development-branch"]
     },
     "test-driven-development": {
       "source": "vendor/superpowers/test-driven-development",
