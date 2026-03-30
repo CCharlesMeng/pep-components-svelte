@@ -1,0 +1,156 @@
+version: 1
+generated_at: 2026-03-25T10:03:07Z
+source_commit: 433f18b26ec3d4b611fff5f70cbe605f5f44e3df
+generator: initialize
+
+features:
+  - id: component-scaffolding
+    title: 新组件脚手架与模板拷贝
+    status: active
+    spec_refs:
+      - scripts/README.md
+    acceptance_refs: []
+    module_refs:
+      - scripts
+      - shared-config
+    code_refs:
+      - scripts/scaffold-component.js
+      - scripts/copy-template.js
+      - .ai-workflow/templates/component/package.json
+      - .ai-workflow/templates/component/vite.config.ts
+    test_refs: []
+    owners: []
+    confidence: high
+    updated_at: 2026-03-25
+
+  - id: component-build-pipeline
+    title: 四产物组件构建管线
+    status: active
+    spec_refs: []
+    acceptance_refs: []
+    module_refs:
+      - shared-config
+      - shared-core
+    code_refs:
+      - shared/config/vite.factory.ts
+      - shared/core/entry-client.ts
+      - shared/core/entry-server.ts
+      - components/pep-cloud-deploy-flow/vite.config.ts
+      - components/pep-common-card-v2/package.json
+    test_refs: []
+    owners: []
+    confidence: high
+    updated_at: 2026-03-25
+    uncertainty:
+      - "shared/config/package.json 的导出字段与当前实际工厂文件名不一致。"
+
+  - id: loader-mock-contract
+    title: 本地 mock 与 component.server loader 契约
+    status: active
+    spec_refs: []
+    acceptance_refs: []
+    module_refs:
+      - shared-core
+      - pep-common-card-v2
+      - pep-cloud-deploy-flow
+    code_refs:
+      - shared/core/main.ts
+      - shared/templates/index.html
+      - components/pep-common-card-v2/src/component.server.ts
+      - components/pep-cloud-deploy-flow/src/component.server.ts
+    test_refs:
+      - components/pep-cloud-deploy-flow/tests/unit/component-server.spec.ts
+    owners: []
+    confidence: high
+    updated_at: 2026-03-25
+    uncertainty:
+      - "shared/bff 是否仍承担真实 loader 基础能力尚未确认。"
+
+  - id: schema-type-consistency
+    title: schema / types / default data 一致性守护
+    status: active
+    spec_refs:
+      - components/pep-common-card-v2/spec.md
+    acceptance_refs: []
+    module_refs:
+      - pep-common-card-v2
+      - pep-cloud-deploy-flow
+    code_refs:
+      - components/pep-common-card-v2/schema.json
+      - components/pep-common-card-v2/src/types.ts
+      - components/pep-cloud-deploy-flow/schema.json
+      - components/pep-cloud-deploy-flow/src/types.ts
+      - components/pep-cloud-deploy-flow/mocks/props/default.json
+    test_refs:
+      - components/pep-common-card-v2/tests/unit/consistency.spec.ts
+      - components/pep-cloud-deploy-flow/tests/unit/consistency.spec.ts
+    owners: []
+    confidence: high
+    updated_at: 2026-03-25
+
+  - id: card-floor-with-traits
+    title: 通用卡片楼层与共享 trait 转发
+    status: active
+    spec_refs:
+      - components/pep-common-card-v2/spec.md
+    acceptance_refs:
+      - components/pep-common-card-v2/spec.md
+    module_refs:
+      - pep-common-card-v2
+      - shared-ui
+    code_refs:
+      - components/pep-common-card-v2/src/index.svelte
+      - components/pep-common-card-v2/src/types.ts
+      - shared/ui/traits.ts
+      - shared/ui/types.ts
+    test_refs:
+      - components/pep-common-card-v2/tests/unit/consistency.spec.ts
+    owners: []
+    confidence: high
+    updated_at: 2026-03-25
+
+  - id: config-driven-navigation-links
+    title: 配置化楼层导航与 tab 数据聚合
+    status: active
+    spec_refs:
+      - components/pep-navigate-link/README.md
+    acceptance_refs: []
+    module_refs:
+      - pep-navigate-link
+    code_refs:
+      - components/pep-navigate-link/src/index.svelte
+      - components/pep-navigate-link/src/types.ts
+      - components/pep-navigate-link/mocks/default.json
+      - components/pep-navigate-link/src/component.server.ts
+    test_refs: []
+    owners: []
+    confidence: medium
+    updated_at: 2026-03-25
+    uncertainty:
+      - "repo 内未找到对应测试入口，BFF 集成主要通过 README 示例描述。"
+
+  - id: cloud-deploy-flow-sidebar-browser
+    title: 云上部署流侧栏与伪浏览器联动
+    status: active
+    spec_refs:
+      - components/pep-cloud-deploy-flow/README.md
+      - components/pep-cloud-deploy-flow/features.json
+    acceptance_refs: []
+    module_refs:
+      - pep-cloud-deploy-flow
+    code_refs:
+      - components/pep-cloud-deploy-flow/src/index.svelte
+      - components/pep-cloud-deploy-flow/src/component.server.ts
+      - components/pep-cloud-deploy-flow/src/utils/sidebar-layout.ts
+      - components/pep-cloud-deploy-flow/src/utils/deploy-flow-link-state.ts
+      - components/pep-cloud-deploy-flow/src/utils/remote-content-loader.ts
+    test_refs:
+      - components/pep-cloud-deploy-flow/tests/unit/component-server.spec.ts
+      - components/pep-cloud-deploy-flow/tests/unit/sidebar-layout.spec.ts
+      - components/pep-cloud-deploy-flow/tests/unit/deploy-flow-link-state.spec.ts
+      - components/pep-cloud-deploy-flow/tests/unit/remote-content-loader.spec.ts
+    owners: []
+    confidence: high
+    updated_at: 2026-03-25
+    uncertainty:
+      - "当前只有 README 和 features.json 可作为文档锚点，尚未看到独立 spec/acceptance 文件。"
