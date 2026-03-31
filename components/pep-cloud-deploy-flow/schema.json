@@ -231,8 +231,14 @@
                                     "default": "markdown",
                                     "ui:options": {
                                       "options": [
-                                        { "label": "直接编写 Markdown", "value": "markdown" },
-                                        { "label": "使用远程 HTML", "value": "remoteHtml" }
+                                        {
+                                          "label": "直接编写 Markdown",
+                                          "value": "markdown"
+                                        },
+                                        {
+                                          "label": "使用远程 HTML",
+                                          "value": "remoteHtml"
+                                        }
                                       ]
                                     }
                                   },
@@ -458,11 +464,17 @@
               "ui:widget": "imageSelector"
             },
             "url": {
-              "title": "点击跳转链接",
+              "title": "点击复制链接",
               "type": "string",
               "ui:options": {
                 "format": "url"
               }
+            },
+            "copyTip": {
+              "title": "点击图片后的提示文案",
+              "description": "移动端点击图片后，底部气泡中显示的文案；不填时默认显示「已复制」",
+              "type": "string",
+              "default": "已复制"
             }
           }
         },
@@ -502,7 +514,10 @@
                         "default": "markdown",
                         "ui:options": {
                           "options": [
-                            { "label": "直接编写 Markdown", "value": "markdown" },
+                            {
+                              "label": "直接编写 Markdown",
+                              "value": "markdown"
+                            },
                             { "label": "使用远程 HTML", "value": "remoteHtml" }
                           ]
                         }
