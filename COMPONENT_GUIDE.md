@@ -838,8 +838,8 @@ test('AC-002：页签切换', async ({ page }) => { ... });
 
 | 阶段 | 操作 |
 |------|------|
-| `/pep-start` 初始化后 | 创建或补充 `acceptance.md`，写入初版 AC |
-| `/pep-spec` 完善需求时 | 在 `spec.md` 中细化需求，在 `acceptance.md` 中同步细化 GWT |
+| `pep-spec` 生成规格后 | 自动输出 `acceptance.md` 初版，包含所有 AC 条目 |
+| 需求变更时 | 重新运行 `pep-spec` 或手动在 `acceptance.md` 中补充/修改 AC |
 | 实现功能前 | 先锁定 `acceptance.md` 中的 AC，再写实现（TDD 思路） |
 | 交付验收时 | 逐条比对 `acceptance.md` 与实际运行结果 |
 
@@ -901,10 +901,9 @@ AI 会：
    - 嵌套数据结构（列表、卡片等）
    - 响应式规格（PC / 移动端布局差异）
    - 交互行为（点击、切换、展开等）
+4. 基于 `spec.md` 自动生成 `acceptance.md`（GWT 验收标准），覆盖基础渲染、核心功能、交互行为、响应式、边界情况等维度
 
-> 完成后输出：`✅ spec.md 已生成`
-
-> `acceptance.md`（GWT 验收标准）需手动创建，格式见[第 12 节](#12-验收标准gwt-规范)。
+> 完成后输出：`✅ spec.md 和 acceptance.md 已写入`（acceptance.md 包含所有 AC 条目）
 
 ---
 

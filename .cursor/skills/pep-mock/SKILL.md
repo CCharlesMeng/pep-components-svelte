@@ -239,9 +239,18 @@ export interface [NestedType] {
 
 ---
 
-### 阶段 6：最终确认
+### 阶段 6：对照 acceptance.md 执行验收
 
-文件写入后，进行最终确认：
+文件写入后，读取 `components/<component-name>/acceptance.md`，逐条核查当前 Mock 数据是否能支撑每条 AC 的 **Given** 前置条件。
+
+**核查逻辑**：
+
+- `default.json` 是否为 AC-001（基础渲染）提供了完整的默认数据？
+- 每条 AC 的 Given 中提到的特定字段或状态，`default.json` 是否有对应数据覆盖？
+- 涉及"空数据"场景的 AC，是否需要额外的 mock 文件（如 `empty.json`）才能验收？
+- 涉及"移动端专属字段"的 AC（如 `titleMb`、`iconMb`），`default.json` 中是否已填充？
+
+向用户展示核查结论：
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -253,21 +262,27 @@ export interface [NestedType] {
 
 ---
 
-快速检查：
-  • 运行 `npm run dev` 预览组件（数据会自动加载）
-  • 若页面报类型错误，检查 types.ts 中的字段名是否与 json 一致
+📋 对照 acceptance.md 验收（共 [N] 条 AC）：
+
+  ✅ AC-001 基础渲染 — default.json 数据完整，可覆盖
+  ✅ AC-002 [功能名] — 相关字段已存在
+  ⚠️  AC-003 [功能名] — Given 需要 [特殊字段]，当前 default.json 缺少，建议补充
+  ⚠️  AC-XXX 边界情况 - 空数据 — 需要额外的 empty.json 才能验收此条
 
 ---
 
-是否还需要生成其他场景的 mock 数据？
-  A. 空数据场景（empty.json）— 测试组件空态
-  B. 边界数据场景 — 测试超长文字、缺图等边界情况
-  C. 不需要，继续生成组件代码（pep-impl）
+是否还需要补充以下内容？
+  A. 为缺失字段更新 default.json
+  B. 生成空数据场景（empty.json）
+  C. 生成其他边界场景
+  D. 无需补充，继续生成组件代码（pep-impl）
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-若用户选择生成额外场景，重复阶段 4 生成对应的 json 文件（如 `mocks/props/empty.json`）。
+若所有 AC 均可被当前 mock 数据覆盖，则直接报告"全部通过"，询问是否继续。
+
+若用户选择补充，按需执行后重新对照 acceptance.md 确认，直到覆盖率满意为止。
 
 ---
 
