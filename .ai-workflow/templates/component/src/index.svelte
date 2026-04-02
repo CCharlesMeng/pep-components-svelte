@@ -4,9 +4,9 @@
   import type { {{COMPONENT_NAME_PASCAL}}Props } from "./types";
 
   // 共享 UI 组件 (使用项目约定的别名路径)
-  import FloorHeader from "/@shared/ui/FloorHeader.svelte";
-  import FloorTabs from "/@shared/ui/FloorTabs.svelte"; // 示例：使用共享 Tabs
-  import { pickTrait } from "/@shared/ui/traits";
+  import FloorHeader from "@pep/shared/ui/FloorHeader.svelte";
+  import FloorTabs from "@pep/shared/ui/FloorTabs.svelte"; // 示例：使用共享 Tabs
+  import { pickTrait } from "@pep/shared/ui/traits";
 
   // 本地业务子组件
   import SubComponent from "./components/SubComponent.svelte";

@@ -1,0 +1,15 @@
+{
+    "name": "@pep/shared",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "files": [
+        "core/",
+        "templates/"
+    ],
+    "exports": {
+        ".":"./index.ts",
+        "./core/dev/main.ts": "./core/dev/main.ts",
+        "./templates/index.html": "./templates/index.html"
+    }
+}

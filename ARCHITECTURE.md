@@ -176,7 +176,7 @@ components/your-component/
 禁止深层 `extends`。必须将业务属性与通用楼层特征进行交叉组合。
 
 ```typescript
-import type { UseTraits } from "/@shared/ui/types";
+import type { UseTraits } from "@pep/shared/ui/types";
 
 // ✅ 正确：定义业务属性并组合特征
 export interface CardBusinessProps {
@@ -191,7 +191,7 @@ export type YourComponentProps = CardBusinessProps & UseTraits<'header' | 'spaci
 
 ```svelte
 <script lang="ts">
-  import { pickTrait } from "/@shared/ui/traits";
+  import { pickTrait } from "@pep/shared/ui/traits";
   let props: YourComponentProps = $props();
 
   // 1. 透明分拣特征属性

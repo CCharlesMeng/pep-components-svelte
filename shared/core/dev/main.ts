@@ -1,4 +1,4 @@
-import '/@shared/styles/tokens/semantic.css';
+import '@pep/shared/styles/tokens/semantic.css';
 import Component from '$component';
 import data from '$data';
 
@@ -47,7 +47,8 @@ const loadComponentData = async () => {
         };
 
         // Call loader with mock client and data (now async)
-        const method = { requestClient: mockRequestClient };
+        const requestClient = new RequestAdater();
+        const method = { requestClient: requestClient };
         const loadedData = await loader(method, data);
 
         // Combine loader result with original data

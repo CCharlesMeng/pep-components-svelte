@@ -6,13 +6,13 @@
   import { createTimer } from "./state/timer.svelte";
 
   // 共享 UI 组件
-  import FloorHeader from "/@shared/ui/FloorHeader.svelte";
-  import FloorTabs from "/@shared/ui/FloorTabs.svelte";
+  import FloorHeader from "@pep/shared/ui/FloorHeader.svelte";
+  import FloorTabs from "@pep/shared/ui/FloorTabs.svelte";
 
   // 本地业务组件
   import CardGrid from "./components/CardGrid.svelte";
 
-  import { pickTrait } from "/@shared/ui/traits";
+  import { pickTrait } from "@pep/shared/ui/traits";
 
   // 2. Props 定义 (严格对应 schema.json)
   let props: PepCommonCardV2Props & { children?: Snippet } = $props();

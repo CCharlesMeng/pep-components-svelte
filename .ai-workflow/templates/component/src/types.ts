@@ -1,4 +1,4 @@
-import type { UseTraits } from "/@shared/ui/types";
+import type { UseTraits } from "@pep/shared/ui/types";
 
 /**
  * 1. 定义该组件特有的“纯业务”属性

@@ -24,6 +24,69 @@ description: 基于 spec.md、mock 数据和设计稿 HTML，生成完整的 Sve
 
 ---
 
+## 前置约定
+
+> 以下规范在整个生成过程中始终适用，**阶段 1 规划时即需运用**，请在执行流程前通读。
+
+### A. 样式体系
+
+本项目使用 **Less + CSS 变量**双层样式体系：
+
+- **Less**：负责选择器嵌套、BEM 结构、媒体查询内嵌
+- **CSS 变量**（`var(--primitive-*)`）：负责设计 token（间距、颜色、容器宽度等），在 Less 中直接通过 `var()` 引用
+
+> **注意**：Less 变量（`@foo: value`）仅用于局部临时复用，**不要**把 CSS 变量赋值给 Less 变量再使用（即不要写 `@mySpace: var(--primitive-space-4)`）。
+
+断点规范（全项目统一）：
+- 项目有多个断点（如 1600px、1024px、767px），具体以当前组件的 spec.md 为准
+- 默认样式（无媒体查询）对应最宽的 PC 端
+- 媒体查询按断点从大到小依次声明，**集中写在组件根块末尾**，不分散在每个元素内部（详见 3.3 样式规范）
+
+### B. Trait 系统
+
+Trait 是本项目对组件"通用能力"的抽象，每个 Trait 对应一组 Props 字段，通过 `pickTrait(props, "traitName")` 从组件 props 中提取后使用。
+
+常用 Trait：
+
+| Trait | 作用 | 用法 |
+|-------|------|------|
+| `header` | 楼层标题区域（title、subtitle、more 链接） | `pickTrait(props, "header")` 传给 `FloorHeader` |
+| `spacing` | 上下间距合并控制 | 控制根元素的 `merge-top` / `merge-bottom` class |
+| `visibility` | 移动端显隐 | 控制根元素的 `hide-mb` class |
+
+Trait 分拣只在根组件处理，子组件只接收处理后的值，不直接调用 `pickTrait`。
+
+### C. Portal-UI 使用规范
+
+Portal-UI 是一个基于 CSS token 和 jQuery 的组件库。**本项目只使用其纯 CSS 样式类**，不引入任何 JS 文件。
+
+#### ✅ 可以使用的类（纯样式）
+
+```html
+<!-- 按钮样式 -->
+<a class="por-btn-primary" href="#">主要按钮</a>
+<a class="por-btn-secondary" href="#">次要按钮</a>
+<a class="por-btn-dark" href="#">深色按钮</a>
+
+<!-- 若有其他纯样式类，根据设计稿按需使用 -->
+```
+
+#### ❌ 不使用的功能（依赖 jQuery 的交互插件）
+
+以下 Portal-UI 功能改用 Svelte 原生实现：
+
+| Portal-UI 功能 | 替代方案 |
+|---------------|----------|
+| 弹窗（Modal） | Svelte `{#if}` + CSS |
+| 下拉菜单（Dropdown） | Svelte 状态 + click 事件 |
+| 轮播（Carousel/Slider） | Svelte 实现或 CSS Scroll Snap |
+| Tooltip | CSS `:hover` |
+| 标签页（Tab） | 项目共享组件 `FloorTabs` |
+
+**判断原则**：需要调用 `$(element).plugin()` 初始化的，一律不用。
+
+---
+
 ## 执行流程
 
 ### 阶段 0：读取所有上下文
@@ -35,6 +98,7 @@ description: 基于 spec.md、mock 数据和设计稿 HTML，生成完整的 Sve
 4. 设计稿 HTML（用户提供，或已在上下文中）
 5. `.ai-workflow/templates/component/src/index.svelte`（参考模板）
 6. `ARCHITECTURE.md`（架构规范）
+7. `components/<component-name>/acceptance.md`（验收标准，若存在则读取，阶段 8 使用）
 
 若 spec.md 或 types.ts 缺失，提示用户先运行 `pep-spec` 和 `pep-mock`。
 
@@ -63,7 +127,7 @@ Traits 使用：
   [✅ FloorHeader / FloorTabs / 其他]
 
 Portal-UI 样式类：
-  [列举会用到的 portal-ui 类名，如 por-btn-primary]
+  [列举会用到的 portal-ui 类名，如 por-btn-primary；若无则填"无"]
 
 响应式策略（纯 CSS 实现）：
   PC（≥768px）：[布局描述]
@@ -177,22 +241,135 @@ Portal-UI 样式类：
 - 内部元素使用 BEM 命名：`<组件名>__<元素>` 或 `<组件名>--<修饰符>`
 - class 绑定使用 Svelte 的 `class:xxx={condition}` 语法
 - 条件渲染用 `{#if}...{/if}`，列表渲染用 `{#each}`
-- 富文本字段用 `{@html text}` 渲染
+- 富文本字段用 `{@html filterXSS(text)}` 渲染
 - 事件绑定用 `onclick={handler}`（不用 on:click，Svelte 5 规范）
 
-#### 3.3 style 块（使用 Less）
+#### 3.3 style 块（完整样式规范）
 
 样式块声明为 `<style lang="less">`，充分利用 Less 的嵌套、变量和混入能力。
 
-**Less 样式的核心规则**：
+##### Less 基础规则
 
 - 使用 Less 嵌套语法，避免重复写父选择器
-- 优先使用项目 CSS 变量（`var(--primitive-space-*)` 等），Less 变量用于局部复用
+- 优先使用项目 CSS 变量（`var(--primitive-space-*)` 等），Less 变量仅用于局部复用
 - BEM 的 `__element` 和 `--modifier` 用 `&__element` / `&--modifier` 嵌套书写
-- 媒体查询可内嵌在选择器块内（Less 支持）
+- **媒体查询按断点分组，集中写在组件根块末尾**，不分散在每个元素内部；多个断点时从大到小依次排列
 - 样式结构不固定，根据组件实际需求灵活组织，无需套用固定模板
 
-**Less 样式示例**（仅供参考，根据实际组件调整）：
+##### CSS-first：所有设备差异通过 CSS 控制
+
+PC/移动端的所有差异——无论是**样式差异**还是**结构差异**——都必须通过 CSS 解决，**不使用 JS 判断设备类型**（原因见阶段 4 的 SSR 说明）。
+
+**同一元素，不同断点的样式不同** — 断点集中写在组件块底部：
+
+```less
+.component {
+  &__grid { grid-template-columns: repeat(4, 1fr); } // 默认 PC
+
+  @media (max-width: 1024px) {
+    &__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 767px) {
+    &__grid { grid-template-columns: 1fr; }
+  }
+}
+```
+
+**PC/移动端显示不同图片** — 两张图都渲染，CSS 控制显隐（不要根据屏幕宽度决定渲染哪张）：
+
+```svelte
+<img class="icon icon--pc" src={item.icon} alt="" />
+<img class="icon icon--mb" src={item.iconMb || item.icon} alt="" />
+```
+
+```less
+.component {
+  .icon--mb { display: none; }
+
+  @media (max-width: 767px) {
+    .icon--pc { display: none; }
+    .icon--mb { display: block; }
+  }
+}
+```
+
+**PC/移动端结构差异较大** — 两套结构都渲染，CSS 控制显隐：
+
+```svelte
+<div class="layout-pc"> ... PC 端结构 ... </div>
+<div class="layout-mb"> ... 移动端结构 ... </div>
+```
+
+```less
+.component {
+  .layout-mb { display: none; }
+
+  @media (max-width: 767px) {
+    .layout-pc { display: none; }
+    .layout-mb { display: block; }
+  }
+}
+```
+
+**Props 驱动的布局变化**（如 `layoutMb` 字段）— class 绑定 + 媒体查询组合：
+
+```svelte
+<div class="item" class:layout-updown={layoutMb === 'upDownLayout'}>
+  ...
+</div>
+```
+
+```less
+.component {
+  .item { display: flex; flex-direction: row; } // 默认横向
+
+  @media (max-width: 767px) {
+    .item.layout-updown { flex-direction: column; } // 移动端纵向
+  }
+}
+```
+
+##### CSS 变量传递动态 Props
+
+通过 `style` 属性将 Props 值传入 CSS 变量，让 CSS 自己处理响应式（不要用 JS 计算后写 inline style）：
+
+```svelte
+<div
+  class="component__grid"
+  style="--col-count: {cardColumn};"
+>
+```
+
+```less
+.component {
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--col-count, 3), 1fr);
+    gap: 24px;
+  }
+
+  @media (max-width: 767px) {
+    &__grid {
+      grid-template-columns: 1fr; // 移动端固定单列，忽略 CSS 变量
+      gap: 12px;
+    }
+  }
+}
+```
+
+##### 从设计稿 HTML 提取视觉意图
+
+分析设计稿 HTML 时，**不要直接翻译 tailwind 类名到 CSS**，而是理解其背后的视觉意图，然后用 Less 重新实现：
+
+- `grid grid-cols-3` → 理解为"三列等宽网格"，用 `grid-template-columns: repeat(3, 1fr)` 实现
+- `text-xl font-bold text-gray-900` → 理解为"大标题，粗体，主色文字"，用 `font-size: 20px; font-weight: 700; color: var(--text-primary)` 实现
+- `hidden md:block` → 理解为"移动端隐藏，PC 端显示"，用 CSS media query 控制 `display`
+- `p-4 md:p-6` → 理解为"移动端 16px 内边距，PC 端 24px"
+
+目标是写出清晰、可维护的 Less 代码，而不是机械翻译。
+
+##### Less 样式示例
 
 ```svelte
 <style lang="less">
@@ -223,7 +400,13 @@ Portal-UI 样式类：
     // 移动端隐藏（Trait 控制）
     &.hide-mb { display: none; }
 
-    // 移动端样式
+    // 断点从大到小集中声明，不分散在每个元素内部
+    @media (max-width: 1024px) {
+      &__grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
     @media (max-width: 767px) {
       &__container {
         padding: var(--primitive-space-10) var(--primitive-space-4);
@@ -245,6 +428,8 @@ Portal-UI 样式类：
 ### 阶段 4：SSR 水合安全 — 禁止 JS 判断设备类型
 
 **这是本项目最重要的约束之一。** 组件在服务端渲染（SSR）时运行于 Node.js 环境，没有 `window`、`document`、`screen` 等浏览器对象。如果在组件初始化阶段用 JS 判断屏幕宽度来决定渲染结构，服务端和客户端得到的结果不同，**将导致水合（Hydration）失败，页面出现闪烁或报错**。
+
+所有设备差异的正确处理方式已在 **3.3 style 块规范**中说明，本阶段只列出禁止写法。
 
 #### ❌ 绝对禁止的写法
 
@@ -272,70 +457,6 @@ Portal-UI 样式类：
 {/if}
 ```
 
-#### ✅ 正确做法：CSS 控制一切设备差异
-
-无论是**样式差异**还是**结构差异**，都通过 CSS 解决：
-
-**同一元素的样式差异** — 直接用媒体查询：
-```less
-.component__grid {
-  grid-template-columns: repeat(3, 1fr); // PC
-
-  @media (max-width: 767px) {
-    grid-template-columns: 1fr; // 移动端
-  }
-}
-```
-
-**PC/移动端显示不同图片** — 两张图都渲染，CSS 控制显隐（不要根据屏幕宽度决定渲染哪张）：
-```svelte
-<!-- ✅ 两个元素都渲染，CSS 控制显示 -->
-<img class="icon icon--pc" src={item.icon} alt="" />
-<img class="icon icon--mb" src={item.iconMb || item.icon} alt="" />
-```
-```less
-.icon--mb { display: none; }
-
-@media (max-width: 767px) {
-  .icon--pc { display: none; }
-  .icon--mb { display: block; }
-}
-```
-
-**PC/移动端结构差异较大** — 同样两套结构都渲染，CSS 控制显隐：
-```svelte
-<!-- ✅ 两套结构都输出，通过 CSS 切换 -->
-<div class="layout-pc"> ... PC 端结构 ... </div>
-<div class="layout-mb"> ... 移动端结构 ... </div>
-```
-```less
-.layout-mb { display: none; }
-
-@media (max-width: 767px) {
-  .layout-pc { display: none; }
-  .layout-mb { display: block; }
-}
-```
-
-**Props 驱动的布局变化**（如 `layoutMb` 字段）— class 绑定 + CSS 媒体查询组合：
-```svelte
-<div class="item" class:layout-updown={layoutMb === 'upDownLayout'}>
-  ...
-</div>
-```
-```less
-.item {
-  display: flex;
-  flex-direction: row; // 默认横向
-
-  @media (max-width: 767px) {
-    &.layout-updown {
-      flex-direction: column; // 移动端纵向
-    }
-  }
-}
-```
-
 #### ⚠️ onMount 的使用限制
 
 `onMount` 只能用于**不影响 HTML 结构**的副作用，例如：
@@ -347,35 +468,7 @@ Portal-UI 样式类：
 
 ---
 
-### 阶段 5：Portal-UI 使用规范
-
-Portal-UI 是一个基于 CSS token 和 jQuery 的组件库。**本项目只使用其纯 CSS 样式类**，不引入任何 JS 文件。
-
-#### ✅ 可以使用的类（纯样式）
-
-```html
-<!-- 按钮样式 -->
-<a class="por-btn-primary" href="#">主要按钮</a>
-<a class="por-btn-secondary" href="#">次要按钮</a>
-<a class="por-btn-dark" href="#">深色按钮</a>
-
-<!-- 若有其他纯样式类，根据设计稿按需使用 -->
-```
-
-#### ❌ 不使用的功能（jQuery 交互插件）
-
-以下 Portal-UI 功能不要使用，改用 Svelte 原生实现：
-- 弹窗（Modal）→ 用 Svelte 的 `{#if}` + CSS 实现
-- 下拉菜单（Dropdown）→ 用 Svelte 状态 + click 事件实现
-- 轮播（Carousel/Slider）→ 用 Svelte 实现或 CSS Scroll Snap
-- Tooltip → 用 CSS `:hover` 实现
-- 标签页（Tab）→ 使用项目共享组件 `FloorTabs`
-
-**判断原则**：需要调用 `$(element).plugin()` 初始化的，一律不用。
-
----
-
-### 阶段 6：共享组件使用
+### 阶段 5：共享组件使用
 
 优先使用项目共享的 UI 组件，避免重复造轮子：
 
@@ -409,45 +502,7 @@ let activeTabIndex = $state(0);
 
 ---
 
-### 阶段 7：响应式实现要点
-
-#### CSS 变量传递动态值（Props 驱动样式）
-
-通过 `style` 属性将 Props 值传入 CSS 变量，让 CSS 自己处理响应式：
-
-```svelte
-<div
-  class="component__grid"
-  style="--col-count: {cardColumn};"
->
-```
-```less
-.component__grid {
-  display: grid;
-  grid-template-columns: repeat(var(--col-count, 3), 1fr);
-  gap: 24px;
-
-  @media (max-width: 767px) {
-    grid-template-columns: 1fr; // 移动端固定单列，忽略 CSS 变量
-    gap: 12px;
-  }
-}
-```
-
-#### 从设计稿 HTML 提取视觉意图
-
-分析设计稿 HTML 时，**不要直接翻译 tailwind 类名到 CSS**，而是理解其背后的视觉意图，然后用 Less 重新实现：
-
-- `grid grid-cols-3` → 理解为"三列等宽网格"，用 `grid-template-columns: repeat(3, 1fr)` 实现
-- `text-xl font-bold text-gray-900` → 理解为"大标题，粗体，主色文字"，用 `font-size: 20px; font-weight: 700; color: var(--text-primary)` 实现
-- `hidden md:block` → 理解为"移动端隐藏，PC 端显示"，用 CSS media query 控制 `display`
-- `p-4 md:p-6` → 理解为"移动端 16px 内边距，PC 端 24px"
-
-目标是写出清晰、可维护的 Less 代码，而不是机械翻译。
-
----
-
-### 阶段 8：生成子组件（如需拆分）
+### 阶段 6：生成子组件（如需拆分）
 
 若决定拆分子组件，在 `src/components/` 目录下创建，命名使用 **PascalCase**：
 
@@ -469,6 +524,11 @@ let activeTabIndex = $state(0);
     &__title { ... }
     &__desc { ... }
 
+    // 断点从大到小集中声明
+    @media (max-width: 1024px) {
+      // 平板样式
+    }
+
     @media (max-width: 767px) {
       // 移动端样式
     }
@@ -477,13 +537,13 @@ let activeTabIndex = $state(0);
 ```
 
 **子组件原则**：
-- 子组件使用自己独立的 BEM 根类名（不要继续用父组件的 `<component-name>__`前缀）
+- 子组件使用自己独立的 BEM 根类名（不要继续用父组件的 `<component-name>__` 前缀）
 - Trait 分拣只在根组件处理，子组件只接收处理后的值
 - 子组件的类型从父组件的 `types.ts` 导入
 
 ---
 
-### 阶段 9：代码质量检查清单
+### 阶段 7：代码质量检查清单
 
 生成代码后，逐一检查：
 
@@ -501,7 +561,7 @@ let activeTabIndex = $state(0);
   □ 根元素 class 与组件包名一致（kebab-case）
   □ 子元素用 BEM 命名，Less 嵌套书写（&__element / &--modifier）
   □ 无 inline style（除 CSS 变量传递，如 style="--col-count: {n};"）
-  □ 响应式断点统一用 @media (max-width: 767px)（在 Less 块内嵌套）
+  □ 媒体查询按断点集中写在组件根块末尾，从大到小排列，不逐元素分散
   □ 优先使用项目 CSS 变量（var(--primitive-*)、var(--text-*)等）
   □ merge-top / merge-bottom / hide-mb 响应 Trait
 
@@ -520,9 +580,19 @@ SSR 水合安全：
 
 ---
 
-### 阶段 10：展示与确认
+### 阶段 8：对照 acceptance.md 执行验收
 
-生成完毕后，向用户展示文件列表：
+代码生成后，读取 `components/<component-name>/acceptance.md`，逐条核查已生成的组件代码是否满足每条 AC 的 **Then** 期望。
+
+**核查逻辑**：逐条分析代码实现，判断是否覆盖了该 AC 的所有 Then 断言：
+
+- **基础渲染类 AC**：对应数据字段在模板中是否有渲染逻辑？空值情况是否处理？
+- **交互类 AC**：对应的事件处理函数是否实现？状态变化是否正确驱动视图？
+- **响应式类 AC**：Less 中是否有 `@media (max-width: 767px)` 对应的样式规则？
+- **移动端隐藏 AC**：`class:hide-mb={visibilityProps.isShowMb === false}` 是否存在？
+- **边界情况 AC**：空数组/缺字段时的条件判断是否有兜底处理？
+
+向用户展示核查报告：
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -530,58 +600,67 @@ SSR 水合安全：
 
 生成文件：
   📄 src/index.svelte — 主组件（约 [N] 行）
-  [📄 src/components/CardItem.svelte — 卡片子组件]
-  [📄 src/types.ts — 已更新（新增 [M] 个字段）]
+  [📄 src/components/[SubName].svelte — 子组件]
+  [📄 src/types.ts — 已更新]
+
+---
+
+📋 对照 acceptance.md 验收（共 [N] 条 AC）：
+
+  ✅ AC-001 基础渲染 — 所有字段均有对应渲染逻辑
+  ✅ AC-002 [交互名] — 事件处理和状态更新已实现
+  ✅ AC-003 移动端适配 — 媒体查询样式已覆盖
+  ❌ AC-004 [功能名] — Then 中 "[具体断言]" 未在代码中实现
+  ⚠️  AC-005 边界情况 - 空数据 — 有条件判断，但未处理 [具体情况]
+
+---
+
+[如有 ❌ 或 ⚠️，立即在当前轮次补充修复，不要留给用户自己发现]
 
 ---
 
 快速验证：
   1. 运行 `npm run dev` 查看效果
   2. 检查控制台是否有类型报错
-  3. 对比设计稿确认 PC/移动端布局（调整浏览器宽度验证断点）
+  3. 调整浏览器宽度验证 768px 断点
+  4. 无水合警告（SSR 结构与客户端一致）
 
----
-
-请检查以下关键点：
-  ✓ PC 端布局是否正确？
-  ✓ 移动端（< 768px）布局变化是否符合预期？
-  ✓ 交互行为（Tab 切换/展开等）是否正常工作？
-  ✓ 服务端渲染时 HTML 结构与客户端是否一致（无水合警告）？
-
-如需调整，告诉我具体的问题即可。
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
+
+**重要**：发现 ❌ 未通过项时，**必须立即修复**，不能仅报告问题让用户处理。修复完成后重新对该条 AC 进行核查，直到所有 AC 全部通过（或标明需要运行时才能验证的项）。
 
 ---
 
 ## 参考：项目 CSS 变量速查
 
-```less
-// 间距
-@space-4: var(--primitive-space-4, 16px);
-@space-5: var(--primitive-space-5, 20px);
-@space-6: var(--primitive-space-6, 24px);
-@space-10: var(--primitive-space-10, 40px);
-@space-15: var(--primitive-space-15, 60px);
+```
+// 间距（在 Less 中直接使用 var()）
+var(--primitive-space-4)   // 16px
+var(--primitive-space-5)   // 20px
+var(--primitive-space-6)   // 24px
+var(--primitive-space-10)  // 40px
+var(--primitive-space-15)  // 60px
 
-// 断点（在媒体查询中使用字面值）
-// 移动端：@media (max-width: 767px)
-// PC端：默认（不加媒体查询）
+// 断点（使用字面值，以 spec.md 为准；集中写在组件块末尾，从大到小排列）
+// @media (max-width: 1600px)  // 大屏收窄
+// @media (max-width: 1024px)  // 平板 / 小屏 PC
+// @media (max-width: 767px)   // 移动端
 
 // 文字颜色
-// var(--text-primary)    #212121
-// var(--text-secondary)  #666666
-// var(--text-tertiary)   #999999
+var(--text-primary)    // #212121
+var(--text-secondary)  // #666666
+var(--text-tertiary)   // #999999
 
 // 背景
-// var(--bg-primary)      #ffffff
-// var(--bg-secondary)    #f5f5f5
+var(--bg-primary)      // #ffffff
+var(--bg-secondary)    // #f5f5f5
 
 // 边框
-// var(--border-subtle)   #e5e5e5
+var(--border-subtle)   // #e5e5e5
 
 // 容器
-// var(--container-max-width) 1200px
+var(--container-max-width)  // 1200px
 ```
 
 ---
@@ -615,10 +694,6 @@ SSR 水合安全：
 ## 注意事项
 
 1. **设计稿 HTML 只是视觉参考**：从中提取颜色值、字号、间距等视觉意图，根据 spec.md 重新设计 HTML 结构，不照搬原始嵌套
-2. **强制使用 Less**：所有 style 块必须声明 `<style lang="less">`，利用嵌套语法写 BEM
-3. **CSS 优先处理响应式**：任何 PC/移动端的展示差异，第一选择是 CSS media query，而非 JS 条件渲染
-4. **禁止 JS 判断设备类型**：初始化阶段不得访问 `window.innerWidth`、`navigator.userAgent`、`document.body.clientWidth` 等，避免 SSR 水合失败
-5. **保守使用 $effect**：大多数场景用 `$derived` 即可，`$effect` 只用于真正的副作用（定时器、事件监听、第三方 JS 库初始化）
-6. **Portal-UI 只用样式类**：不引入 portal-ui 的 JS 文件，不调用任何 jQuery 插件
-7. **不要写无用注释**：不要写"// 导入组件"、"// 定义 Props"这类纯描述性注释
-8. **BEM 命名不要太深**：最多三层（`block__element--modifier`），超过则考虑拆子组件
+2. **保守使用 $effect**：大多数场景用 `$derived` 即可，`$effect` 只用于真正的副作用（定时器、事件监听、第三方 JS 库初始化）
+3. **不要写无用注释**：不要写"// 导入组件"、"// 定义 Props"这类纯描述性注释
+4. **BEM 命名不要太深**：最多三层（`block__element--modifier`），超过则考虑拆子组件

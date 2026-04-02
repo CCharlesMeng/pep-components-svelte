@@ -33,12 +33,14 @@ export function createComponentConfig(options: { cwd: string; name: string }) {
     const dataPath =
         mockCandidates.find((p) => fs.existsSync(p)) ?? resolve(cwd, 'mocks/default.json');
 
+        const sharedPath = resolve(__dirname, '../../shared');
     const commonAliases = {
         '$lib': resolve(cwd, 'src/lib'),
         '$component': resolve(cwd, 'src/index.svelte'), // Convention: main component is src/index.svelte
-        '$loader': resolve(cwd, 'src/component.server.ts'),
+        '$loader': fs.existsSync(resolve(cwd, 'src/component.server.ts')) ? resolve(cwd, 'src/component.server.ts') : null,
         '$data': dataPath,
-        '/@shared': resolve(projectRoot, 'shared')
+        '@pep/shared':sharedPath,
+        $mockServer:fs.existsSync(resolve(cwd, 'mocks/api/index.ts')) ?resolve(cwd, 'mocks/api/index.ts') :null
     };
 
     return defineConfig(({ command }) => {
@@ -93,6 +95,9 @@ export function createComponentConfig(options: { cwd: string; name: string }) {
                 plugins: [
                     svelte({ compilerOptions: { runes: true } })
                 ],
+                ssr:{
+                    noExternal:['js-base64','marked']
+                },
                 build: {
                     ssr: true,
                     rollupOptions: {
