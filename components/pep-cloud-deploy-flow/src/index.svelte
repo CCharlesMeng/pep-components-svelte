@@ -53,6 +53,10 @@
   let isDragging = $state(false);
   let hasManualSidebarResize = $state(false);
   let workspaceEl = $state<HTMLDivElement | null>(null);
+  let previewImageSrc = $state("");
+  let previewImageAlt = $state("");
+  const previewCloseIconSrc =
+    "https://res-static.hc-cdn.cn/aem/content/dam/cloudbu-site/archive/china/zh-cn/support/resource/framework/v3/images/modal-close-icon.svg";
 
   /** 悬浮窗贴右缘吸附带宽度（px，与原先左缘吸附阈值相同） */
   const FLOAT_RIGHT_SNAP_THRESHOLD_PX = 24;
@@ -108,6 +112,16 @@
     showEndModal = false;
     isDeploying = false;
     isDeploymentFinished = true;
+  }
+
+  function handlePreviewImage(src: string, alt: string): void {
+    previewImageSrc = src;
+    previewImageAlt = alt;
+  }
+
+  function closeImagePreview(): void {
+    previewImageSrc = "";
+    previewImageAlt = "";
   }
 
   function handleRedeploy(): void {
@@ -363,6 +377,21 @@
       window.removeEventListener("resize", updateViewportFlag);
     };
   });
+
+  $effect(() => {
+    if (!previewImageSrc) {
+      return;
+    }
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeImagePreview();
+      }
+    };
+    window.addEventListener("keydown", handleEscape);
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
+  });
 </script>
 
 <section class="pep-cloud-deploy-flow" class:is-sidebar-resizing={isDragging}>
@@ -386,6 +415,7 @@
         stepCheckedIcon={sidebar.icons?.stepCheckedIcon}
         domainWhitelistPatterns={iframePages.domainWhitelistPatterns}
         onOpenExternal={handleOpenExternal}
+        onPreviewImage={handlePreviewImage}
       />
     {:else}
       <div class="main-wrap" class:is-hidden={sidebarState === "fullscreen"}>
@@ -430,6 +460,7 @@
           <SidebarPanel
             {sidebar}
             onOpenExternal={handleOpenExternal}
+            onPreviewImage={handlePreviewImage}
             onFloat={openFloating}
             onRestoreSide={restoreSidebarSideModeWithDefaultRatio}
             onCollapse={() => (sidebarState = "collapsed")}
@@ -505,6 +536,7 @@
           <SidebarPanel
             {sidebar}
             onOpenExternal={handleOpenExternal}
+            onPreviewImage={handlePreviewImage}
             onFloat={restoreSidebarSideModeWithDefaultRatio}
             onRestoreSide={restoreSidebarSideModeWithDefaultRatio}
             onCollapse={() => (sidebarState = "collapsed")}
@@ -540,6 +572,36 @@
   </div>
 </section>
 
+{#if previewImageSrc}
+  <div
+    class="pep-cloud-deploy-flow-image-preview-mask"
+    role="dialog"
+    aria-modal="true"
+    aria-label="图片预览"
+    tabindex="-1"
+  >
+    <button
+      type="button"
+      class="pep-cloud-deploy-flow-image-preview-backdrop"
+      aria-label="关闭图片预览"
+      onclick={closeImagePreview}
+    ></button>
+    <button
+      type="button"
+      class="pep-cloud-deploy-flow-image-preview-close"
+      aria-label="关闭图片预览"
+      onclick={closeImagePreview}
+    >
+      <img src={previewCloseIconSrc} alt="" />
+    </button>
+    <img
+      class="pep-cloud-deploy-flow-image-preview-image"
+      src={previewImageSrc}
+      alt={previewImageAlt}
+    />
+  </div>
+{/if}
+
 <div
   class="right-snap-shadow"
   class:is-visible={sidebarState === "floating" && showRightSnapShadow}
@@ -560,6 +622,9 @@
     background: var(--bg-secondary);
     color: #1f2329;
     font-family: Arial, sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
 
   :global(.pep-cloud-deploy-flow.is-sidebar-resizing iframe) {
@@ -592,8 +657,8 @@
     gap: 0;
     padding: 0;
     box-sizing: border-box;
-    min-height: calc(100vh - 48px);
     position: relative;
+    flex: 1;
   }
 
   .sidebar-wrap {
@@ -831,25 +896,5 @@
     .main-wrap.is-hidden {
       display: block;
     }
-  }
-
-  :global(.pep-cloud-deploy-flow .rich-text a) {
-    color: #165dff;
-    text-decoration: none;
-  }
-
-  :global(.pep-cloud-deploy-flow .rich-text a:hover) {
-    text-decoration: underline;
-  }
-
-  :global(.pep-cloud-deploy-flow .rich-text ol) {
-    margin: 0;
-    padding-left: 20px;
-  }
-
-  :global(.pep-cloud-deploy-flow .rich-text li) {
-    font-size: 14px;
-    line-height: 22px;
-    margin: 8px 0;
   }
 </style>

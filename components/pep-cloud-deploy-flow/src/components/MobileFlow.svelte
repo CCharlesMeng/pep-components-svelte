@@ -21,6 +21,7 @@
     stepCheckedIcon?: string;
     domainWhitelistPatterns?: string[];
     onOpenExternal?: (url: string, title: string) => void;
+    onPreviewImage?: (src: string, alt: string) => void;
   }
 
   let {
@@ -29,6 +30,7 @@
     stepCheckedIcon,
     domainWhitelistPatterns = [],
     onOpenExternal,
+    onPreviewImage,
   }: Props = $props();
 
   let activeStepIndex = $state(0);
@@ -158,6 +160,12 @@
 
   function handleInlineContentClick(event: MouseEvent): void {
     const target = getEventTargetElement(event.target);
+    const image = target?.closest("img");
+    if (image instanceof HTMLImageElement && image.src) {
+      event.preventDefault();
+      onPreviewImage?.(image.currentSrc || image.src, image.alt || "图片预览");
+      return;
+    }
     const anchor = target?.closest("a");
     if (!anchor) {
       return;
@@ -291,6 +299,7 @@
       clearCopyTipTimers();
     };
   });
+
 </script>
 
 <section class="pep-cloud-deploy-flow-mobile">
@@ -417,6 +426,7 @@
       {mobile.linkImage.copyTip ?? "已复制"}
     </div>
   {/if}
+
 </section>
 
 <style>

@@ -2,7 +2,6 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "title": "Cloud Deploy Flow",
-  "additionalProperties": false,
   "required": [
     "navbar",
     "sidebar",
@@ -13,17 +12,50 @@
     "theme",
     "shortcuts"
   ],
+  "ui:widget": "tabContainer",
+  "ui:options": [
+    {
+      "title": "导航配置",
+      "content": ["navbar"]
+    },
+    {
+      "title": "侧边栏配置",
+      "content": ["sidebar"]
+    },
+    {
+      "title": "主内容配置",
+      "content": ["mainContent"]
+    },
+    {
+      "title": "背景图片配置",
+      "content": ["backgroundImage"]
+    },
+    {
+      "title": "iframe 页面配置",
+      "content": ["iframePages"]
+    },
+    {
+      "title": "移动端配置",
+      "content": ["mobile"]
+    },
+    {
+      "title": "主题配置",
+      "content": ["theme"]
+    },
+    {
+      "title": "快捷入口配置",
+      "content": ["shortcuts"]
+    }
+  ],
   "properties": {
     "navbar": {
       "title": "顶部导航配置",
       "type": "object",
-      "additionalProperties": false,
       "required": ["logo", "breadcrumbs", "rightActions", "endDeployment"],
       "properties": {
         "logo": {
           "title": "Logo 配置",
           "type": "object",
-          "additionalProperties": false,
           "required": ["img"],
           "properties": {
             "img": {
@@ -49,7 +81,6 @@
           "items": {
             "title": "面包屑项",
             "type": "object",
-            "additionalProperties": false,
             "required": ["text"],
             "properties": {
               "text": {
@@ -74,7 +105,6 @@
           "items": {
             "title": "操作项",
             "type": "object",
-            "additionalProperties": false,
             "required": ["text", "icon"],
             "properties": {
               "text": {
@@ -99,7 +129,6 @@
         "endDeployment": {
           "title": "结束部署配置",
           "type": "object",
-          "additionalProperties": false,
           "required": ["buttonText", "icon", "modal", "successPage"],
           "properties": {
             "buttonText": {
@@ -115,7 +144,6 @@
               "title": "结束部署确认弹窗",
               "description": "用户点击「结束部署」后弹出的二次确认弹窗",
               "type": "object",
-              "additionalProperties": false,
               "required": ["title", "icon", "content", "confirmText"],
               "properties": {
                 "title": {
@@ -141,7 +169,6 @@
               "title": "结束部署成功页",
               "description": "用户确认结束部署后展示的结束页。快捷入口卡片列表请在「快捷入口配置 shortcuts.finishPage」中统一配置",
               "type": "object",
-              "additionalProperties": false,
               "required": ["title", "redeployText"],
               "properties": {
                 "title": {
@@ -162,7 +189,9 @@
       "title": "侧边栏配置",
       "description": "侧边栏的标签页、步骤内容和底部翻页按钮。图标和文案配置请在「主题配置 theme」中统一管理",
       "type": "object",
-      "additionalProperties": false,
+      "ui:options": {
+        "hidden": "child-component"
+      },
       "required": ["tabs", "footer"],
       "properties": {
         "tabs": {
@@ -173,7 +202,6 @@
           "items": {
             "title": "标签页",
             "type": "object",
-            "additionalProperties": false,
             "required": ["title", "applications"],
             "properties": {
               "title": {
@@ -188,7 +216,6 @@
                 "items": {
                   "title": "应用",
                   "type": "object",
-                  "additionalProperties": false,
                   "required": ["steps"],
                   "properties": {
                     "title": {
@@ -203,7 +230,6 @@
                       "items": {
                         "title": "步骤项",
                         "type": "object",
-                        "additionalProperties": false,
                         "required": ["title", "remoteContent"],
                         "properties": {
                           "title": {
@@ -213,15 +239,33 @@
                           "remoteContent": {
                             "title": "步骤内容配置",
                             "type": "object",
-                            "additionalProperties": false,
                             "required": ["source"],
+
                             "properties": {
                               "source": {
                                 "title": "内容来源",
                                 "description": "通过「内容来源类型」选择：直接编写 Markdown（推荐，所见即所得）；或提供远程 HTML 页面地址（适合已有文档页面的场景）",
                                 "type": "object",
-                                "additionalProperties": false,
                                 "required": ["contentType"],
+                                "ui:widget": "tabContainer",
+                                "ui:options": [
+                                  {
+                                    "title": "来源类型",
+                                    "content": ["contentType"]
+                                  },
+                                  {
+                                    "title": "Markdown 内容配置",
+                                    "content": ["markdownContent"]
+                                  },
+                                  {
+                                    "title": "远程 HTML 页面地址配置",
+                                    "content": ["htmlUrl"]
+                                  },
+                                  {
+                                    "title": "远程 CSS 样式地址配置",
+                                    "content": ["cssUrl"]
+                                  }
+                                ],
                                 "properties": {
                                   "contentType": {
                                     "title": "内容来源类型",
@@ -288,7 +332,6 @@
         "footer": {
           "title": "底部翻页按钮文案",
           "type": "object",
-          "additionalProperties": false,
           "required": ["prevText", "nextText"],
           "properties": {
             "prevText": {
@@ -307,7 +350,6 @@
       "title": "部署引导页配置",
       "description": "用户点击「开始部署」前看到的引导页内容。云产品快捷入口请在「快捷入口配置 shortcuts.deployPage」中统一配置",
       "type": "object",
-      "additionalProperties": false,
       "required": [
         "title",
         "notice",
@@ -324,7 +366,6 @@
           "title": "部署须知",
           "description": "整块为富文本 HTML，可将标题（如 h3）、列表、链接等一并写入",
           "type": "object",
-          "additionalProperties": false,
           "required": ["contentHtml"],
           "properties": {
             "contentHtml": {
@@ -339,7 +380,6 @@
           "title": "部署预估信息",
           "description": "整块为富文本 HTML，可将「预估费用」标题、价格、说明、部署时长等一并排版",
           "type": "object",
-          "additionalProperties": false,
           "required": ["contentHtml"],
           "properties": {
             "contentHtml": {
@@ -353,7 +393,6 @@
         "action": {
           "title": "部署按钮区",
           "type": "object",
-          "additionalProperties": false,
           "required": ["buttonText", "url", "launchTitle"],
           "properties": {
             "buttonText": {
@@ -378,7 +417,6 @@
         "agreement": {
           "title": "用户协议确认",
           "type": "object",
-          "additionalProperties": false,
           "required": ["contentHtml"],
           "properties": {
             "contentHtml": {
@@ -394,20 +432,17 @@
       "title": "移动端配置",
       "description": "移动端（屏幕宽度 ≤ 768px）的专属配置。logo、面包屑、步骤内容均支持留空，留空时自动继承 PC 端对应配置",
       "type": "object",
-      "additionalProperties": false,
       "required": ["linkImage"],
       "properties": {
         "navbar": {
           "title": "移动端顶部导航（可选）",
           "description": "不填时自动继承顶部导航（navbar）的 logo 和面包屑配置",
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "logo": {
               "title": "移动端 Logo（可选）",
               "description": "不填时自动继承 navbar.logo",
               "type": "object",
-              "additionalProperties": false,
               "properties": {
                 "img": {
                   "title": "Logo 图片地址",
@@ -432,7 +467,6 @@
               "items": {
                 "title": "面包屑项",
                 "type": "object",
-                "additionalProperties": false,
                 "required": ["text"],
                 "properties": {
                   "text": {
@@ -455,7 +489,6 @@
           "title": "移动端标题下方图片卡片",
           "description": "移动端页面标题下方展示的可点击图片，通常用于展示方案架构图或引导图",
           "type": "object",
-          "additionalProperties": false,
           "required": ["image", "url"],
           "properties": {
             "image": {
@@ -486,7 +519,6 @@
           "items": {
             "title": "步骤项",
             "type": "object",
-            "additionalProperties": false,
             "required": ["title", "remoteContent"],
             "properties": {
               "title": {
@@ -496,14 +528,12 @@
               "remoteContent": {
                 "title": "步骤内容配置",
                 "type": "object",
-                "additionalProperties": false,
                 "required": ["source"],
                 "properties": {
                   "source": {
                     "title": "内容来源",
                     "description": "通过「内容来源类型」选择：直接编写 Markdown（推荐，所见即所得）；或提供远程 HTML 页面地址（适合已有文档页面的场景）",
                     "type": "object",
-                    "additionalProperties": false,
                     "required": ["contentType"],
                     "properties": {
                       "contentType": {
@@ -518,7 +548,10 @@
                               "label": "直接编写 Markdown",
                               "value": "markdown"
                             },
-                            { "label": "使用远程 HTML", "value": "remoteHtml" }
+                            {
+                              "label": "使用远程 HTML",
+                              "value": "remoteHtml"
+                            }
                           ]
                         }
                       },
@@ -571,7 +604,6 @@
       "title": "伪浏览器配置",
       "description": "内嵌伪浏览器的行为配置。图标资源请在「主题配置 theme.icons.browser」中统一管理；新标签页快捷入口请在「快捷入口配置 shortcuts.browserNewTab」中统一管理",
       "type": "object",
-      "additionalProperties": false,
       "required": ["domainWhitelistPatterns", "newTabPage"],
       "properties": {
         "domainWhitelistPatterns": {
@@ -588,7 +620,6 @@
           "title": "新标签页配置",
           "description": "用户在伪浏览器中新建标签页时显示的内容。快捷入口列表请在「快捷入口配置 shortcuts.browserNewTab」中统一管理",
           "type": "object",
-          "additionalProperties": false,
           "required": ["tabTitle", "title", "addressPlaceholder"],
           "properties": {
             "tabTitle": {
@@ -598,7 +629,6 @@
             "title": {
               "title": "新标签页主标题",
               "type": "object",
-              "additionalProperties": false,
               "required": ["icon", "text"],
               "properties": {
                 "icon": {
@@ -625,20 +655,17 @@
       "title": "主题配置（图标与系统文案）",
       "description": "集中管理所有 UI 图标资源和系统提示文案，分为侧边栏图标、伪浏览器图标和系统文案三个子模块",
       "type": "object",
-      "additionalProperties": false,
       "required": ["icons", "texts"],
       "properties": {
         "icons": {
           "title": "图标资源",
           "type": "object",
-          "additionalProperties": false,
           "required": ["sidebar", "browser"],
           "properties": {
             "sidebar": {
               "title": "侧边栏图标",
               "description": "侧边栏各交互按钮的图标资源，建议使用 SVG 格式，尺寸 16×16 或 24×24",
               "type": "object",
-              "additionalProperties": false,
               "required": [
                 "floatIcon",
                 "switchToSideModeIcon",
@@ -697,7 +724,6 @@
               "title": "伪浏览器图标",
               "description": "内嵌伪浏览器各交互按钮的图标资源，建议使用 SVG 格式，尺寸 16×16 或 24×24",
               "type": "object",
-              "additionalProperties": false,
               "required": [
                 "headerLogo",
                 "addTab",
@@ -744,7 +770,6 @@
           "title": "系统提示文案",
           "description": "侧边栏和移动端的系统级提示文案，通常使用默认值即可，如需多语言适配可在此修改",
           "type": "object",
-          "additionalProperties": false,
           "required": [
             "openExternalDefaultTitle",
             "browserFrameLoadingText",
@@ -796,14 +821,12 @@
       "title": "快捷入口配置",
       "description": "集中管理三处快捷入口卡片列表：部署引导页的云产品列表、实操结束页的推荐入口、伪浏览器新标签页的快捷入口",
       "type": "object",
-      "additionalProperties": false,
       "required": ["deployPage", "finishPage", "browserNewTab"],
       "properties": {
         "deployPage": {
           "title": "部署引导页 — 云产品资源列表",
           "description": "显示在部署引导页中，展示本方案涉及的云产品，点击可跳转至对应产品页",
           "type": "object",
-          "additionalProperties": false,
           "required": ["title", "items"],
           "properties": {
             "title": {
@@ -818,7 +841,6 @@
               "items": {
                 "title": "快捷入口项",
                 "type": "object",
-                "additionalProperties": false,
                 "required": ["icon", "text", "url"],
                 "properties": {
                   "icon": {
@@ -846,7 +868,6 @@
           "title": "实操结束页 — 推荐入口列表",
           "description": "用户结束部署后展示的结束页中，推荐用户访问的云服务控制台入口",
           "type": "object",
-          "additionalProperties": false,
           "required": ["description", "items"],
           "properties": {
             "description": {
@@ -861,7 +882,6 @@
               "items": {
                 "title": "快捷入口项",
                 "type": "object",
-                "additionalProperties": false,
                 "required": ["icon", "text", "url"],
                 "properties": {
                   "icon": {
@@ -889,7 +909,6 @@
           "title": "伪浏览器新标签页 — 快捷入口列表",
           "description": "用户在伪浏览器中新建标签页时，展示的快捷入口卡片",
           "type": "object",
-          "additionalProperties": false,
           "required": ["title", "items"],
           "properties": {
             "title": {
@@ -903,7 +922,6 @@
               "items": {
                 "title": "快捷入口项",
                 "type": "object",
-                "additionalProperties": false,
                 "required": ["icon", "text", "url"],
                 "properties": {
                   "icon": {

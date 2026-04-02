@@ -23,6 +23,7 @@
   interface Props {
     sidebar: SidebarConfig;
     onOpenExternal?: (url: string, title: string) => void;
+    onPreviewImage?: (src: string, alt: string) => void;
     onFloat?: () => void;
     onRestoreSide?: () => void;
     onCollapse?: () => void;
@@ -33,6 +34,7 @@
   let {
     sidebar,
     onOpenExternal,
+    onPreviewImage,
     onFloat,
     onRestoreSide,
     onCollapse,
@@ -295,6 +297,12 @@
 
   function handleInlineContentClick(event: MouseEvent): void {
     const target = getEventTargetElement(event.target);
+    const image = target?.closest("img");
+    if (image instanceof HTMLImageElement && image.src) {
+      event.preventDefault();
+      onPreviewImage?.(image.currentSrc || image.src, image.alt || "图片预览");
+      return;
+    }
     const anchor = target?.closest("a");
     if (!anchor) {
       return;
@@ -312,7 +320,13 @@
   }
 </script>
 
-<aside class="pep-cloud-deploy-flow-sidebar" class:is-floating={isFloating}>
+<aside
+  class="pep-cloud-deploy-flow-sidebar"
+  class:is-floating={isFloating}
+  data-mod-id="sidebar"
+  data-mode-name="child-component"
+  data-partial-refresh="false"
+>
   <div class="pep-cloud-deploy-flow-sidebar__header">
     <div class="pep-cloud-deploy-flow-sidebar__tabs">
       {#each sidebar.tabs as tab, index (`${tab.title}-${index}`)}
@@ -338,25 +352,6 @@
         >
           {#if sidebar.icons?.floatIcon}
             <img src={sidebar.icons.floatIcon} alt="" />
-          {:else}
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none">
-              <rect
-                x="2"
-                y="5"
-                width="14"
-                height="14"
-                rx="2"
-                stroke="currentColor"
-                stroke-width="1.8"
-              />
-              <path
-                d="M8 5V3h13a2 2 0 0 1 2 2v13h-2"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
           {/if}
         </button>
         <button
@@ -367,23 +362,6 @@
         >
           {#if sidebar.icons?.minimizeToSideIcon}
             <img src={sidebar.icons.minimizeToSideIcon} alt="" />
-          {:else}
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none">
-              <path
-                d="M7 4h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H7"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M11 8l-4 4 4 4"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
           {/if}
         </button>
       {:else}
@@ -397,43 +375,6 @@
             <img src={sidebar.icons.switchToSideModeIcon} alt="" />
           {:else if sidebar.icons?.floatIcon}
             <img src={sidebar.icons.floatIcon} alt="" />
-          {:else if isFloating}
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none">
-              <rect
-                x="3"
-                y="3"
-                width="18"
-                height="18"
-                rx="2"
-                stroke="currentColor"
-                stroke-width="1.8"
-              />
-              <path
-                d="M9 3v18"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-              />
-            </svg>
-          {:else}
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none">
-              <rect
-                x="2"
-                y="5"
-                width="14"
-                height="14"
-                rx="2"
-                stroke="currentColor"
-                stroke-width="1.8"
-              />
-              <path
-                d="M8 5V3h13a2 2 0 0 1 2 2v13h-2"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
           {/if}
         </button>
         <button
@@ -444,16 +385,6 @@
         >
           {#if sidebar.icons?.collapseIcon}
             <img src={sidebar.icons.collapseIcon} alt="" />
-          {:else}
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M5 12h14"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-              ></path>
-            </svg>
           {/if}
         </button>
       {/if}
@@ -669,10 +600,10 @@
     color: #4e5969;
   }
 
-  .pep-cloud-deploy-flow-sidebar__tools svg,
+  .pep-cloud-deploy-flow-sidebar__tools :global(svg),
   .pep-cloud-deploy-flow-sidebar__tools img {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     object-fit: contain;
   }
 
@@ -965,29 +896,15 @@
     justify-content: flex-end;
     gap: 8px;
     padding: 14px 16px;
-    border-top: 1px solid var(--primitive-gray-200);
+    border-top: 1px solid #eee;
     background: #fff;
-  }
-
-  :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text h2) {
-    font-size: 20px;
-    line-height: 1.4;
-    margin: 0 0 16px;
-    color: var(--text-primary);
-  }
-
-  :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text h3) {
-    font-size: var(--primitive-font-base);
-    line-height: 1.5;
-    margin: 0 0 10px;
-    color: var(--text-primary);
   }
 
   :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text p),
   :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text li) {
     font-size: var(--primitive-font-sm);
     line-height: 1.7;
-    color: #4e5969;
+    color: #191919;
   }
 
   :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text) {

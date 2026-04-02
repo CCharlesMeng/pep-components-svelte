@@ -119,6 +119,7 @@
     font-weight: 700;
     margin: 0;
     margin-bottom: 32px;
+    margin-left: -16px;
     color: #191919;
   }
 
@@ -134,9 +135,29 @@
   }
 
   .pep-cloud-deploy-flow-main__rich-text {
-    color: #374151;
+    color: #191919;
     font-size: 14px;
     line-height: 1.7;
+  }
+
+  :global(.pep-cloud-deploy-flow-main .rich-text a) {
+    color: #165dff;
+    text-decoration: none;
+  }
+
+  :global(.pep-cloud-deploy-flow-main .rich-text a:hover) {
+    text-decoration: underline;
+  }
+
+  :global(.pep-cloud-deploy-flow-main .rich-text ol) {
+    margin: 0;
+    padding-left: 20px;
+  }
+
+  :global(.pep-cloud-deploy-flow-main .rich-text li) {
+    font-size: 14px;
+    line-height: 22px;
+    margin: 8px 0;
   }
 
   .pep-cloud-deploy-flow-main__products {
