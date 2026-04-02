@@ -17,6 +17,7 @@
 
 <section
   class="pep-cloud-deploy-flow-success"
+  bi_parent_name="DeploymentFinished"
   style={backgroundImage
     ? `background-image: url('${backgroundImage}'); background-size: cover; background-position: center;`
     : undefined}

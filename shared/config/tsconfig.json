@@ -1,7 +1,8 @@
 {
     "compilerOptions": {
         "paths": {
-            "@pep/shared": ["../../shared/index.ts"]
+            "@pep/shared": ["../../shared/index.ts"],
+            "@pep/shared/*": ["../../shared/*"]
         },
         "moduleResolution": "bundler",
         "module": "esnext",

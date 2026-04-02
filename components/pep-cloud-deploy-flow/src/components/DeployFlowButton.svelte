@@ -32,7 +32,7 @@
   );
 </script>
 
-<button {type} class={mergedClass} {...rest}>
+<button {type} class={mergedClass} {...rest} bi_name="DeployFlowButton">
   {@render children()}
 </button>
 
@@ -48,7 +48,7 @@
 
   .pep-cloud-deploy-flow-btn--primary {
     border: none;
-    background: #191919;
+    background-color: #191919;
     color: #fff;
     padding: 7px 24px;
     font-size: 12px;
@@ -57,18 +57,21 @@
   }
 
   .pep-cloud-deploy-flow-btn--primary:hover:not(:disabled) {
-    background: #1f2937;
+    background-color: #292929;
   }
 
   .pep-cloud-deploy-flow-btn--primary:disabled {
-    opacity: 0.45;
+    background-color: #f0f0f0;
+    color: #c2c2c2;
+    opacity: 1;
+    box-shadow: none;
     cursor: not-allowed;
   }
 
   .pep-cloud-deploy-flow-btn--secondary {
-    border: 1px solid #c9cdd4;
-    background: #fff;
-    color: #4e5969;
+    border: 1px solid #595959;
+    background-color: transparent;
+    color: #191919;
     padding: 7px 24px;
     font-size: 12px;
     line-height: 18px;
@@ -76,7 +79,8 @@
   }
 
   .pep-cloud-deploy-flow-btn--secondary:hover:not(:disabled) {
-    background: #f5f7fa;
+    background-color: transparent;
+    border-color: #c2c2c2;
   }
 
   .pep-cloud-deploy-flow-btn--secondary:disabled {

@@ -1,8 +1,20 @@
 <script lang="ts">
+  import { onDestroy, onMount } from "svelte";
   import { injectExternalTab } from "../utils/phase2";
   import type { BrowserExternalUrl, BrowserTab } from "../utils/phase2";
+  import {
+    MAX_BROWSER_TABS,
+    TAB_GAP,
+    computeTabOverflowLayout,
+  } from "../utils/pseudo-browser-tab-overflow";
+  import {
+    createTabScrollController,
+    type TabScrollDirection,
+  } from "../utils/pseudo-browser-tab-scroll";
   import type { IframePagesConfig } from "../types";
+  import AlertToast from "./AlertToast.svelte";
   import QuickLinkCard from "./QuickLinkCard.svelte";
+  import Tooltip from "./Tooltip.svelte";
 
   interface Props {
     externalUrl?: BrowserExternalUrl | null;
@@ -29,11 +41,204 @@
   let frameLoading = $state(false);
   let tabFrameVersions = $state<Record<string, number>>({});
   let loadedFrameKeys = $state<Record<string, true>>({});
+  let pinnedTabTitles = $state<Record<string, string>>({});
+  let tabAreaEl = $state<HTMLDivElement | null>(null);
+  let tabsViewportEl = $state<HTMLDivElement | null>(null);
+  let addTabButtonEl = $state<HTMLButtonElement | null>(null);
+  let computedTabWidth = $state(166);
+  let useTabScrollControls = $state(false);
+  let addTabPinned = $state(false);
+  let canScrollLeft = $state(false);
+  let canScrollRight = $state(false);
+  let layoutRafId = 0;
+  let activeTabScrollRafId = 0;
+  let resizeObserver: ResizeObserver | null = null;
+  let tabScrollController: ReturnType<typeof createTabScrollController> | null =
+    null;
+  let tabIdSeed = 0;
+  let tabLimitWarningVisible = $state(false);
+  let tabLimitWarningTimer: ReturnType<typeof setTimeout> | null = null;
+
+  const LEFT_ARROW_ICON =
+    "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/browserIcon/leftArrowIcon.svg";
+  const LEFT_ARROW_ICON_DISABLED =
+    "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/browserIcon/leftArrowIconDisabled.svg";
+  const RIGHT_ARROW_ICON =
+    "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/browserIcon/rightArrowIcon.svg";
+  const RIGHT_ARROW_ICON_DISABLED =
+    "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/browserIcon/rightArrowIconDisabled.svg";
+  const TAB_LIMIT_CONFIRM_TEXT =
+    "页签已增加至最大数量，如需继续增加可关闭无用标签";
+  const TAB_LIMIT_WARNING_TITLE = "告警信息";
+  const TAB_LIMIT_WARNING_DURATION = 3000;
+  const TAB_SCROLL_ARROWS_TOTAL_WIDTH = 46;
+  const ADD_BTN_PINNED_RESERVED = 48;
+
+  function createTabId(): string {
+    tabIdSeed += 1;
+    return `${Date.now()}-${tabIdSeed}`;
+  }
+
+  function getHorizontalOuterWidth(element: HTMLElement | null): number {
+    if (!element || typeof window === "undefined") {
+      return 0;
+    }
+    const styles = window.getComputedStyle(element);
+    const marginLeft = Number.parseFloat(styles.marginLeft || "0") || 0;
+    const marginRight = Number.parseFloat(styles.marginRight || "0") || 0;
+    return element.offsetWidth + marginLeft + marginRight;
+  }
+
+  function scheduleTabLayoutRecompute(): void {
+    if (typeof window === "undefined") {
+      return;
+    }
+    if (layoutRafId) {
+      window.cancelAnimationFrame(layoutRafId);
+    }
+    layoutRafId = window.requestAnimationFrame(() => {
+      layoutRafId = 0;
+      recomputeTabLayout();
+    });
+  }
+
+  function recomputeTabLayout(): void {
+    if (!tabAreaEl) {
+      computedTabWidth = 166;
+      useTabScrollControls = false;
+      addTabPinned = false;
+      return;
+    }
+    const containerWidth = tabAreaEl.clientWidth;
+    const addBtnWidth = getHorizontalOuterWidth(addTabButtonEl);
+
+    const inlineAvailable = Math.max(0, containerWidth - addBtnWidth);
+    const inlineLayout = computeTabOverflowLayout({
+      tabCount: tabs.length,
+      availableWidth: inlineAvailable,
+      tabGap: TAB_GAP,
+    });
+
+    if (!inlineLayout.isCompressed) {
+      computedTabWidth = 166;
+      useTabScrollControls = false;
+      addTabPinned = false;
+      if (tabsViewportEl) {
+        tabsViewportEl.scrollLeft = 0;
+      }
+      tabScrollController?.updateScrollState();
+      return;
+    }
+
+    const pinnedAvailable = Math.max(
+      0,
+      containerWidth - ADD_BTN_PINNED_RESERVED,
+    );
+    const pinnedLayout = computeTabOverflowLayout({
+      tabCount: tabs.length,
+      availableWidth: pinnedAvailable,
+      tabGap: TAB_GAP,
+    });
+
+    if (!pinnedLayout.useScrollControls) {
+      computedTabWidth = pinnedLayout.tabWidth;
+      useTabScrollControls = false;
+      addTabPinned = true;
+      if (tabsViewportEl) {
+        tabsViewportEl.scrollLeft = 0;
+      }
+      tabScrollController?.updateScrollState();
+      return;
+    }
+
+    const scrollAvailable = Math.max(
+      0,
+      pinnedAvailable - TAB_SCROLL_ARROWS_TOTAL_WIDTH,
+    );
+    const scrollLayout = computeTabOverflowLayout({
+      tabCount: tabs.length,
+      availableWidth: scrollAvailable,
+      tabGap: TAB_GAP,
+    });
+    computedTabWidth = scrollLayout.tabWidth;
+    useTabScrollControls = true;
+    addTabPinned = true;
+    tabScrollController?.updateScrollState();
+  }
+
+  function clearTabLimitWarningTimer(): void {
+    if (tabLimitWarningTimer) {
+      clearTimeout(tabLimitWarningTimer);
+      tabLimitWarningTimer = null;
+    }
+  }
+
+  function dismissTabLimitWarning(): void {
+    clearTabLimitWarningTimer();
+    tabLimitWarningVisible = false;
+  }
+
+  function scheduleScrollAfterLayout(): void {
+    if (typeof window === "undefined") {
+      return;
+    }
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        if (useTabScrollControls) {
+          scrollActiveTabIntoView("auto");
+        }
+      });
+    });
+  }
+
+  function scrollActiveTabIntoView(behavior: ScrollBehavior = "smooth"): void {
+    if (!tabsViewportEl || typeof window === "undefined") {
+      return;
+    }
+    if (activeTabScrollRafId) {
+      window.cancelAnimationFrame(activeTabScrollRafId);
+    }
+    activeTabScrollRafId = window.requestAnimationFrame(() => {
+      activeTabScrollRafId = 0;
+      const activeElement = tabsViewportEl?.querySelector(
+        ".pep-cloud-deploy-flow-browser__tab-item.active",
+      ) as HTMLElement | null;
+      activeElement?.scrollIntoView({
+        block: "nearest",
+        inline: "nearest",
+        behavior,
+      });
+      tabScrollController?.updateScrollState();
+    });
+  }
+
+  function notifyTabLimitReached(): void {
+    if (typeof window === "undefined" || tabLimitWarningVisible) {
+      return;
+    }
+    tabLimitWarningVisible = true;
+    clearTabLimitWarningTimer();
+    tabLimitWarningTimer = setTimeout(() => {
+      dismissTabLimitWarning();
+    }, TAB_LIMIT_WARNING_DURATION);
+  }
+
+  function canAppendTab(): boolean {
+    if (tabs.length < MAX_BROWSER_TABS) {
+      return true;
+    }
+    notifyTabLimitReached();
+    return false;
+  }
 
   $effect(() => {
     if (externalUrl && externalUrl.timestamp !== handledTimestamp) {
       const normalized = normalizeUrl(externalUrl.url);
       if (normalized && isUrlAllowed(normalized)) {
+        if (!canAppendTab()) {
+          handledTimestamp = externalUrl.timestamp;
+          return;
+        }
         tabs = injectExternalTab(
           tabs,
           { ...externalUrl, url: normalized },
@@ -98,17 +303,25 @@
     loadedFrameKeys = nextLoaded;
     const { [tabId]: _ignored, ...restVersions } = tabFrameVersions;
     tabFrameVersions = restVersions;
+    clearPinnedTabTitle(tabId);
   }
 
   function selectTab(id: string): void {
     tabs = tabs.map((item) => ({ ...item, active: item.id === id }));
+    if (useTabScrollControls) {
+      scrollActiveTabIntoView();
+    }
   }
 
   function addTab(): void {
-    const id = String(Date.now());
+    if (!canAppendTab()) {
+      return;
+    }
+    const id = createTabId();
     tabs = tabs
       .map((item) => ({ ...item, active: false }))
       .concat([{ id, title: defaultTabTitle, url: "", active: true }]);
+    scheduleScrollAfterLayout();
   }
 
   function closeTab(id: string): void {
@@ -136,7 +349,48 @@
     return `https://${value}`;
   }
 
-  function toTabTitle(url: string): string {
+  function clearPinnedTabTitle(tabId: string): void {
+    const { [tabId]: _ignoredPinnedTitle, ...restPinnedTitles } =
+      pinnedTabTitles;
+    pinnedTabTitles = restPinnedTitles;
+  }
+
+  function setPinnedTabTitle(tabId: string, preferredTitle?: string): void {
+    const normalizedPreferredTitle = preferredTitle?.trim();
+    if (normalizedPreferredTitle) {
+      pinnedTabTitles = {
+        ...pinnedTabTitles,
+        [tabId]: normalizedPreferredTitle,
+      };
+      return;
+    }
+    clearPinnedTabTitle(tabId);
+  }
+
+  /**
+   * tab 标题优先级（从高到低）：
+   * 1) preferredTitle：业务显式指定（如快捷卡片主标题）
+   * 2) iframeTitle：页面加载后读到的 document.title
+   * 3) url hostname：从地址推导
+   * 4) defaultTabTitle：兜底标题
+   */
+  function resolveTabTitle({
+    preferredTitle,
+    iframeTitle,
+    url,
+  }: {
+    preferredTitle?: string;
+    iframeTitle?: string | null;
+    url?: string;
+  }): string {
+    const explicitTitle = preferredTitle?.trim();
+    if (explicitTitle) {
+      return explicitTitle;
+    }
+    const loadedTitle = iframeTitle?.trim();
+    if (loadedTitle) {
+      return loadedTitle;
+    }
     if (!url) {
       return defaultTabTitle;
     }
@@ -179,7 +433,7 @@
     window.open(url, "_blank", "noopener,noreferrer");
   }
 
-  function openUrlFromShortcut(rawUrl: string): void {
+  function openUrlFromShortcut(rawUrl: string, preferredTitle?: string): void {
     const nextUrl = normalizeUrl(rawUrl);
     if (!nextUrl) {
       return;
@@ -190,13 +444,18 @@
     }
     tabs = tabs.map((item) =>
       item.id === activeTab.id
-        ? { ...item, url: nextUrl, title: toTabTitle(nextUrl) }
+        ? {
+            ...item,
+            url: nextUrl,
+            title: resolveTabTitle({ preferredTitle, url: nextUrl }),
+          }
         : item,
     );
     tabFrameVersions = {
       ...tabFrameVersions,
       [activeTab.id]: getTabFrameVersion(activeTab.id) + 1,
     };
+    setPinnedTabTitle(activeTab.id, preferredTitle);
   }
 
   function navigateToAddress(): void {
@@ -210,13 +469,14 @@
     }
     tabs = tabs.map((item) =>
       item.id === activeTab.id
-        ? { ...item, url: nextUrl, title: toTabTitle(nextUrl) }
+        ? { ...item, url: nextUrl, title: resolveTabTitle({ url: nextUrl }) }
         : item,
     );
     tabFrameVersions = {
       ...tabFrameVersions,
       [activeTab.id]: getTabFrameVersion(activeTab.id) + 1,
     };
+    clearPinnedTabTitle(activeTab.id);
   }
 
   function handleAddressKeydown(event: KeyboardEvent): void {
@@ -256,12 +516,18 @@
     frameLoading = false;
     const iframe = event.currentTarget as HTMLIFrameElement;
     const docTitle = tryReadIframeDocumentTitle(iframe);
-    if (!docTitle) {
+    const pinnedTitle = pinnedTabTitles[mountedTabId];
+    if (!docTitle && !pinnedTitle) {
       return;
     }
+    const nextTitle = resolveTabTitle({
+      preferredTitle: pinnedTitle,
+      iframeTitle: docTitle,
+      url: mountedTabUrl,
+    });
     tabs = tabs.map((item) =>
       item.id === mountedTabId && item.url === mountedTabUrl
-        ? { ...item, title: docTitle }
+        ? { ...item, title: nextTitle }
         : item,
     );
   }
@@ -269,71 +535,255 @@
   $effect(() => {
     addressInput = activeTab.url || "";
   });
+
+  $effect(() => {
+    tabs.length;
+    scheduleTabLayoutRecompute();
+  });
+
+  $effect(() => {
+    useTabScrollControls;
+    scheduleTabLayoutRecompute();
+  });
+
+  $effect(() => {
+    activeTab.id;
+    if (useTabScrollControls) {
+      scrollActiveTabIntoView();
+    }
+  });
+
+  function handleTabViewportScroll(): void {
+    tabScrollController?.updateScrollState();
+  }
+
+  function handleArrowPointerDown(
+    event: PointerEvent,
+    direction: TabScrollDirection,
+  ): void {
+    const target = event.currentTarget as HTMLElement | null;
+    target?.setPointerCapture?.(event.pointerId);
+    tabScrollController?.startContinuousScroll(direction);
+  }
+
+  function handleArrowPointerUp(event: PointerEvent): void {
+    const target = event.currentTarget as HTMLElement | null;
+    if (target?.hasPointerCapture?.(event.pointerId)) {
+      target.releasePointerCapture(event.pointerId);
+    }
+    tabScrollController?.stopContinuousScroll();
+  }
+
+  onMount(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    tabScrollController = createTabScrollController({
+      getContainer: () => tabsViewportEl,
+      getStep: () => computedTabWidth + TAB_GAP,
+      onStateChange: (nextState) => {
+        canScrollLeft = nextState.canScrollLeft;
+        canScrollRight = nextState.canScrollRight;
+      },
+    });
+    resizeObserver = new ResizeObserver(() => {
+      scheduleTabLayoutRecompute();
+    });
+    if (tabAreaEl) {
+      resizeObserver.observe(tabAreaEl);
+    }
+    if (addTabButtonEl) {
+      resizeObserver.observe(addTabButtonEl);
+    }
+    window.addEventListener("resize", scheduleTabLayoutRecompute);
+    scheduleTabLayoutRecompute();
+    return () => {
+      if (layoutRafId) {
+        window.cancelAnimationFrame(layoutRafId);
+      }
+      if (activeTabScrollRafId) {
+        window.cancelAnimationFrame(activeTabScrollRafId);
+      }
+      window.removeEventListener("resize", scheduleTabLayoutRecompute);
+      resizeObserver?.disconnect();
+      resizeObserver = null;
+      tabScrollController?.destroy();
+      tabScrollController = null;
+    };
+  });
+
+  onDestroy(() => {
+    if (layoutRafId && typeof window !== "undefined") {
+      window.cancelAnimationFrame(layoutRafId);
+    }
+    if (activeTabScrollRafId && typeof window !== "undefined") {
+      window.cancelAnimationFrame(activeTabScrollRafId);
+    }
+    clearTabLimitWarningTimer();
+  });
 </script>
 
-<section class="pep-cloud-deploy-flow-browser">
+<section class="pep-cloud-deploy-flow-browser" bi_parent_name="PseudoBrowser">
+  <AlertToast
+    variant="warning"
+    visible={tabLimitWarningVisible}
+    title={TAB_LIMIT_WARNING_TITLE}
+    description={TAB_LIMIT_CONFIRM_TEXT}
+    onClose={dismissTabLimitWarning}
+  />
   <div class="pep-cloud-deploy-flow-browser__tabs-bar">
-    <div class="pep-cloud-deploy-flow-browser__tabs">
-      {#each tabs as tab}
-        <div
-          class:active={tab.active}
-          class="pep-cloud-deploy-flow-browser__tab-item"
-          role="button"
-          tabindex="0"
-          onclick={() => selectTab(tab.id)}
-          onkeydown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              selectTab(tab.id);
-            }
-          }}
+    <div class="pep-cloud-deploy-flow-browser__tab-main" bind:this={tabAreaEl}>
+      {#if useTabScrollControls}
+        <button
+          type="button"
+          class="pep-cloud-deploy-flow-browser__tab-arrow pep-cloud-deploy-flow-browser__tab-arrow--left"
+          bi_name="BrowserTabScrollLeft"
+          onclick={() => tabScrollController?.scrollByOneTab(-1)}
+          onpointerdown={(event) => handleArrowPointerDown(event, -1)}
+          onpointerup={handleArrowPointerUp}
+          onpointercancel={handleArrowPointerUp}
+          onpointerleave={handleArrowPointerUp}
+          onlostpointercapture={handleArrowPointerUp}
+          aria-label="向左滚动标签页"
+          disabled={!canScrollLeft}
         >
-          <span class="pep-cloud-deploy-flow-browser__tab-title"
-            >{tab.title}</span
-          >
-          <button
-            type="button"
-            class="pep-cloud-deploy-flow-browser__close"
-            onclick={(event) => {
-              event.stopPropagation();
-              closeTab(tab.id);
-            }}
-            aria-label="关闭标签页"
-          >
-            {#if iframePages?.icons?.closeTab}
-              <img src={iframePages.icons.closeTab} alt="" />
-            {:else}
-              x
-            {/if}
-          </button>
-        </div>
-      {/each}
-      <button
-        type="button"
-        class="pep-cloud-deploy-flow-browser__add-tab"
-        onclick={addTab}
-        aria-label="新建标签页"
+          <img
+            src={canScrollLeft ? LEFT_ARROW_ICON : LEFT_ARROW_ICON_DISABLED}
+            alt=""
+          />
+        </button>
+      {/if}
+      <div
+        class="pep-cloud-deploy-flow-browser__tabs-viewport"
+        class:pep-cloud-deploy-flow-browser__tabs-viewport--scrollable={useTabScrollControls}
+        bind:this={tabsViewportEl}
+        onscroll={handleTabViewportScroll}
       >
-        {#if iframePages?.icons?.addTab}
-          <img src={iframePages.icons.addTab} alt="" />
-        {:else}
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              d="M12 5v14M5 12h14"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-            ></path>
-          </svg>
-        {/if}
-      </button>
+        <div
+          class="pep-cloud-deploy-flow-browser__tabs"
+          class:pep-cloud-deploy-flow-browser__tabs--scrollable={useTabScrollControls}
+        >
+          {#each tabs as tab}
+            <div
+              class:active={tab.active}
+              class="pep-cloud-deploy-flow-browser__tab-item"
+              class:pep-cloud-deploy-flow-browser__tab-item--fixed-width={useTabScrollControls}
+              style={useTabScrollControls
+                ? `width:${computedTabWidth}px;min-width:${computedTabWidth}px;max-width:${computedTabWidth}px;`
+                : undefined}
+              role="button"
+              tabindex="0"
+              bi_name="BrowserTabItem"
+              onclick={() => selectTab(tab.id)}
+              onkeydown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  selectTab(tab.id);
+                }
+              }}
+            >
+              <Tooltip
+                content={tab.title}
+                placement="bottom"
+                positioning={{ offset: 16 }}
+              >
+                <span class="pep-cloud-deploy-flow-browser__tab-title"
+                  >{tab.title}</span
+                >
+              </Tooltip>
+              <button
+                type="button"
+                class="pep-cloud-deploy-flow-browser__close"
+                bi_name="BrowserCloseTab"
+                onclick={(event) => {
+                  event.stopPropagation();
+                  closeTab(tab.id);
+                }}
+                aria-label="关闭标签页"
+              >
+                {#if iframePages?.icons?.closeTab}
+                  <img src={iframePages.icons.closeTab} alt="" />
+                {:else}
+                  x
+                {/if}
+              </button>
+            </div>
+          {/each}
+          {#if !addTabPinned}
+            <button
+              type="button"
+              class="pep-cloud-deploy-flow-browser__add-tab"
+              bi_name="BrowserAddTab"
+              onclick={addTab}
+              aria-label="新建标签页"
+              bind:this={addTabButtonEl}
+            >
+              {#if iframePages?.icons?.addTab}
+                <img src={iframePages.icons.addTab} alt="" />
+              {:else}
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M12 5v14M5 12h14"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  ></path>
+                </svg>
+              {/if}
+            </button>
+          {/if}
+        </div>
+      </div>
+      {#if useTabScrollControls}
+        <button
+          type="button"
+          class="pep-cloud-deploy-flow-browser__tab-arrow pep-cloud-deploy-flow-browser__tab-arrow--right"
+          bi_name="BrowserTabScrollRight"
+          onclick={() => tabScrollController?.scrollByOneTab(1)}
+          onpointerdown={(event) => handleArrowPointerDown(event, 1)}
+          onpointerup={handleArrowPointerUp}
+          onpointercancel={handleArrowPointerUp}
+          onpointerleave={handleArrowPointerUp}
+          onlostpointercapture={handleArrowPointerUp}
+          aria-label="向右滚动标签页"
+          disabled={!canScrollRight}
+        >
+          <img
+            src={canScrollRight ? RIGHT_ARROW_ICON : RIGHT_ARROW_ICON_DISABLED}
+            alt=""
+          />
+        </button>
+      {/if}
+      {#if addTabPinned}
+        <button
+          type="button"
+          class="pep-cloud-deploy-flow-browser__add-tab pep-cloud-deploy-flow-browser__add-tab--pinned"
+          bi_name="BrowserAddTab"
+          onclick={addTab}
+          aria-label="新建标签页"
+          bind:this={addTabButtonEl}
+        >
+          {#if iframePages?.icons?.addTab}
+            <img src={iframePages.icons.addTab} alt="" />
+          {:else}
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 5v14M5 12h14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              ></path>
+            </svg>
+          {/if}
+        </button>
+      {/if}
     </div>
-
-    <div class="pep-cloud-deploy-flow-browser__tabs-spacer"></div>
     {#if isBrowserFullscreen}
       <button
         type="button"
         class="pep-cloud-deploy-flow-browser__tool-btn"
+        bi_name="BrowserSwitchToSideMode"
         onclick={onSwitchToSideMode}
         aria-label="切回侧边模式"
       >
@@ -364,6 +814,7 @@
       <button
         type="button"
         class="pep-cloud-deploy-flow-browser__tool-btn"
+        bi_name="BrowserFullscreen"
         onclick={onFullscreen}
         aria-label="全屏伪浏览器"
       >
@@ -478,7 +929,7 @@
                   icon={item.icon}
                   label={item.text}
                   href={item.url}
-                  onClick={() => openUrlFromShortcut(item.url)}
+                  onClick={() => openUrlFromShortcut(item.url, item.text)}
                 />
               {/each}
             </div>
@@ -504,43 +955,74 @@
   .pep-cloud-deploy-flow-browser__tabs-bar {
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 4px 4px 0;
+    gap: 8px;
+    padding: 4px 0 0 4px;
     min-height: 32px;
     background: #d3e3fd;
     border-bottom: 1px solid #fff;
   }
 
-  .pep-cloud-deploy-flow-browser__tabs {
+  .pep-cloud-deploy-flow-browser__tab-main {
     display: flex;
-    gap: 2px;
-    flex-shrink: 0;
-    overflow: visible;
-    align-items: flex-end;
-  }
-
-  .pep-cloud-deploy-flow-browser__tabs-spacer {
+    align-items: center;
+    min-width: 0;
+    width: 0;
     flex: 1;
   }
 
+  .pep-cloud-deploy-flow-browser__tabs-viewport {
+    flex: 1;
+    width: 0;
+    min-width: 0;
+    overflow: hidden;
+    scrollbar-width: none;
+  }
+
+  .pep-cloud-deploy-flow-browser__tabs-viewport--scrollable {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .pep-cloud-deploy-flow-browser__tabs-viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pep-cloud-deploy-flow-browser__tabs {
+    display: flex;
+    gap: 2px;
+    align-items: flex-end;
+    width: 100%;
+  }
+
+  .pep-cloud-deploy-flow-browser__tabs--scrollable {
+    width: max-content;
+    min-width: 100%;
+  }
+
   .pep-cloud-deploy-flow-browser__tab-item {
+    box-sizing: border-box;
     border: none;
     border-radius: 8px 8px 0 0;
     background: transparent;
     color: #4e5969;
-    padding: 0 16px;
+    padding: 0 8px 0 20px;
     height: 32px;
-    min-width: 124px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 6px;
+    gap: 8px;
     cursor: pointer;
     font-size: 12px;
     line-height: 16px;
-    max-width: 220px;
     position: relative;
     transition: background-color 0.15s;
+    flex: 1 1 0;
+    min-width: 70px;
+    max-width: 166px;
+  }
+
+  .pep-cloud-deploy-flow-browser__tab-item--fixed-width {
+    flex: 0 0 auto;
   }
 
   .pep-cloud-deploy-flow-browser__tab-item:not(.active):hover {
@@ -586,10 +1068,18 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    display: block;
+    min-width: 0;
+  }
+
+  .pep-cloud-deploy-flow-browser__tab-item :global(.pep-tooltip) {
+    min-width: 0;
+    flex: 1 1 auto;
   }
 
   .pep-cloud-deploy-flow-browser__add-tab,
-  .pep-cloud-deploy-flow-browser__tool-btn {
+  .pep-cloud-deploy-flow-browser__tool-btn,
+  .pep-cloud-deploy-flow-browser__tab-arrow {
     border: none;
     background: transparent;
     border-radius: 4px;
@@ -611,7 +1101,41 @@
     border-radius: 50%;
     align-self: center;
     flex-shrink: 0;
-    margin-left: 12px;
+    margin-left: 4px;
+  }
+
+  .pep-cloud-deploy-flow-browser__add-tab--pinned {
+    margin-left: 6px;
+    margin-right: 20px;
+  }
+
+  .pep-cloud-deploy-flow-browser__tab-arrow {
+    width: 14px;
+    min-width: 14px;
+    height: 14px;
+    padding: 0;
+    border-radius: 0;
+    flex-shrink: 0;
+  }
+
+  .pep-cloud-deploy-flow-browser__tab-arrow--left {
+    margin-left: 4px;
+    margin-right: 4px;
+  }
+
+  .pep-cloud-deploy-flow-browser__tab-arrow--right {
+    margin-left: 4px;
+    margin-right: 6px;
+  }
+
+  .pep-cloud-deploy-flow-browser__tab-arrow:disabled {
+    cursor: default;
+  }
+
+  .pep-cloud-deploy-flow-browser__tab-arrow img {
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
   }
 
   .pep-cloud-deploy-flow-browser__tool-btn {
@@ -623,6 +1147,7 @@
     margin-top: -4px;
     border-radius: 0;
     align-self: stretch;
+    flex-shrink: 0;
   }
 
   .pep-cloud-deploy-flow-browser__add-tab svg,

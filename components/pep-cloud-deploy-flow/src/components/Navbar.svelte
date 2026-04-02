@@ -14,11 +14,12 @@
   }
 </script>
 
-<header class="pep-cloud-deploy-flow-navbar">
+<header class="pep-cloud-deploy-flow-navbar" bi_parent_name="Navbar">
   {#if navbar.logo.url}
     <a
       href={navbar.logo.url}
       class="pep-cloud-deploy-flow-navbar__logo"
+      bi_name="NavbarLogo"
       target="_self"
       rel="noreferrer"
     >
@@ -35,6 +36,7 @@
       <a
         href={breadcrumb.url ?? "#"}
         class:bold={idx === navbar.breadcrumbs.length - 1}
+        bi_name="NavbarBreadcrumb"
         target="_self"
         rel="noreferrer"
       >
@@ -52,6 +54,7 @@
         href={action.url ?? "#"}
         target="_self"
         rel="noreferrer"
+        bi_name="NavbarActionLink"
         class="pep-cloud-deploy-flow-navbar__action-link"
       >
         {#if action.icon}
@@ -70,6 +73,7 @@
       <button
         type="button"
         class="pep-cloud-deploy-flow-navbar__action-link pep-cloud-deploy-flow-navbar__end-btn"
+        bi_name="NavbarEndDeployBtn"
         onclick={onEndDeployment}
       >
         {#if navbar.endDeployment.icon}

@@ -12,6 +12,7 @@
 {#if href}
   <a
     class="pep-cloud-deploy-flow-quick-link-card"
+    bi_name="QuickLinkCard"
     {href}
     target="_blank"
     rel="noreferrer"
@@ -31,6 +32,7 @@
   <button
     type="button"
     class="pep-cloud-deploy-flow-quick-link-card"
+    bi_name="QuickLinkCard"
     onclick={onClick}
   >
     <span class="pep-cloud-deploy-flow-quick-link-card__icon">

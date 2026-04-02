@@ -19,10 +19,11 @@
   import DeployFlowButton from "./DeployFlowButton.svelte";
   import Tooltip from "./Tooltip.svelte";
   import StepStatusDot from "./StepStatusDot.svelte";
-
+  import { onCustomEvent } from "@pep/shared/utils/onCustomEvent";
   interface Props {
     sidebar: SidebarConfig;
     onOpenExternal?: (url: string, title: string) => void;
+    onPreviewImage?: (src: string, alt: string) => void;
     onFloat?: () => void;
     onRestoreSide?: () => void;
     onCollapse?: () => void;
@@ -33,6 +34,7 @@
   let {
     sidebar,
     onOpenExternal,
+    onPreviewImage,
     onFloat,
     onRestoreSide,
     onCollapse,
@@ -135,6 +137,16 @@
       }
       event.preventDefault();
       const url = href ?? "";
+      onCustomEvent({
+        eventCategory: "link",
+        eventAction: "click",
+        eventLabel: url,
+        eventValue: anchor.innerText || sidebar.texts.openExternalDefaultTitle,
+        jsonParam: JSON.stringify({
+          url,
+          title: anchor.innerText || sidebar.texts.openExternalDefaultTitle,
+        }),
+      });
       openLinkByPolicy(
         url,
         anchor.innerText || sidebar.texts.openExternalDefaultTitle,
@@ -295,6 +307,12 @@
 
   function handleInlineContentClick(event: MouseEvent): void {
     const target = getEventTargetElement(event.target);
+    const image = target?.closest("img");
+    if (image instanceof HTMLImageElement && image.src) {
+      event.preventDefault();
+      onPreviewImage?.(image.currentSrc || image.src, image.alt || "图片预览");
+      return;
+    }
     const anchor = target?.closest("a");
     if (!anchor) {
       return;
@@ -305,20 +323,33 @@
     }
     event.preventDefault();
     const url = href ?? "";
-    openLinkByPolicy(
-      url,
-      anchor.innerText || sidebar.texts.openExternalDefaultTitle,
-    );
+    const title = anchor.innerText || sidebar.texts.openExternalDefaultTitle;
+    onCustomEvent({
+      eventCategory: "link",
+      eventAction: "click",
+      eventLabel: url,
+      eventValue: title,
+      jsonParam: JSON.stringify({ url, title }),
+    });
+    openLinkByPolicy(url, title);
   }
 </script>
 
-<aside class="pep-cloud-deploy-flow-sidebar" class:is-floating={isFloating}>
+<aside
+  class="pep-cloud-deploy-flow-sidebar"
+  class:is-floating={isFloating}
+  bi_parent_name="SidebarPanel"
+  data-mod-id="sidebar"
+  data-mode-name="child-component"
+  data-partial-refresh="false"
+>
   <div class="pep-cloud-deploy-flow-sidebar__header">
     <div class="pep-cloud-deploy-flow-sidebar__tabs">
       {#each sidebar.tabs as tab, index (`${tab.title}-${index}`)}
         <button
           type="button"
           class:active={activeTabIndex === index}
+          bi_name="SidebarTabBtn"
           onclick={() => handleTabClick(index)}
           title={tab.title}
         >
@@ -334,56 +365,22 @@
           type="button"
           aria-label="切换到悬浮"
           title="切换到悬浮"
+          bi_name="SidebarFloatBtn"
           onclick={onFloat}
         >
           {#if sidebar.icons?.floatIcon}
             <img src={sidebar.icons.floatIcon} alt="" />
-          {:else}
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none">
-              <rect
-                x="2"
-                y="5"
-                width="14"
-                height="14"
-                rx="2"
-                stroke="currentColor"
-                stroke-width="1.8"
-              />
-              <path
-                d="M8 5V3h13a2 2 0 0 1 2 2v13h-2"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
           {/if}
         </button>
         <button
           type="button"
           aria-label="恢复原状/切换到侧边模式"
           title="恢复原状/切换到侧边模式"
+          bi_name="SidebarRestoreSideBtn"
           onclick={onRestoreSide}
         >
           {#if sidebar.icons?.minimizeToSideIcon}
             <img src={sidebar.icons.minimizeToSideIcon} alt="" />
-          {:else}
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none">
-              <path
-                d="M7 4h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H7"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M11 8l-4 4 4 4"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
           {/if}
         </button>
       {:else}
@@ -391,69 +388,24 @@
           type="button"
           aria-label={isFloating ? "切换为侧边栏" : "切换为悬浮窗"}
           title={isFloating ? "切换为侧边栏" : "切换为悬浮窗"}
+          bi_name="SidebarFloatBtn"
           onclick={onFloat}
         >
           {#if isFloating && sidebar.icons?.switchToSideModeIcon}
             <img src={sidebar.icons.switchToSideModeIcon} alt="" />
           {:else if sidebar.icons?.floatIcon}
             <img src={sidebar.icons.floatIcon} alt="" />
-          {:else if isFloating}
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none">
-              <rect
-                x="3"
-                y="3"
-                width="18"
-                height="18"
-                rx="2"
-                stroke="currentColor"
-                stroke-width="1.8"
-              />
-              <path
-                d="M9 3v18"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-              />
-            </svg>
-          {:else}
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none">
-              <rect
-                x="2"
-                y="5"
-                width="14"
-                height="14"
-                rx="2"
-                stroke="currentColor"
-                stroke-width="1.8"
-              />
-              <path
-                d="M8 5V3h13a2 2 0 0 1 2 2v13h-2"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
           {/if}
         </button>
         <button
           type="button"
           aria-label="折叠"
           title="折叠"
+          bi_name="SidebarCollapseBtn"
           onclick={onCollapse}
         >
           {#if sidebar.icons?.collapseIcon}
             <img src={sidebar.icons.collapseIcon} alt="" />
-          {:else}
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M5 12h14"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-              ></path>
-            </svg>
           {/if}
         </button>
       {/if}
@@ -477,6 +429,7 @@
             aria-label="选择应用"
             aria-expanded={appDropdownOpen}
             aria-haspopup="listbox"
+            bi_name="SidebarAppTrigger"
             title={getApplicationDisplayTitle(
               activeTab.applications[activeApplicationIndex],
               activeApplicationIndex,
@@ -517,6 +470,7 @@
                   aria-selected={activeApplicationIndex === idx}
                   class="pep-cloud-deploy-flow-sidebar__app-option"
                   class:active={activeApplicationIndex === idx}
+                  bi_name="SidebarAppOption"
                   onclick={() => handleApplicationChange(idx)}
                 >
                   {getApplicationDisplayTitle(app, idx)}
@@ -535,6 +489,7 @@
           <li class:active={activeStepIndex === index}>
             <button
               type="button"
+              bi_name="SidebarStepBtn"
               onclick={(event) => handleStepButtonClick(event, index)}
             >
               <span class="pep-cloud-deploy-flow-sidebar__step-dot-hitbox">
@@ -669,10 +624,10 @@
     color: #4e5969;
   }
 
-  .pep-cloud-deploy-flow-sidebar__tools svg,
+  .pep-cloud-deploy-flow-sidebar__tools :global(svg),
   .pep-cloud-deploy-flow-sidebar__tools img {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     object-fit: contain;
   }
 
@@ -965,29 +920,15 @@
     justify-content: flex-end;
     gap: 8px;
     padding: 14px 16px;
-    border-top: 1px solid var(--primitive-gray-200);
+    border-top: 1px solid #eee;
     background: #fff;
-  }
-
-  :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text h2) {
-    font-size: 20px;
-    line-height: 1.4;
-    margin: 0 0 16px;
-    color: var(--text-primary);
-  }
-
-  :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text h3) {
-    font-size: var(--primitive-font-base);
-    line-height: 1.5;
-    margin: 0 0 10px;
-    color: var(--text-primary);
   }
 
   :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text p),
   :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text li) {
     font-size: var(--primitive-font-sm);
     line-height: 1.7;
-    color: #4e5969;
+    color: #191919;
   }
 
   :global(.pep-cloud-deploy-flow-sidebar__remote-content .rich-text) {
