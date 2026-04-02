@@ -32,7 +32,7 @@
   );
 </script>
 
-<button {type} class={mergedClass} {...rest}>
+<button {type} class={mergedClass} {...rest} bi_name="DeployFlowButton">
   {@render children()}
 </button>
 

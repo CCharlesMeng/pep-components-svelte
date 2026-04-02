@@ -623,7 +623,7 @@
   });
 </script>
 
-<section class="pep-cloud-deploy-flow-browser">
+<section class="pep-cloud-deploy-flow-browser" bi_parent_name="PseudoBrowser">
   <AlertToast
     variant="warning"
     visible={tabLimitWarningVisible}
@@ -637,6 +637,7 @@
         <button
           type="button"
           class="pep-cloud-deploy-flow-browser__tab-arrow pep-cloud-deploy-flow-browser__tab-arrow--left"
+          bi_name="BrowserTabScrollLeft"
           onclick={() => tabScrollController?.scrollByOneTab(-1)}
           onpointerdown={(event) => handleArrowPointerDown(event, -1)}
           onpointerup={handleArrowPointerUp}
@@ -672,6 +673,7 @@
                 : undefined}
               role="button"
               tabindex="0"
+              bi_name="BrowserTabItem"
               onclick={() => selectTab(tab.id)}
               onkeydown={(event) => {
                 if (event.key === "Enter" || event.key === " ") {
@@ -691,6 +693,7 @@
               <button
                 type="button"
                 class="pep-cloud-deploy-flow-browser__close"
+                bi_name="BrowserCloseTab"
                 onclick={(event) => {
                   event.stopPropagation();
                   closeTab(tab.id);
@@ -709,6 +712,7 @@
             <button
               type="button"
               class="pep-cloud-deploy-flow-browser__add-tab"
+              bi_name="BrowserAddTab"
               onclick={addTab}
               aria-label="新建标签页"
               bind:this={addTabButtonEl}
@@ -734,6 +738,7 @@
         <button
           type="button"
           class="pep-cloud-deploy-flow-browser__tab-arrow pep-cloud-deploy-flow-browser__tab-arrow--right"
+          bi_name="BrowserTabScrollRight"
           onclick={() => tabScrollController?.scrollByOneTab(1)}
           onpointerdown={(event) => handleArrowPointerDown(event, 1)}
           onpointerup={handleArrowPointerUp}
@@ -753,6 +758,7 @@
         <button
           type="button"
           class="pep-cloud-deploy-flow-browser__add-tab pep-cloud-deploy-flow-browser__add-tab--pinned"
+          bi_name="BrowserAddTab"
           onclick={addTab}
           aria-label="新建标签页"
           bind:this={addTabButtonEl}
@@ -777,6 +783,7 @@
       <button
         type="button"
         class="pep-cloud-deploy-flow-browser__tool-btn"
+        bi_name="BrowserSwitchToSideMode"
         onclick={onSwitchToSideMode}
         aria-label="切回侧边模式"
       >
@@ -807,6 +814,7 @@
       <button
         type="button"
         class="pep-cloud-deploy-flow-browser__tool-btn"
+        bi_name="BrowserFullscreen"
         onclick={onFullscreen}
         aria-label="全屏伪浏览器"
       >

@@ -19,7 +19,7 @@
   import DeployFlowButton from "./DeployFlowButton.svelte";
   import Tooltip from "./Tooltip.svelte";
   import StepStatusDot from "./StepStatusDot.svelte";
-
+  import { onCustomEvent } from "@pep/shared/utils/onCustomEvent";
   interface Props {
     sidebar: SidebarConfig;
     onOpenExternal?: (url: string, title: string) => void;
@@ -137,6 +137,16 @@
       }
       event.preventDefault();
       const url = href ?? "";
+      onCustomEvent({
+        eventCategory: "link",
+        eventAction: "click",
+        eventLabel: url,
+        eventValue: anchor.innerText || sidebar.texts.openExternalDefaultTitle,
+        jsonParam: JSON.stringify({
+          url,
+          title: anchor.innerText || sidebar.texts.openExternalDefaultTitle,
+        }),
+      });
       openLinkByPolicy(
         url,
         anchor.innerText || sidebar.texts.openExternalDefaultTitle,
@@ -313,16 +323,22 @@
     }
     event.preventDefault();
     const url = href ?? "";
-    openLinkByPolicy(
-      url,
-      anchor.innerText || sidebar.texts.openExternalDefaultTitle,
-    );
+    const title = anchor.innerText || sidebar.texts.openExternalDefaultTitle;
+    onCustomEvent({
+      eventCategory: "link",
+      eventAction: "click",
+      eventLabel: url,
+      eventValue: title,
+      jsonParam: JSON.stringify({ url, title }),
+    });
+    openLinkByPolicy(url, title);
   }
 </script>
 
 <aside
   class="pep-cloud-deploy-flow-sidebar"
   class:is-floating={isFloating}
+  bi_parent_name="SidebarPanel"
   data-mod-id="sidebar"
   data-mode-name="child-component"
   data-partial-refresh="false"
@@ -333,6 +349,7 @@
         <button
           type="button"
           class:active={activeTabIndex === index}
+          bi_name="SidebarTabBtn"
           onclick={() => handleTabClick(index)}
           title={tab.title}
         >
@@ -348,6 +365,7 @@
           type="button"
           aria-label="切换到悬浮"
           title="切换到悬浮"
+          bi_name="SidebarFloatBtn"
           onclick={onFloat}
         >
           {#if sidebar.icons?.floatIcon}
@@ -358,6 +376,7 @@
           type="button"
           aria-label="恢复原状/切换到侧边模式"
           title="恢复原状/切换到侧边模式"
+          bi_name="SidebarRestoreSideBtn"
           onclick={onRestoreSide}
         >
           {#if sidebar.icons?.minimizeToSideIcon}
@@ -369,6 +388,7 @@
           type="button"
           aria-label={isFloating ? "切换为侧边栏" : "切换为悬浮窗"}
           title={isFloating ? "切换为侧边栏" : "切换为悬浮窗"}
+          bi_name="SidebarFloatBtn"
           onclick={onFloat}
         >
           {#if isFloating && sidebar.icons?.switchToSideModeIcon}
@@ -381,6 +401,7 @@
           type="button"
           aria-label="折叠"
           title="折叠"
+          bi_name="SidebarCollapseBtn"
           onclick={onCollapse}
         >
           {#if sidebar.icons?.collapseIcon}
@@ -408,6 +429,7 @@
             aria-label="选择应用"
             aria-expanded={appDropdownOpen}
             aria-haspopup="listbox"
+            bi_name="SidebarAppTrigger"
             title={getApplicationDisplayTitle(
               activeTab.applications[activeApplicationIndex],
               activeApplicationIndex,
@@ -448,6 +470,7 @@
                   aria-selected={activeApplicationIndex === idx}
                   class="pep-cloud-deploy-flow-sidebar__app-option"
                   class:active={activeApplicationIndex === idx}
+                  bi_name="SidebarAppOption"
                   onclick={() => handleApplicationChange(idx)}
                 >
                   {getApplicationDisplayTitle(app, idx)}
@@ -466,6 +489,7 @@
           <li class:active={activeStepIndex === index}>
             <button
               type="button"
+              bi_name="SidebarStepBtn"
               onclick={(event) => handleStepButtonClick(event, index)}
             >
               <span class="pep-cloud-deploy-flow-sidebar__step-dot-hitbox">

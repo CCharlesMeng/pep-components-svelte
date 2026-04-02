@@ -14,6 +14,7 @@
   import "../styles/markdown-content.css";
   import DeployFlowButton from "./DeployFlowButton.svelte";
   import StepStatusDot from "./StepStatusDot.svelte";
+  import { onCustomEvent } from "@pep/shared/utils/onCustomEvent";
 
   interface Props {
     mobile: ResolvedMobileConfig;
@@ -176,7 +177,15 @@
     }
     event.preventDefault();
     const url = href ?? "";
-    openLinkByPolicy(url, anchor.innerText || texts.openExternalDefaultTitle);
+    const title = anchor.innerText || texts.openExternalDefaultTitle;
+    onCustomEvent({
+      eventCategory: "link",
+      eventAction: "click",
+      eventLabel: url,
+      eventValue: title,
+      jsonParam: JSON.stringify({ url, title }),
+    });
+    openLinkByPolicy(url, title);
   }
 
   $effect(() => {
@@ -224,7 +233,15 @@
       }
       event.preventDefault();
       const url = href ?? "";
-      openLinkByPolicy(url, anchor.innerText || texts.openExternalDefaultTitle);
+      const title = anchor.innerText || texts.openExternalDefaultTitle;
+      onCustomEvent({
+        eventCategory: "link",
+        eventAction: "click",
+        eventLabel: url,
+        eventValue: title,
+        jsonParam: JSON.stringify({ url, title }),
+      });
+      openLinkByPolicy(url, title);
     };
 
     const adjustHeight = () => {
@@ -302,12 +319,13 @@
 
 </script>
 
-<section class="pep-cloud-deploy-flow-mobile">
+<section class="pep-cloud-deploy-flow-mobile" bi_parent_name="MobileFlow">
   <header class="pep-cloud-deploy-flow-mobile__header">
     <nav class="pep-cloud-deploy-flow-mobile__breadcrumbs" aria-label="面包屑">
       {#if mobile.navbar.logo.url}
         <a
           class="pep-cloud-deploy-flow-mobile__logo"
+          bi_name="MobileNavbarLogo"
           href={mobile.navbar.logo.url}
           target="_self"
           rel="noreferrer"
@@ -323,7 +341,7 @@
         <span class="pep-cloud-deploy-flow-mobile__logo-separator">/</span>
       {/if}
       {#each mobile.navbar.breadcrumbs as breadcrumb, index}
-        <a href={breadcrumb.url || "#"}>{breadcrumb.text}</a>
+        <a href={breadcrumb.url || "#"} bi_name="MobileBreadcrumb">{breadcrumb.text}</a>
         {#if index < mobile.navbar.breadcrumbs.length - 1}
           <span class="pep-cloud-deploy-flow-mobile__logo-separator">/</span>
         {/if}
@@ -335,7 +353,7 @@
     <ol class="pep-cloud-deploy-flow-mobile__steps">
       {#each mobile.steps as step, index (`${step.title}-${index}`)}
         <li class:active={index === activeStepIndex}>
-          <button type="button" onclick={() => (activeStepIndex = index)}>
+          <button type="button" bi_name="MobileStepBtn" onclick={() => (activeStepIndex = index)}>
             <StepStatusDot
               completed={index < activeStepIndex}
               {index}
@@ -360,6 +378,7 @@
   <button
     type="button"
     class="pep-cloud-deploy-flow-mobile__link-image"
+    bi_name="MobileCopyLinkBtn"
     onclick={openLinkImage}
     aria-label="复制相关链接"
   >

@@ -32,6 +32,7 @@
 
 <main
   class="pep-cloud-deploy-flow-main"
+  bi_parent_name="MainPanel"
   style={backgroundImage
     ? `background-image: url('${backgroundImage}'); background-size: cover; background-position: center;`
     : undefined}
@@ -82,7 +83,7 @@
       </DeployFlowButton>
     </section>
 
-    <label class="pep-cloud-deploy-flow-main__agreement-row">
+    <label class="pep-cloud-deploy-flow-main__agreement-row" bi_name="MainPanelAgreementCheckbox">
       <input type="checkbox" bind:checked={isAgreementChecked} />
       <span class="pep-cloud-deploy-flow-main__agreement rich-text">
         {@html mainContent.agreement.contentHtml}

@@ -16,7 +16,7 @@
   role="dialog"
   aria-modal="true"
 >
-  <div class="pep-cloud-deploy-flow-modal">
+  <div class="pep-cloud-deploy-flow-modal" bi_parent_name="EndDeploymentModal">
     <div class="pep-cloud-deploy-flow-modal__head">
       <div class="pep-cloud-deploy-flow-modal__head-title">
         {#if endDeployment.modal.icon}
@@ -44,6 +44,7 @@
     <button
       type="button"
       class="pep-cloud-deploy-flow-modal__close-btn"
+      bi_name="ModalCloseBtn"
       onclick={onCancel}
       aria-label="关闭"
     >

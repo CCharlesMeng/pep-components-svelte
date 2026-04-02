@@ -508,6 +508,7 @@
           <button
             class="restore-btn restore-btn--right"
             type="button"
+            bi_name="RestoreSidebarBtn"
             aria-label="恢复侧边栏"
             onclick={restoreSidebarSideModeWithDefaultRatio}
           >
@@ -583,12 +584,14 @@
     <button
       type="button"
       class="pep-cloud-deploy-flow-image-preview-backdrop"
+      bi_name="ImagePreviewClose"
       aria-label="关闭图片预览"
       onclick={closeImagePreview}
     ></button>
     <button
       type="button"
       class="pep-cloud-deploy-flow-image-preview-close"
+      bi_name="ImagePreviewClose"
       aria-label="关闭图片预览"
       onclick={closeImagePreview}
     >
