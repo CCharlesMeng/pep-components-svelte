@@ -44,5 +44,5 @@ You are an expert Svelte 5 developer. Strictly follow Svelte 5 syntax and Runes 
 - NO `beforeUpdate`, `afterUpdate`
 ## 8. Component Architecture (Trait-based)
 - **Trait Registry**: Use `UseTraits` in `types.ts` to mix common floor capabilities (header, spacing, visibility).
-- **Explicit Forwarding**: Use `pickTrait(props, 'trait')` from `/@shared/ui/traits` in `index.svelte` to pass data to shared sub-components.
+- **Explicit Forwarding**: Use `pickTrait(props, 'trait')` from `@pep/shared/ui/traits` in `index.svelte` to pass data to shared sub-components.
 - **Consistency Guard**: Every component must have `tests/unit/consistency.spec.ts` to ensure `schema.json` and `types.ts` sync.

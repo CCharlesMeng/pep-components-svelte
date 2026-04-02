@@ -1,4 +1,4 @@
-import type { UseTraits, TabItem as BaseTabItem } from "/@shared/ui/types";
+import type { UseTraits, TabItem as BaseTabItem } from "@pep/shared/ui/types";
 
 /**
  * 1. 定义该组件特有的“纯业务”属性

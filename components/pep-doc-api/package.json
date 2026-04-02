@@ -1,0 +1,33 @@
+{
+  "name": "pep-doc-api",
+  "version": "0.1.0",
+  "description": "API 文档渲染组件，将结构化 JSON 渲染为类 Mintlify 风格的 API 文档页面",
+  "type": "module",
+  "private": true,
+  "main": "./dist/server/entry-server.js",
+  "exports": {
+    ".": "./dist/server/entry-server.js",
+    "./client": "./dist/client/entry-client.js",
+    "./server": "./dist/server/entry-server.js",
+    "./data": "./dist/data/data.es.js"
+  },
+  "scripts": {
+    "dev": "vite dev",
+    "build": "npm run build:client && npm run build:server && npm run build:editor",
+    "build:client": "vite build --mode=production --config vite.config.ts --outDir dist/client",
+    "build:server": "vite build --mode=server --config vite.config.ts --outDir dist/server",
+    "build:editor": "vite build --mode=editor --config vite.config.ts --outDir dist/editor",
+    "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "@pep/shared": "workspace:*"
+  },
+  "keywords": [
+    "svelte",
+    "pep-doc-api",
+    "pep-components"
+  ]
+}

@@ -3,7 +3,7 @@
     "include": [
         "*.ts",
         "../../types.d.ts"
-    ],
+, "dev/main.ts", "prod/entry-client.ts", "prod/entry-editor.ts", "prod/entry-server.ts"    ],
     "exclude": [
         "node_modules"
     ]

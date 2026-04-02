@@ -1,0 +1,331 @@
+{
+  "id": "SyncCommand",
+  "title": "实例执行同步命令",
+  "category": "实例管理",
+
+  "content": [
+    {
+      "type": "paragraph",
+      "text": "实例执行同步命令接口。调用此 API 的前提条件是租户需要先购买实例。可以通过调用该接口实现对自己的实例进行 ADB 指令操作。\n该接口是同步操作接口，如果有耗时 ADB 操作建议使用实例执行异步命令接口。",
+      "links": [],
+      "images": [],
+      "blocks": []
+    },
+    {
+      "type": "api-endpoint",
+      "method": "POST",
+      "path": "/v1/instances/sync-command"
+    },
+    {
+      "type": "api-code-panel",
+      "title": "实例执行同步命令",
+      "request": {
+        "language": "curl",
+        "code": "curl --request POST \\\n  --url https://localhost.com/v1/instances/sync-command \\\n  --header 'X-Auth-Token: <token>' \\\n  --header 'x-request-id: <request-id>' \\\n  --header 'Content-Type: application/json' \\\n  --data '{\n  \"command\": \"ls -l /system\",\n  \"instance_ids\": [\n    \"a44uhlf7\",\n    \"efjy72gs\"\n  ]\n}'"
+      },
+      "responses": [
+        {
+          "status": "200",
+          "body": "{\n  \"data\": {\n    \"cmd_results\": [\n      {\n        \"instance_id\": \"a44uhlf7\",\n        \"status\": -1,\n        \"error_code\": \"CPS.0191\",\n        \"error_msg\": \"Run command failed.\",\n        \"execute_msg\": \"ls: cannot access '/system': No such file or directory\"\n      },\n      {\n        \"instance_id\": \"efjy72gs\",\n        \"status\": 2,\n        \"error_code\": \"\",\n        \"error_msg\": \"\",\n        \"execute_msg\": \"xxxxxx\"\n      }\n    ]\n  },\n  \"error_code\": \"0\",\n  \"error_msg\": \"ok\"\n}"
+        }
+      ]
+    }
+  ],
+
+  "sections": [
+    {
+      "title": "Authorizations",
+      "content": [
+        {
+          "type": "api-param",
+          "name": "X-Auth-Token",
+          "param_type": "string",
+          "location": "header",
+          "required": true,
+          "default": null,
+          "description": "租户级 Token，用于身份验证。使用格式：Bearer <token>",
+          "enum_values": null,
+          "example": null,
+          "constraints": [],
+          "list_items": [],
+          "content": []
+        },
+        {
+          "type": "api-param",
+          "name": "x-request-id",
+          "param_type": "string",
+          "location": "header",
+          "required": true,
+          "default": null,
+          "description": "消息跟踪唯一 ID，用于请求链路追踪。",
+          "enum_values": null,
+          "example": null,
+          "constraints": [],
+          "list_items": [],
+          "content": []
+        }
+      ]
+    },
+    {
+      "title": "Body",
+      "content_type": "application/json",
+      "content": [
+        {
+          "type": "api-param",
+          "name": "command",
+          "param_type": "string",
+          "location": "body",
+          "required": true,
+          "default": null,
+          "description": "需要执行的 ADB 命令，只支持大小写字母、数字、下划线（_）、点（.）、斜线（/）、冒号（:）、中划线（-）。",
+          "enum_values": null,
+          "example": "\"ls -l /system\"",
+          "constraints": [
+            "Maximum length: 1024"
+          ],
+          "list_items": [],
+          "content": []
+        },
+        {
+          "type": "api-param",
+          "name": "instance_ids",
+          "param_type": "array[string]",
+          "location": "body",
+          "required": true,
+          "default": null,
+          "description": "需要执行命令的实例 ID 列表，单个实例 ID 最长 32 个字符。",
+          "enum_values": null,
+          "example": "[\"a44uhlf7\", \"efjy72gs\"]",
+          "constraints": [
+            "Maximum array length: 100",
+            "Item maximum length: 32"
+          ],
+          "list_items": [],
+          "content": []
+        }
+      ]
+    },
+    {
+      "title": "Response",
+      "content": [
+        {
+          "type": "tabs",
+          "items": [
+            {
+              "title": "200",
+              "content_type": "application/json",
+              "description": "正常响应",
+              "content": [
+                {
+                  "type": "api-param",
+                  "name": "error_code",
+                  "param_type": "string",
+                  "required": false,
+                  "default": null,
+                  "description": "响应码，错误码规范 KP.API.0001，数字递增。",
+                  "enum_values": null,
+                  "example": null,
+                  "constraints": [],
+                  "list_items": [],
+                  "content": []
+                },
+                {
+                  "type": "api-param",
+                  "name": "error_msg",
+                  "param_type": "string",
+                  "required": false,
+                  "default": null,
+                  "description": "响应描述信息。",
+                  "enum_values": null,
+                  "example": null,
+                  "constraints": [],
+                  "list_items": [],
+                  "content": []
+                },
+                {
+                  "type": "api-param",
+                  "name": "data",
+                  "param_type": "object",
+                  "required": false,
+                  "default": null,
+                  "description": "命令执行结果的包装对象。",
+                  "enum_values": null,
+                  "example": null,
+                  "constraints": [],
+                  "list_items": [],
+                  "content": [
+                    {
+                      "type": "api-param",
+                      "name": "data.cmd_results",
+                      "param_type": "array[object]",
+                      "required": false,
+                      "default": null,
+                      "description": "各实例命令执行结果列表。",
+                      "enum_values": null,
+                      "example": null,
+                      "constraints": [
+                        "Maximum array length: 100"
+                      ],
+                      "list_items": [],
+                      "content": [
+                        {
+                          "type": "api-param",
+                          "name": "data.cmd_results[].instance_id",
+                          "param_type": "string",
+                          "required": false,
+                          "default": null,
+                          "description": "实例 ID。",
+                          "enum_values": null,
+                          "example": null,
+                          "constraints": [
+                            "Maximum length: 32"
+                          ],
+                          "list_items": [],
+                          "content": []
+                        },
+                        {
+                          "type": "api-param",
+                          "name": "data.cmd_results[].status",
+                          "param_type": "integer(int32)",
+                          "required": false,
+                          "default": null,
+                          "description": "任务执行状态。",
+                          "enum_values": null,
+                          "example": null,
+                          "constraints": [],
+                          "list_items": [
+                            "1：运行中",
+                            "2：成功",
+                            "-1：失败"
+                          ],
+                          "content": []
+                        },
+                        {
+                          "type": "api-param",
+                          "name": "data.cmd_results[].error_code",
+                          "param_type": "string",
+                          "required": false,
+                          "default": null,
+                          "description": "任务错误码。",
+                          "enum_values": null,
+                          "example": null,
+                          "constraints": [],
+                          "list_items": [],
+                          "content": []
+                        },
+                        {
+                          "type": "api-param",
+                          "name": "data.cmd_results[].error_msg",
+                          "param_type": "string",
+                          "required": false,
+                          "default": null,
+                          "description": "任务错误码说明。",
+                          "enum_values": null,
+                          "example": null,
+                          "constraints": [],
+                          "list_items": [],
+                          "content": []
+                        },
+                        {
+                          "type": "api-param",
+                          "name": "data.cmd_results[].execute_msg",
+                          "param_type": "string",
+                          "required": false,
+                          "default": null,
+                          "description": "任务执行返回内容，命令执行成功和失败均将命令的输出返回。",
+                          "enum_values": null,
+                          "example": null,
+                          "constraints": [
+                            "Maximum length: 1024"
+                          ],
+                          "list_items": [],
+                          "content": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "400",
+              "content_type": "application/json",
+              "description": "请求参数错误",
+              "content": [
+                {
+                  "type": "api-param",
+                  "name": "error_code",
+                  "param_type": "string",
+                  "required": true,
+                  "default": null,
+                  "description": "错误码。",
+                  "enum_values": null,
+                  "example": null,
+                  "constraints": [],
+                  "list_items": [
+                    "0：成功",
+                    "KOOPHONE.API.1000：请求参数错误",
+                    "KOOPHONE.API.1001：没有实例权限",
+                    "KOOPHONE.API.9999：服务内部错误"
+                  ],
+                  "content": []
+                },
+                {
+                  "type": "api-param",
+                  "name": "error_info",
+                  "param_type": "string",
+                  "required": true,
+                  "default": null,
+                  "description": "错误信息详情。",
+                  "enum_values": null,
+                  "example": null,
+                  "constraints": [],
+                  "list_items": [],
+                  "content": []
+                }
+              ]
+            },
+            {
+              "title": "500",
+              "content_type": "application/json",
+              "description": "服务内部错误",
+              "content": [
+                {
+                  "type": "api-param",
+                  "name": "error_code",
+                  "param_type": "string",
+                  "required": true,
+                  "default": null,
+                  "description": "错误码。",
+                  "enum_values": null,
+                  "example": null,
+                  "constraints": [],
+                  "list_items": [
+                    "0：成功",
+                    "KOOPHONE.API.1000：请求参数错误",
+                    "KOOPHONE.API.1001：没有实例权限",
+                    "KOOPHONE.API.9999：服务内部错误"
+                  ],
+                  "content": []
+                },
+                {
+                  "type": "api-param",
+                  "name": "error_info",
+                  "param_type": "string",
+                  "required": true,
+                  "default": null,
+                  "description": "错误信息详情。",
+                  "enum_values": null,
+                  "example": null,
+                  "constraints": [],
+                  "list_items": [],
+                  "content": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

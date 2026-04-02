@@ -1,46 +1,61 @@
 # PEP Components Svelte Monorepo
 
-这是一个基于 `pnpm` workspaces 管理的 Svelte 组件单仓项目。它允许独立开发组件，同时共享配置和工具逻辑。
+这是一个基于 `pnpm` workspaces 管理的 **Svelte 5** 组件单仓项目。各组件独立开发，通过统一的 `@pep/shared` 包共享 UI 基础件、配置、工具和样式。
 
 ## 项目架构
 
 ```
 /
-├── components/                  # 独立的 SvelteKit 组件应用
-│   ├── pep-common-card-v2/      # 通用卡片组件 v2
-│   ├── pep-mkp-common-offering/ # 市场通用产品组件
-│   └── pep-navigate-link/       # 导航链接组件
-├── shared/                      # 共享库和配置
-│   ├── bff/                     # 后端服务代理 (Backend-For-Frontend)
-│   ├── config/                  # 共享配置 (TypeScript, Vite, ESLint等)
-│   ├── core/                    # 核心入口文件和主应用逻辑
-│   ├── utils/                   # 通用工具函数
-│   └── templates/               # 共享模板和资源文件
-├── scripts/                     # 开发工具脚本
-│   ├── copy-template.js           # 组件模板拷贝工具
-│   ├── scaffold-component.js      # 组件脚手架生成器
-│   ├── generate-features.js       # 功能特性生成器
-│   └── dev-pkg.js                 # 开发环境管理脚本
-├── autonomous-coding/           # 自主编码代理演示系统
-│   ├── agent.py                  # 代理核心逻辑
-│   ├── autonomous_agent_demo.py  # 演示入口
-│   └── prompts/                  # 提示模板和规格
-├── templates/                   # 项目模板
-│   ├── app.html                 # HTML 模板
-│   └── Layout.svelte            # Svelte 布局组件
-├── package.json                 # 根配置
-├── pnpm-workspace.yaml          # 工作区定义
-└── types.d.ts                   # 全局类型定义
+├── components/                      # 独立的业务组件包
+│   ├── pep-cloud-deploy-flow/       # 云部署流程组件
+│   ├── pep-common-card-v2/          # 通用卡片组件 v2
+│   ├── pep-mkp-common-offering/     # 市场通用产品组件
+│   └── pep-navigate-link/           # 导航链接组件
+├── shared/                          # 全局共享包 (@pep/shared)
+│   ├── core/                        # 核心入口文件
+│   │   ├── dev/                     # 开发模式入口 (main.ts)
+│   │   └── prod/                    # 生产模式入口 (entry-client.ts / entry-server.ts / entry-editor.ts)
+│   ├── config/                      # 共享构建配置
+│   │   ├── tsconfig.json            # 基础 TypeScript 配置
+│   │   └── vite.factory.ts          # Vite 配置工厂函数
+│   ├── ui/                          # 共享 UI 基础组件
+│   │   ├── FloorHeader.svelte       # 楼层头部组件
+│   │   ├── FloorTabs.svelte         # 楼层页签组件
+│   │   ├── traits.ts                # Trait 分拣工具函数
+│   │   └── types.ts                 # 共享 UI 类型定义
+│   ├── styles/                      # 全局样式
+│   │   └── tokens/                  # 设计 Token
+│   │       ├── primitives.css       # 原始设计变量 (颜色/尺寸)
+│   │       └── semantic.css         # 语义化 CSS 变量
+│   ├── utils/                       # 通用工具函数
+│   │   └── date.ts                  # 日期处理工具
+│   ├── bff/                         # 后端服务代理 (Backend-For-Frontend)
+│   ├── templates/                   # HTML 模板
+│   │   └── index.html               # 开发模式共享 HTML 入口
+│   └── index.ts                     # 包主入口
+├── .ai-workflow/                    # AI 辅助开发模板
+│   └── templates/component/         # 新组件标准模板
+├── scripts/                         # 开发工具脚本
+│   ├── copy-template.js             # 从现有组件拷贝创建新组件
+│   ├── scaffold-component.js        # 组件脚手架生成器
+│   ├── generate-features.js         # 功能特性配置生成
+│   └── dev-pkg.js                   # 多组件并行开发脚本
+├── package.json                     # 根配置 (pnpm workspace)
+├── pnpm-workspace.yaml              # 工作区定义
+└── types.d.ts                       # 全局类型声明
 ```
 
 ## 开发环境
 
 ### 环境要求
-- Node.js（推荐最新 LTS 版本）
-- pnpm（`npm install -g pnpm`）
+
+- **Node.js** — 推荐最新 LTS 版本
+- **pnpm** — `npm install -g pnpm`
 
 ### 安装依赖
+
 在根目录运行以下命令为所有工作区安装依赖：
+
 ```bash
 pnpm install
 ```
@@ -57,16 +72,7 @@ pnpm install
 | `pnpm format` | 格式化所有组件的代码 |
 | `pnpm clean` | 清理所有组件的构建产物 |
 
-### 组件开发脚本
-
-| 脚本 | 说明 |
-|------|------|
-| `node scripts/copy-template.js --source <源组件> --target <新组件>` | 从现有组件拷贝创建新组件 |
-| `node scripts/scaffold-component.js --component <组件名> --mode standard` | 使用脚手架快速创建组件 |
-| `node scripts/generate-features.js --component <组件名>` | 生成任务列表 |
-
 ### 开发单个组件
-要启动特定组件的开发服务器（例如 `pep-common-card-v2`）：
 
 **快捷方式（推荐）：**
 ```bash
@@ -78,136 +84,155 @@ pnpm dev pep-common-card-v2
 pnpm --filter pep-common-card-v2 dev
 ```
 
-这将启动该组件的 Vite 开发服务器，通常在 `http://localhost:5173`。
+启动后访问 `http://localhost:5173`，使用 `mocks/` 目录下的 Mock 数据渲染组件。
 
 ### 开发所有组件
-要同时运行所有组件的开发服务器（它们将使用不同的端口）：
 
 ```bash
 pnpm -r dev
 ```
 
+各组件将自动使用不同端口（5173、5174、…）。
+
 ## 构建
 
-### 构建单个组件
-要构建特定组件：
+每个组件支持四种构建产物，全部由根目录的一条命令触发：
 
 ```bash
+# 构建全部组件
+pnpm build
+
+# 构建单个组件
 pnpm --filter pep-common-card-v2 build
 ```
 
-### 构建所有组件
-要构建工作区中的所有组件：
+| 构建模式 | 命令 | 产物目录 | 用途 |
+|----------|------|----------|------|
+| `client` | `--mode=client` | `dist/client/` | 浏览器端水合脚本 |
+| `server` | `--mode=server` | `dist/server/` | SSR 服务端渲染入口 |
+| `data` | `--mode=data` | `dist/data/` | 服务端数据 Loader |
+| `editor` | `--mode=editor` | `dist/editor/` | 可视化编辑器入口 |
 
-```bash
-pnpm build
+## 共享包 `@pep/shared`
+
+所有组件通过 `"@pep/shared": "workspace:*"` 引用统一共享包，提供以下能力：
+
+### `@pep/shared/ui/*` — 共享 UI 基础组件
+
+| 导入路径 | 说明 |
+|---------|------|
+| `@pep/shared/ui/FloorHeader.svelte` | 楼层头部（标题/副标题/更多链接） |
+| `@pep/shared/ui/FloorTabs.svelte` | 楼层页签切换 |
+| `@pep/shared/ui/traits.ts` | `pickTrait()` — Trait 属性分拣工具 |
+| `@pep/shared/ui/types.ts` | `UseTraits<>`, `TabItem`, `FloorTraits` 等核心类型 |
+
+### `@pep/shared/styles/tokens/*` — 设计 Token
+
+| 文件 | 说明 |
+|------|------|
+| `primitives.css` | 原始设计变量（基础色板、间距尺度等） |
+| `semantic.css` | 语义化 CSS 变量（`--bg-primary`, `--text-secondary` 等） |
+
+样式由 `shared/core/prod/entry-client.ts` 和 `shared/core/dev/main.ts` 自动注入，组件内无需手动导入。
+
+### `@pep/shared/utils/*` — 工具函数
+
+| 导入路径 | 说明 |
+|---------|------|
+| `@pep/shared/utils/date.ts` | `isExpired()` 等日期处理工具 |
+
+### `@pep/shared/core/*` — 核心入口（构建系统内部使用）
+
+| 目录 | 说明 |
+|------|------|
+| `core/dev/main.ts` | 开发模式：挂载组件 + 调用 Mock Loader |
+| `core/prod/entry-client.ts` | 生产 Client 模式：Svelte `hydrate()` 入口 |
+| `core/prod/entry-server.ts` | 生产 Server 模式：SSR 导出组件 |
+| `core/prod/entry-editor.ts` | 生产 Editor 模式：可视化编辑器入口 |
+
+## 组件目录结构
+
+每个组件遵循统一的目录约定：
+
 ```
-
-## 共享包
-
-### `@pep/bff` (已清理)
-原包含共享的后端服务代理 (Backend-For-Frontend) 逻辑，现已清理。各组件使用独立的loader实现。
-
-### `@pep/config`
-包含共享配置文件，确保项目一致性。
-- `tsconfig.json`: 基础 TypeScript 配置。
-- `vite.config.ts`: 基础 Vite 构建配置。
-- 其他共享配置：ESLint、Prettier 等。
-
-### `@pep/core`
-核心应用入口和主逻辑。
-- `entry-client.ts`: 客户端入口点。
-- `entry-server.ts`: 服务端入口点。
-- `entry-editor.ts`: 编辑器模式入口点。
-- `main.ts`: 主要应用逻辑。
-
-### `@pep/utils`
-通用工具函数库。
-- `date.ts`: 日期处理工具函数。
-
-## 开发工具脚本
-
-`scripts/` 目录包含用于组件开发的自动化工具：
-
-- **`copy-template.js`**: 从现有组件完整拷贝结构创建新组件，支持自动重命名和文档清理。
-- **`scaffold-component.js`**: 基于模板快速生成新组件，支持多种模式（最小、标准、定制）。
-- **`generate-features.js`**: 生成或更新组件的 `features.json` 配置文件。
-- **`dev-pkg.js`**: 开发环境管理脚本，支持多组件并行开发。
-
-详细用法请参考 [`scripts/README.md`](scripts/README.md)。
-
-## 自主编码代理系统
-
-`autonomous-coding/` 目录包含基于 Claude Agent SDK 的自主编码演示系统：
-
-- **双代理模式**: 初始化代理 + 编码代理的分工协作。
-- **会话管理**: 支持多会话持续开发，进度自动保存。
-- **安全沙箱**: 命令白名单和文件系统限制确保安全。
-- **完整演示**: 可构建包含 200+ 功能特性的完整应用。
-
-适用于学习 AI 驱动开发和原型快速搭建。详情请见 [`autonomous-coding/README.md`](autonomous-coding/README.md)。
-
-## 设计理念
-
-### 模块化架构
-- **组件独立性**: 每个组件都是独立的 SvelteKit 应用，可以单独开发、测试和部署。
-- **共享复用**: 通过 workspace 共享配置、工具和模板，避免重复代码。
-- **标准化**: 统一的开发流程、代码规范和项目结构。
-
-### 开发工具链
-- **自动化脚本**: 提供丰富的开发工具，降低新组件创建的门槛。
-- **AI 辅助开发**: 集成自主编码代理，支持快速原型开发。
-- **质量保证**: 内置代码检查、格式化和类型验证。
+components/pep-your-component/
+├── src/
+│   ├── index.svelte          # 组件主入口（必须）
+│   ├── types.ts              # TypeScript 类型定义（必须）
+│   ├── component.server.ts   # 服务端数据 Loader（必须）
+│   ├── vite-env.d.ts         # Vite 环境类型补充
+│   ├── components/           # 本地子组件
+│   │   └── SubComponent.svelte
+│   ├── state/                # 可复用响应式状态
+│   │   └── timer.svelte.ts
+│   ├── styles/               # 组件级样式（可选）
+│   └── utils/                # 组件级工具函数（可选）
+├── mocks/
+│   ├── default.json          # 默认 Mock 数据（必须）
+│   └── index.ts              # 数据聚合/预处理（可选）
+├── tests/
+│   └── *.spec.ts             # Playwright E2E 测试
+├── schema.json               # 编辑器 JSON Schema（必须）
+├── features.json             # 组件功能特性描述
+├── spec.md                   # 组件需求规格说明
+├── DEVELOPMENT.md            # 开发日志和待办事项
+├── package.json              # 包配置
+├── vite.config.ts            # Vite 配置（引用工厂函数）
+└── tsconfig.json             # TypeScript 配置（继承共享配置）
+```
 
 ## 添加新组件
 
-### 方式一：使用脚本工具（推荐）
+### 方式一：使用脚手架（推荐）
 
-#### 快速创建（推荐新手）
 ```bash
-# 使用预制模板创建标准组件
+# 基于 .ai-workflow/templates/component 模板生成
 node scripts/scaffold-component.js --component pep-new-component --mode standard
 ```
 
-#### 从现有组件拷贝
+### 方式二：从现有组件拷贝
+
 ```bash
-# 从相似组件拷贝结构
+# 从相似组件完整拷贝并自动重命名
 node scripts/copy-template.js --source pep-common-card-v2 --target pep-new-component
 ```
 
-### 方式二：手动创建
+### 方式三：手动创建
 
-1. 在 `components/` 下创建新文件夹
-2. 参考现有组件的结构，创建 `package.json`、`src/`、`tests/` 等目录
-3. 在 `package.json` 中添加 workspace 依赖：
+1. 在 `components/` 下创建组件目录
+2. 创建 `package.json`，添加 workspace 依赖：
    ```json
-   "devDependencies": {
-     "@pep/config": "workspace:*",
-     "@pep/core": "workspace:*",
-     "@pep/utils": "workspace:*"
+   {
+     "name": "pep-new-component",
+     "devDependencies": {
+       "@pep/shared": "workspace:*"
+     }
    }
    ```
-4. 扩展共享配置（TypeScript、Vite 等）
-5. 更新组件的 `README.md` 和相关文档
+3. 创建 `vite.config.ts`：
+   ```ts
+   import { createComponentConfig } from '../../shared/config/vite.factory';
+   export default createComponentConfig({ cwd: process.cwd(), name: 'NewComponent' });
+   ```
+4. 创建 `tsconfig.json`，继承 `../../shared/config/tsconfig.json`
+5. 参照 [COMPONENT_GUIDE.md](./COMPONENT_GUIDE.md) 编写组件源码
 
-## 贡献指南
+> 详细的组件开发规范与最佳实践，请参阅 **[COMPONENT_GUIDE.md](./COMPONENT_GUIDE.md)**。
 
-### 代码规范
-- 使用 TypeScript 进行类型安全的开发
+## 代码规范
+
+- 使用 **Svelte 5 Runes** 语法（`$props()`, `$state()`, `$derived()`）
+- 使用 **TypeScript** 进行类型安全开发，Props 必须声明类型
 - 遵循 ESLint 和 Prettier 配置
-- 组件应包含完整的类型定义和测试用例
-- 提交前运行 `pnpm check`、`pnpm lint` 和 `pnpm format`
+- 提交前运行：`pnpm check && pnpm lint && pnpm format`
 
-### 文档维护
-- 每个组件应有详细的 `README.md`
-- 更新 `features.json` 描述组件功能特性
-- 保持 `DEVELOPMENT.md` 记录开发进度和待办事项
+## 文档维护
 
-### 共享代码
-- 将可复用的逻辑提取到 `shared/` 包中
-- 更新相应包的文档和导出配置
-- 确保向后兼容性
+- `schema.json` — 描述组件可配置字段，用于可视化编辑器
+- `features.json` — 描述组件功能特性
+- `DEVELOPMENT.md` — 记录开发进度和待办事项
+- 每个组件目录内应有 `README.md`
 
 ## 许可证
 
-内部 Anthropic 使用。
+内部项目，仅限内部使用。
