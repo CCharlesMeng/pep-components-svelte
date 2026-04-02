@@ -16,12 +16,27 @@ description: 基于组件 spec.md 生成 mock/props/default.json 数据和 src/t
 - Mock 数据要真实有意义，不要写 "text" "title" 这样的占位符
 - 必须覆盖多种场景（默认态、边界态、特殊态）
 - 每个关键决策都要与用户确认
+- 按钮类型、主题值等枚举字段必须与 PortalUI 规范对齐
+
+---
+
+## 前置依赖 Skill
+
+> **必须在阶段 0 首先执行**：读取并激活 `frontend-portalui-helper` skill，获取 PortalUI 的完整使用指南。生成 Mock 数据时，按钮类型（`btnType`）、主题（`theme`）等枚举值必须严格对齐 PortalUI 规范。
+>
+> 操作：使用 Read 工具读取 `frontend-portalui-helper` 的 SKILL.md，确认可用的 PortalUI 类名和枚举值。
 
 ---
 
 ## 执行流程
 
 ### 阶段 0：读取上下文
+
+**0-A. 激活 PortalUI 辅助 Skill（必须首先执行）**：
+
+读取 `frontend-portalui-helper` skill 的 SKILL.md，获取 PortalUI 可用的按钮类名、主题背景值、图标类名等。后续生成 `types.ts` 中的枚举类型和 `default.json` 中的枚举值时，以该 skill 为准。
+
+**0-B. 读取组件上下文**：
 
 1. 读取 `components/<component-name>/spec.md`
    - 若不存在：提示用户先运行 `pep-spec` 技能生成规格文档
@@ -176,7 +191,7 @@ export interface [NestedType] {
 ```json
 {
   "_id": "<component-name>_<timestamp>",
-  // Trait 字段（标题区）
+  // Trait 字段（标题区 → 传递给 Floor 组件）
   "title": "<p>楼层标题文字</p>",
   "titleMb": "<p>楼层标题文字（移动端，可与PC相同）</p>",
   "subtitle": "",
@@ -189,8 +204,13 @@ export interface [NestedType] {
   "isShowMb": true,
   "isMergeTopSpacing": false,
   "isMergeBottomSpacing": true,
+  // 主题（映射到 Floor 的 bg prop → PortalUI por-section[data-bg]）
+  // 可选值: "white" | "light" | "grey" | "dark"
+  "theme": "white",
   // 业务字段
   "[propName]": "[value]",
+  // 按钮类型必须使用 PortalUI 类名
+  // 示例: "btnType": "por-btn-primary" | "por-btn-secondary" | "por-btn-dark"
   // 列表数据（含 3-6 条真实有意义的示例数据）
   "[listField]": [
     {
@@ -311,31 +331,39 @@ isShowMb?: boolean;  // false = 在移动端隐藏整个楼层
 
 ### 常见业务字段命名惯例
 
-| 字段含义 | 推荐命名 | 类型示例 |
-|---------|---------|---------|
-| 主题/配色 | `theme` | `'white' \| 'grey'` |
-| 列数 | `cardColumn` | `'2' \| '3' \| '4'` |
-| 图片高度 | `imgHeight` | `'80px' \| '60px'` |
-| 是否展示描述 | `showCardDesc` | `boolean` |
-| 卡片样式 | `cardType` | `'left' \| 'center' \| 'product'` |
-| 页签列表 | `tabList` | `TabItem[]` |
-| 倒计时结束时间 | `endTime` | `string` (格式 YYYY/MM/DD HH:mm) |
-| 图标URL | `icon` | `string` |
-| 移动端图标 | `iconMb` | `string` |
-| 按钮组 | `btnGroups` | `ButtonItem[]` |
-| 标签列表 | `tags` | `string[]` |
+| 字段含义 | 推荐命名 | 类型示例 | PortalUI 映射 |
+|---------|---------|---------|-------------|
+| 主题/配色 | `theme` | `'white' \| 'light' \| 'grey' \| 'dark'` | Floor 的 `bg` prop → por-section[data-bg] |
+| 列数 | `cardColumn` | `'2' \| '3' \| '4'` | — |
+| 图片高度 | `imgHeight` | `'80px' \| '60px'` | — |
+| 是否展示描述 | `showCardDesc` | `boolean` | — |
+| 卡片样式 | `cardType` | `'left' \| 'center' \| 'product'` | — |
+| 页签列表 | `tabList` | `TabItem[]` | — |
+| 倒计时结束时间 | `endTime` | `string` (格式 YYYY/MM/DD HH:mm) | — |
+| 图标URL | `icon` | `string` | — |
+| 移动端图标 | `iconMb` | `string` | — |
+| 按钮组 | `btnGroups` | `ButtonItem[]` | por-btn-primary/secondary/dark |
+| 标签列表 | `tags` | `string[]` | — |
 
-### 按钮类型（portal-ui 类名）
+### 按钮类型（PortalUI 类名）
 
 ```typescript
 export interface ButtonItem {
-  /** 按钮样式类型（对应 portal-ui 类名） */
+  /** 按钮样式类型（对应 PortalUI 类名，实现时直接作为 CSS class 使用） */
   btnType?: 'por-btn-primary' | 'por-btn-secondary' | 'por-btn-dark';
   /** 按钮链接 */
   btnHref?: string;
   /** 按钮文案 */
   btnLinkText?: string;
 }
+```
+
+### 主题/背景类型（PortalUI data-bg 值）
+
+```typescript
+// theme 字段映射到 Floor 组件的 bg prop，最终对应 PortalUI por-section[data-bg]
+// 可选值：'white' | 'light' | 'grey' | 'dark' | 'transBlack' | 'transWhite'
+// default.json 中使用的 theme 值必须在此范围内
 ```
 
 ---
@@ -348,3 +376,5 @@ export interface ButtonItem {
 4. **枚举字段要验证**：确保 default.json 中的枚举值在 types.ts 中有定义
 5. **列表不要太多**：开发阶段 3-6 条最合适，太多会影响开发体验
 6. **时间字段用未来时间**：如果有倒计时，设置到 2026 年以后，避免一打开就过期
+7. **按钮类型必须用 PortalUI 类名**：`btnType` 字段值必须是 `por-btn-primary`、`por-btn-secondary` 或 `por-btn-dark`，不要自定义按钮样式名
+8. **主题值对齐 PortalUI**：`theme` 字段值必须是 PortalUI `por-section[data-bg]` 支持的值（white / light / grey / dark），最终通过 Floor 组件传递

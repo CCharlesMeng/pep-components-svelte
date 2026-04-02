@@ -24,6 +24,14 @@ description: 基于 spec.md、mock 数据和设计稿 HTML，生成完整的 Sve
 
 ---
 
+## 前置依赖 Skill
+
+> **必须在阶段 0 首先执行**：读取并激活 `frontend-portalui-helper` skill，获取 PortalUI 的完整使用指南（token 列表、组件用法、CSS class 规范等）。该 skill 提供比本文档更详尽的 PortalUI 参考，在编写样式和选择组件时以其为准。
+>
+> 操作：使用 Read 工具读取 `frontend-portalui-helper` 的 SKILL.md，将其中的 PortalUI 规范作为本次生成的样式参考基准。
+
+---
+
 ## 前置约定
 
 > 以下规范在整个生成过程中始终适用，**阶段 1 规划时即需运用**，请在执行流程前通读。
@@ -56,34 +64,187 @@ Trait 是本项目对组件"通用能力"的抽象，每个 Trait 对应一组 P
 
 Trait 分拣只在根组件处理，子组件只接收处理后的值，不直接调用 `pickTrait`。
 
-### C. Portal-UI 使用规范
+### C. Portal-UI（PortalUI）使用规范
 
-Portal-UI 是一个基于 CSS token 和 jQuery 的组件库。**本项目只使用其纯 CSS 样式类**，不引入任何 JS 文件。
+Portal-UI 是华为云官网标准设计体系，提供 CSS token（颜色、字号、间距等）和基于 jQuery 的 UI 组件。**本项目复用其 CSS token 和纯样式类**，但所有需要 JS 交互的组件使用 `shared/ui/` 中基于 PortalUI 封装的 Svelte 组件替代。
 
-#### ✅ 可以使用的类（纯样式）
+#### C.1 核心原则：静态用 PortalUI，动态用 shared/ui
+
+| 场景 | 方案 | 示例 |
+|------|------|------|
+| **纯样式**（颜色、字号、按钮外观、图标） | 直接使用 PortalUI CSS 类名 / token | `por-btn-primary`、`por-text-title-t7`、`por-icon por-icon-right` |
+| **布局容器**（楼层、栅格） | 使用 `shared/ui/floor/Floor.svelte` 组件 | `<Floor bg="white" title="..." />` |
+| **交互组件**（轮播等） | 使用 `shared/ui/` 中的 Svelte 封装组件 | `<Carousel loop pagination />` |
+| **样式 token**（间距、颜色、文字） | 使用 PortalUI CSS 变量 / class | `--por-color-text-primary`、`por-text-body-t3` |
+
+#### C.2 PortalUI CSS Token 速查
+
+##### 颜色 Token
+
+| 用途 | PortalUI Token | 色值 |
+|------|---------------|------|
+| 页面深色背景 | `--por-color-background-primary` | #191919 |
+| 禁用背景 | `--por-color-background-disabled` | rgba(0,0,0,0.05) |
+| 悬浮背景 | `--por-color-background-gray-1` | #fafafa |
+| 白色背景 | `--por-color-background-white` | #ffffff |
+| 文本\_重要色 | `--por-color-text-primary` | #191919 |
+| 文本\_次要色 | `--por-color-text-secondary` | #595959 |
+| 文本\_按钮色 | `--por-color-text-button` | #1476ef |
+| 文本\_弱化色 | `--por-color-text-weak` | #808080 |
+| 文本\_禁用色 | `--por-color-text-disabled` | #c2c2c2 |
+| 错误色 | — | #F23030 |
+| 告警色 | — | #FF8800 |
+| 成功色 | — | #5CB300 |
+| 提示色 | — | #1476FF |
+
+在 Less 中使用：
+```less
+.my-title {
+  color: var(--por-color-text-primary);
+}
+.my-desc {
+  color: var(--por-color-text-secondary);
+}
+.my-link:hover {
+  color: var(--por-color-text-button);
+}
+```
+
+##### 文本 Token（class 方式）
+
+| 类名 | 字号/行高 | 适用场景 |
+|------|---------|---------|
+| `por-text-title-t3` | 40px/60px | 官网楼层一级标题 |
+| `por-text-title-t4` | 36px/54px | 购买页标题、子站楼层标题 |
+| `por-text-title-t5` | 32px/48px | 首页、活动标题 |
+| `por-text-title-t6` | 28px/42px | 价格数字、控制台页面标题 |
+| `por-text-title-t7` | 24px/36px | banner 副标题、控制台文字标题 |
+| `por-text-title-t8` | 20px/30px | 卡片标题 |
+| `por-text-body-t1` | 18px/28px | 小标题 |
+| `por-text-body-t2` | 16px/24px | 小标题 |
+| `por-text-body-t3` | 14px/22px | 卡片内说明文字 |
+| `por-text-body-t4` | 12px/18px | 辅助文字 |
+
+字重 token：`--por-base-font-weight-lighter` (100)、`--por-base-font-weight-normal` (400)、`--por-base-font-weight-bold` (700)
+
+在模板中使用：
+```svelte
+<h2 class="por-text-title-t7">标题</h2>
+<p class="por-text-body-t3">说明文字</p>
+```
+
+在 Less 中也可以直接用对应的字号值：
+```less
+.card-title {
+  font-size: 20px;
+  line-height: 30px;
+  font-weight: var(--por-base-font-weight-bold);
+}
+```
+
+##### 图标
+
+使用 PortalUI 字体图标：
+```html
+<i class="por-icon por-icon-right"></i>
+<i class="por-icon por-icon-left"></i>
+<i class="por-icon por-icon-close"></i>
+<i class="por-icon por-icon-more"></i>
+```
+
+产品图标：`<i class="icons-product-md ecs"></i>`
+
+##### 按钮样式
 
 ```html
-<!-- 按钮样式 -->
 <a class="por-btn-primary" href="#">主要按钮</a>
 <a class="por-btn-secondary" href="#">次要按钮</a>
 <a class="por-btn-dark" href="#">深色按钮</a>
-
-<!-- 若有其他纯样式类，根据设计稿按需使用 -->
 ```
 
-#### ❌ 不使用的功能（依赖 jQuery 的交互插件）
+##### 楼层布局类（由 `Floor.svelte` 封装，了解即可）
 
-以下 Portal-UI 功能改用 Svelte 原生实现：
+| 类名 | 作用 |
+|------|------|
+| `por-section` | 楼层容器根元素 |
+| `por-section[data-bg="white/light/grey/dark"]` | 楼层背景色 |
+| `por-container` | 楼层内容容器（居中、最大宽度） |
+| `por-section-head` | 标题区容器 |
+| `por-section-title` | 楼层主标题 |
+| `por-section-subtitle` | 楼层副标题 |
+| `por-section-title-link` | 标题区"查看更多"链接 |
+| `por-section-body` | 楼层内容区 |
+| `por-section-merge-spacing-top` | 合并上方间距 |
+| `por-section-merge-spacing-bottom` | 合并下方间距 |
+
+> **注意**：不要手写这些 `por-section*` 类名，统一通过 `<Floor>` 组件使用。
+
+##### 轮播类（由 `Carousel.svelte` 封装，了解即可）
+
+| 类名 | 作用 |
+|------|------|
+| `por-carousel` | 轮播根元素 |
+| `por-carousel-wrapper` | 滑块容器 |
+| `por-carousel-slide` | 每一张幻灯片（**使用时必须加此 class**） |
+| `por-carousel-pagination` | 分页圆点容器 |
+| `por-carousel-prev` / `por-carousel-next` | 前进/后退按钮 |
+
+> **注意**：轮播交互由 `<Carousel>` 组件管理，但幻灯片内容必须使用 `por-carousel-slide` class。
+
+#### C.3 shared/ui 封装组件（动态组件，必须使用）
+
+| 组件 | 路径 | 替代的 PortalUI 功能 | 使用场景 |
+|------|------|---------------------|---------|
+| `Floor` | `@pep/shared/ui/floor/Floor.svelte` | 楼层容器 `por-section` | 所有楼层组件的根容器 |
+| `Carousel` | `@pep/shared/ui/carousel/Carousel.svelte` | 轮播 `por-carousel` | 需要轮播切换的场景 |
+
+##### Floor 组件使用：
+```svelte
+import Floor from "@pep/shared/ui/floor/Floor.svelte";
+
+<Floor
+  bg={theme === "grey" ? "grey" : "white"}
+  title={headerProps.title}
+  subtitle={headerProps.subtitle}
+  titleLink={headerProps.more?.text ? { text: headerProps.more.text, href: headerProps.more.href } : undefined}
+  mergeTopSpacing={spacingProps.isMergeTopSpacing}
+  mergeBottomSpacing={spacingProps.isMergeBottomSpacing}
+>
+  <!-- 楼层内容 -->
+</Floor>
+```
+
+Floor Props：`bg`（white/light/grey/dark/transBlack/transWhite）、`theme`（dark/light）、`title`、`subtitle`、`titleLink`、`titleLeft`、`mergeTopSpacing`、`mergeBottomSpacing`
+
+##### Carousel 组件使用：
+```svelte
+import Carousel from "@pep/shared/ui/carousel/Carousel.svelte";
+
+<Carousel loop autoplay pagination navigation>
+  {#each items as item}
+    <div class="por-carousel-slide">
+      <!-- 幻灯片内容 -->
+    </div>
+  {/each}
+</Carousel>
+```
+
+Carousel Props：`transition`（slide/fade）、`initialSlide`、`preview`（同屏数量）、`speed`、`loop`、`autoplay`、`pagination`、`navigation`、`simulateTouch`、`dark`
+
+#### C.4 不使用的 PortalUI 功能（依赖 jQuery）
+
+以下 PortalUI 功能的 JS 交互部分不使用，改用上述 Svelte 组件或原生实现：
 
 | Portal-UI 功能 | 替代方案 |
 |---------------|----------|
-| 弹窗（Modal） | Svelte `{#if}` + CSS |
-| 下拉菜单（Dropdown） | Svelte 状态 + click 事件 |
-| 轮播（Carousel/Slider） | Svelte 实现或 CSS Scroll Snap |
+| 弹窗 Modal（JS 初始化） | Svelte `{#if}` + CSS |
+| 下拉菜单 Dropdown（JS） | Svelte 状态 + click 事件 |
+| 轮播 Carousel（JS） | `shared/ui/carousel/Carousel.svelte` |
+| 标签页 Tab（JS） | Svelte 状态 + 自定义实现 |
+| 楼层容器（JS） | `shared/ui/floor/Floor.svelte` |
 | Tooltip | CSS `:hover` |
-| 标签页（Tab） | 项目共享组件 `FloorTabs` |
 
-**判断原则**：需要调用 `$(element).plugin()` 初始化的，一律不用。
+**判断原则**：需要 `$(element).plugin()` 初始化的 JS 功能一律不用，用 shared/ui 中的 Svelte 封装替代。纯 CSS 类名和 token 直接使用。
 
 ---
 
@@ -91,7 +252,11 @@ Portal-UI 是一个基于 CSS token 和 jQuery 的组件库。**本项目只使�
 
 ### 阶段 0：读取所有上下文
 
-并行读取以下文件：
+**0-A. 激活 PortalUI 辅助 Skill（必须首先执行）**：
+
+读取 `frontend-portalui-helper` skill 的 SKILL.md，获取 PortalUI 完整参考（颜色 token、文本 class、图标用法、组件规范等）。后续所有样式编写、组件选型均以该 skill 的指南为基准，本文档的 PortalUI 速查仅作备用参考。
+
+**0-B. 并行读取组件上下文文件**：
 1. `components/<component-name>/spec.md`
 2. `components/<component-name>/src/types.ts`
 3. `components/<component-name>/mocks/props/default.json`
@@ -123,11 +288,18 @@ Traits 使用：
   ✅ spacing — 上下间距
   ✅ visibility — 移动端显隐
 
-共享组件复用：
-  [✅ FloorHeader / FloorTabs / 其他]
+共享组件复用（shared/ui 封装组件）：
+  ✅ Floor — 楼层容器（por-section 封装）
+  [✅ / ⬜] Carousel — 轮播（por-carousel 封装）
 
-Portal-UI 样式类：
-  [列举会用到的 portal-ui 类名，如 por-btn-primary；若无则填"无"]
+Portal-UI 样式类直接使用：
+  [列举会用到的 PortalUI 类名，如 por-btn-primary、por-text-title-t7、por-icon por-icon-right]
+  [若无则填"无"]
+
+Portal-UI Token 使用：
+  颜色：[列举会用到的颜色 token，如 --por-color-text-primary]
+  字重：[如 --por-base-font-weight-bold]
+  文本排版：[如 por-text-body-t3]
 
 响应式策略（纯 CSS 实现）：
   PC（≥768px）：[布局描述]
@@ -173,8 +345,7 @@ Portal-UI 样式类：
   import type { <ComponentName>Props } from "./types";
 
   // 共享 UI 组件（按需导入）
-  import FloorHeader from "@pep/shared/ui/FloorHeader.svelte";
-  import FloorTabs from "@pep/shared/ui/FloorTabs.svelte";
+  import Floor from "@pep/shared/ui/floor/Floor.svelte";
   import { pickTrait } from "@pep/shared/ui/traits";
 
   // 本地子组件
@@ -220,8 +391,6 @@ Portal-UI 样式类：
     <FloorHeader {...headerProps} />
 
     <div class="<component-name>__content">
-      <FloorTabs {tabList} bind:activeTabIndex />
-
       {#if displayItems.length > 0}
         <div class="<component-name>__grid">
           {#each displayItems as item}
@@ -358,34 +527,25 @@ PC/移动端的所有差异——无论是**样式差异**还是**结构差异**
 }
 ```
 
-##### 从设计稿 HTML 提取视觉意图
+##### 从设计稿 HTML 提取视觉意图（映射到 PortalUI Token）
 
-分析设计稿 HTML 时，**不要直接翻译 tailwind 类名到 CSS**，而是理解其背后的视觉意图，然后用 Less 重新实现：
+分析设计稿 HTML 时，**不要直接翻译 tailwind 类名到 CSS**，而是理解其背后的视觉意图，**优先映射到 PortalUI token 或 class**，然后用 Less 重新实现：
 
 - `grid grid-cols-3` → 理解为"三列等宽网格"，用 `grid-template-columns: repeat(3, 1fr)` 实现
-- `text-xl font-bold text-gray-900` → 理解为"大标题，粗体，主色文字"，用 `font-size: 20px; font-weight: 700; color: var(--text-primary)` 实现
+- `text-xl font-bold text-gray-900` → 理解为"大标题，粗体，主色文字"，映射到 `font-size: 20px; font-weight: var(--por-base-font-weight-bold); color: var(--por-color-text-primary)`，或直接使用 `por-text-title-t8` class
+- `text-sm text-gray-500` → 映射到 `por-text-body-t3` + `color: var(--por-color-text-secondary)`
 - `hidden md:block` → 理解为"移动端隐藏，PC 端显示"，用 CSS media query 控制 `display`
-- `p-4 md:p-6` → 理解为"移动端 16px 内边距，PC 端 24px"
+- `p-4 md:p-6` → 理解为"移动端 16px 内边距，PC 端 24px"，用 `var(--primitive-space-4)` / `var(--primitive-space-6)`
 
-目标是写出清晰、可维护的 Less 代码，而不是机械翻译。
+目标是写出**使用 PortalUI token** 的清晰、可维护的 Less 代码，而不是机械翻译或使用硬编码色值。
 
 ##### Less 样式示例
 
 ```svelte
 <style lang="less">
   .pep-your-component {
-    width: 100%;
-    box-sizing: border-box;
-
-    &.theme-grey {
-      background-color: var(--bg-secondary, #f5f5f5);
-    }
-
-    &__container {
-      max-width: var(--container-max-width, 1200px);
-      margin: 0 auto;
-      padding: var(--primitive-space-15) var(--primitive-space-5);
-    }
+    // 由于楼层容器已由 <Floor> 组件提供 por-section + por-container，
+    // 这里只写内容区自身的样式
 
     &__grid {
       display: grid;
@@ -393,9 +553,20 @@ PC/移动端的所有差异——无论是**样式差异**还是**结构差异**
       gap: 24px;
     }
 
-    // 间距合并（Trait 控制）
-    &.merge-top &__container { padding-top: 0; }
-    &.merge-bottom &__container { padding-bottom: 0; }
+    &__title {
+      color: var(--por-color-text-primary);
+      font-weight: var(--por-base-font-weight-bold);
+    }
+
+    &__desc {
+      color: var(--por-color-text-secondary);
+      font-size: 14px;
+      line-height: 22px;
+    }
+
+    &__link {
+      color: var(--por-color-text-button);
+    }
 
     // 移动端隐藏（Trait 控制）
     &.hide-mb { display: none; }
@@ -408,10 +579,6 @@ PC/移动端的所有差异——无论是**样式差异**还是**结构差异**
     }
 
     @media (max-width: 767px) {
-      &__container {
-        padding: var(--primitive-space-10) var(--primitive-space-4);
-      }
-
       &__grid {
         grid-template-columns: 1fr;
         gap: 12px;
@@ -421,7 +588,7 @@ PC/移动端的所有差异——无论是**样式差异**还是**结构差异**
 </style>
 ```
 
-> 这只是一个结构示例。不同组件的样式复杂度差异很大，根据实际 spec 和设计稿的视觉意图自由组织 Less 代码，无需机械套用此结构。
+> 这只是一个结构示例。注意：楼层容器布局（`por-section`、`por-container`、间距合并等）已由 `<Floor>` 组件封装，组件样式只需关注内容区自身。颜色、字重等优先使用 PortalUI token。
 
 ---
 
@@ -468,36 +635,70 @@ PC/移动端的所有差异——无论是**样式差异**还是**结构差异**
 
 ---
 
-### 阶段 5：共享组件使用
+### 阶段 5：共享组件与 PortalUI 组件使用
 
-优先使用项目共享的 UI 组件，避免重复造轮子：
+**必须优先使用 shared/ui 组件和 PortalUI 样式，禁止重复造轮子。**
+
+#### 5.1 组件导入参考
 
 ```typescript
-// 楼层标题（包含 title、subtitle、more 链接）
-import FloorHeader from "@pep/shared/ui/FloorHeader.svelte";
+// 楼层容器（封装了 por-section / por-container / por-section-head 等 PortalUI 布局类）
+import Floor from "@pep/shared/ui/floor/Floor.svelte";
 
-// Tab 切换（配合 tabList Props + activeTabIndex 状态）
-import FloorTabs from "@pep/shared/ui/FloorTabs.svelte";
+// 轮播（封装了 por-carousel 系列 PortalUI 类）
+import Carousel from "@pep/shared/ui/carousel/Carousel.svelte";
 
 // Trait 分拣工具
 import { pickTrait } from "@pep/shared/ui/traits";
 ```
 
-**FloorHeader 使用方式**：
+#### 5.2 Floor 组件使用（取代手写 por-section）
+
+**所有楼层组件必须使用 `Floor` 作为根容器**，不要手写 `por-section`、`por-container` 等类名：
+
 ```svelte
 const headerProps = $derived(pickTrait(props, "header"));
-// ...
-<FloorHeader {...headerProps} />
+const spacingProps = $derived(pickTrait(props, "spacing"));
+
+<Floor
+  bg={theme === "grey" ? "grey" : "white"}
+  title={headerProps.title}
+  subtitle={headerProps.subtitle}
+  titleLink={headerProps.more?.text ? { text: headerProps.more.text, href: headerProps.more.href } : undefined}
+  mergeTopSpacing={spacingProps.isMergeTopSpacing}
+  mergeBottomSpacing={spacingProps.isMergeBottomSpacing}
+>
+  <!-- 楼层内容放在 Floor 内部 -->
+</Floor>
 ```
 
-**FloorTabs 使用方式**：
+#### 5.3 Carousel 使用方式
+
 ```svelte
-let activeTabIndex = $state(0);
-// ...
-<FloorTabs {tabList} bind:activeTabIndex />
-{#if tabList[activeTabIndex]}
-  <!-- 当前 Tab 的内容 -->
-{/if}
+<Carousel loop autoplay pagination navigation>
+  {#each items as item}
+    <div class="por-carousel-slide">
+      <!-- 幻灯片内容，class 必须包含 por-carousel-slide -->
+    </div>
+  {/each}
+</Carousel>
+```
+
+#### 5.4 PortalUI 纯样式类的直接使用
+
+以下 PortalUI 样式类可在模板中直接使用，无需封装：
+
+```svelte
+<!-- 按钮 -->
+<a class="por-btn-primary" href={item.href}>立即使用</a>
+<a class="por-btn-secondary" href={item.href}>了解详情</a>
+
+<!-- 文本排版 -->
+<h2 class="por-text-title-t7">标题文字</h2>
+<p class="por-text-body-t3">描述文字</p>
+
+<!-- 图标 -->
+<i class="por-icon por-icon-right"></i>
 ```
 
 ---
@@ -562,8 +763,18 @@ let activeTabIndex = $state(0);
   □ 子元素用 BEM 命名，Less 嵌套书写（&__element / &--modifier）
   □ 无 inline style（除 CSS 变量传递，如 style="--col-count: {n};"）
   □ 媒体查询按断点集中写在组件根块末尾，从大到小排列，不逐元素分散
-  □ 优先使用项目 CSS 变量（var(--primitive-*)、var(--text-*)等）
+  □ 颜色使用 PortalUI token（--por-color-text-primary 等），不硬编码色值
+  □ 字重使用 PortalUI token（--por-base-font-weight-bold 等）
+  □ 文本排版优先使用 PortalUI class（por-text-title-t7、por-text-body-t3 等）
+  □ 间距使用项目 CSS 变量（var(--primitive-space-*)）
   □ merge-top / merge-bottom / hide-mb 响应 Trait
+
+PortalUI 合规：
+  □ 楼层容器使用 <Floor> 组件，不手写 por-section / por-container
+  □ 轮播使用 <Carousel> 组件，幻灯片加 por-carousel-slide class
+  □ 按钮使用 PortalUI 按钮类（por-btn-primary / por-btn-secondary / por-btn-dark）
+  □ 图标使用 PortalUI 图标类（por-icon por-icon-xxx）
+  □ 无硬编码颜色值（#191919、#595959 等），全部用 PortalUI token 替代
 
 SSR 水合安全：
   □ 无任何 window / document / navigator 访问（初始化阶段）
@@ -632,7 +843,45 @@ SSR 水合安全：
 
 ---
 
-## 参考：项目 CSS 变量速查
+## 参考：CSS 变量与 PortalUI Token 速查
+
+### PortalUI 官方 Token（优先使用）
+
+```
+// ── 颜色 Token（来自 PortalUI 设计规范）──
+var(--por-color-background-primary)   // #191919 深色背景
+var(--por-color-background-disabled)  // rgba(0,0,0,0.05) 禁用背景
+var(--por-color-background-gray-1)    // #fafafa 悬浮背景
+var(--por-color-background-white)     // #ffffff 白色背景
+
+var(--por-color-text-primary)    // #191919 重要文本
+var(--por-color-text-secondary)  // #595959 次要文本
+var(--por-color-text-button)     // #1476ef 按钮/链接文本
+var(--por-color-text-weak)       // #808080 弱化文本
+var(--por-color-text-disabled)   // #c2c2c2 禁用/失效文本
+
+// ── 字重 Token ──
+var(--por-base-font-weight-lighter)  // 100 细体（辅助文字）
+var(--por-base-font-weight-normal)   // 400 常规体（正文）
+var(--por-base-font-weight-bold)     // 700 中黑体（标题）
+```
+
+### PortalUI 文本 class（在 HTML 模板中使用）
+
+```
+por-text-title-t3  // 40px/60px  楼层一级标题
+por-text-title-t4  // 36px/54px  子站楼层标题
+por-text-title-t5  // 32px/48px  活动标题
+por-text-title-t6  // 28px/42px  价格数字
+por-text-title-t7  // 24px/36px  副标题
+por-text-title-t8  // 20px/30px  卡片标题
+por-text-body-t1   // 18px/28px  小标题
+por-text-body-t2   // 16px/24px  小标题
+por-text-body-t3   // 14px/22px  卡片说明文字
+por-text-body-t4   // 12px/18px  辅助文字
+```
+
+### 项目补充 Token（PortalUI 未覆盖时使用）
 
 ```
 // 间距（在 Less 中直接使用 var()）
@@ -647,20 +896,14 @@ var(--primitive-space-15)  // 60px
 // @media (max-width: 1024px)  // 平板 / 小屏 PC
 // @media (max-width: 767px)   // 移动端
 
-// 文字颜色
-var(--text-primary)    // #212121
-var(--text-secondary)  // #666666
-var(--text-tertiary)   // #999999
-
-// 背景
-var(--bg-primary)      // #ffffff
+// 以下为项目 fallback token，优先使用 PortalUI token
+var(--text-primary)    // → 优先用 var(--por-color-text-primary)
+var(--text-secondary)  // → 优先用 var(--por-color-text-secondary)
+var(--bg-primary)      // #ffffff → 优先用 var(--por-color-background-white)
 var(--bg-secondary)    // #f5f5f5
 
-// 边框
-var(--border-subtle)   // #e5e5e5
-
 // 容器
-var(--container-max-width)  // 1200px
+var(--container-max-width)  // 1200px（Floor 组件内部已处理，无需手写）
 ```
 
 ---

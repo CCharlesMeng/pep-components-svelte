@@ -5,7 +5,7 @@ import type { FloorTraits } from "./types";
  * 用于在运行时从大 Props 对象中提取特定特征的属性
  */
 const TRAIT_KEYS_MAP: Record<keyof FloorTraits, Array<string>> = {
-  header: ['title', 'titleMb', 'subtitle', 'subtitleMb', 'more'],
+  header: ['title', 'subtitle', 'more'],
   spacing: ['isMergeTopSpacing', 'isMergeBottomSpacing'],
   visibility: ['isShowMb']
 };

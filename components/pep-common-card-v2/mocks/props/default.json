@@ -57,6 +57,26 @@
       }
     }
   ],
+  "carouselSlides": [
+    {
+      "img": "https://res-static.hc-cdn.cn/cloudbu-site/china/zh-cn/architecture/slide/slide-bg-01.jpg",
+      "title": "华为云弹性云服务器 ECS",
+      "desc": "高性能计算，灵活扩展，稳定可靠，助力企业数字化转型",
+      "href": "https://www.huaweicloud.com/product/ecs.html"
+    },
+    {
+      "img": "https://res-static.hc-cdn.cn/cloudbu-site/china/zh-cn/architecture/slide/slide-bg-02.jpg",
+      "title": "对象存储服务 OBS",
+      "desc": "安全、高可靠、低成本的云存储服务，支持海量数据存储",
+      "href": "https://www.huaweicloud.com/product/obs.html"
+    },
+    {
+      "img": "https://res-static.hc-cdn.cn/cloudbu-site/china/zh-cn/architecture/slide/slide-bg-03.jpg",
+      "title": "云数据库 RDS",
+      "desc": "稳定可靠、弹性伸缩、便捷管理的在线关系型数据库服务",
+      "href": "https://www.huaweicloud.com/product/rds.html"
+    }
+  ],
   "titleMb": "<p>您可能感兴趣的产品</p>",
   "cardType": "product",
   "isShowMb": true,

@@ -1,7 +1,15 @@
 import type { UseTraits, TabItem as BaseTabItem } from "@pep/shared/ui/types";
 
+/** 轮播图单个滑块数据 */
+export interface CarouselSlide {
+  img?: string;
+  title?: string;
+  desc?: string;
+  href?: string;
+}
+
 /**
- * 1. 定义该组件特有的“纯业务”属性
+ * 1. 定义该组件特有的"纯业务"属性
  */
 export interface CardBusinessProps {
   /** PC 端卡片样式 */
@@ -18,6 +26,8 @@ export interface CardBusinessProps {
   showCardDesc?: boolean;
   /** 页签列表 */
   tabList?: TabItem[];
+  /** 轮播图滑块列表（有值时在卡片区下方展示轮播） */
+  carouselSlides?: CarouselSlide[];
 }
 
 /**

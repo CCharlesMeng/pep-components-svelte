@@ -16,11 +16,23 @@ description: 从设计稿转换的HTML中分析组件需求，生成详细的组
 
 ---
 
+## 前置依赖 Skill
+
+> **必须在阶段 0 首先执行**：读取并激活 `frontend-portalui-helper` skill，获取 PortalUI 的完整使用指南。在分析设计稿时，需要依据该 skill 中的 PortalUI 规范来识别颜色 token、文本 class、图标和组件映射关系。
+>
+> 操作：使用 Read 工具读取 `frontend-portalui-helper` 的 SKILL.md，将其作为样式规格分析的参考基准。
+
+---
+
 ## 执行流程
 
 ### 阶段 0：准备
 
-**收集上下文**：
+**0-A. 激活 PortalUI 辅助 Skill（必须首先执行）**：
+
+读取 `frontend-portalui-helper` skill 的 SKILL.md，获取 PortalUI 完整的 token 列表、class 命名、组件规范。后续在分析设计稿 HTML、生成样式规格（Section 7）时，所有颜色、字号、字重都要映射到该 skill 提供的 PortalUI token/class。
+
+**0-B. 收集组件上下文**：
 
 1. 确认组件名称（如用户未提供，根据 HTML 内容推断并确认）
 2. 确认组件目录是否已存在：`components/<component-name>/`
@@ -52,6 +64,16 @@ description: 从设计稿转换的HTML中分析组件需求，生成详细的组
   - Tab/轮播切换
   - 展开/收起
   - 倒计时等动态效果
+
+PortalUI 组件/Token 映射层面（必须识别）：
+  - 楼层容器 → Floor 组件（shared/ui），自动提供 por-section 布局
+  - 轮播 → Carousel 组件（shared/ui），使用 por-carousel-slide class
+  - Tab 切换 → Svelte 状态 + 自定义实现
+  - 按钮样式 → por-btn-primary / por-btn-secondary / por-btn-dark
+  - 文本排版 → por-text-title-t* / por-text-body-t* class
+  - 图标 → por-icon 系列
+  - 颜色 → --por-color-text-primary / secondary / button / weak 等 token
+  - 字重 → --por-base-font-weight-bold / normal / lighter
 ```
 
 ---
@@ -75,6 +97,11 @@ description: 从设计稿转换的HTML中分析组件需求，生成详细的组
 响应式：
   PC：[描述 PC 端布局]
   移动端：[描述移动端布局]
+
+PortalUI 组件/Token 映射：
+  shared/ui 组件：[Floor（必须）、Carousel（如有轮播）]
+  PortalUI 样式类：[por-btn-primary、por-text-title-t7 等]
+  PortalUI 颜色 token：[--por-color-text-primary 等]
 
 数据字段（初步推断）：
   - [字段名]：[用途说明]（🟢 确定 / 🟡 推断）
@@ -240,40 +267,81 @@ description: 从设计稿转换的HTML中分析组件需求，生成详细的组
 
 ---
 
-## 7. 样式规格
+## 7. 样式规格（必须映射到 PortalUI Token）
+
+> **核心要求**：所有颜色、字号、字重必须优先映射到 PortalUI token 或 class，不使用硬编码值。
 
 ### 7.1 颜色方案
 
-[参考设计稿中的颜色，映射到 CSS 变量]
+[分析设计稿中的颜色，映射到 PortalUI 颜色 token]
 
-| 用途 | 颜色值或 CSS 变量 |
-|------|-----------------|
-| 背景 | `var(--bg-primary)` / `#ffffff` |
-| 标题 | `var(--text-primary)` |
-| ... | ... |
+| 用途 | PortalUI Token | 备注 |
+|------|---------------|------|
+| 主要文本 | `var(--por-color-text-primary)` | #191919 |
+| 次要文本 | `var(--por-color-text-secondary)` | #595959 |
+| 弱化文本 | `var(--por-color-text-weak)` | #808080 |
+| 链接/按钮文本 | `var(--por-color-text-button)` | #1476ef |
+| 白色背景 | `var(--por-color-background-white)` | #ffffff |
+| 悬浮背景 | `var(--por-color-background-gray-1)` | #fafafa |
+| [其他] | [映射到最接近的 PortalUI token 或说明无对应 token] | |
 
 ### 7.2 字体规格
 
-| 元素 | 字号 | 字重 | 行高 |
-|------|------|------|------|
-| [元素名] | [值] | [值] | [值] |
+[分析设计稿中的字体，映射到 PortalUI 文本 class]
+
+| 元素 | PortalUI class 或字号 | 字重 token | 行高 |
+|------|---------------------|-----------|------|
+| 楼层标题 | `por-text-title-t7`（24px/36px） | `--por-base-font-weight-bold` | 36px |
+| 卡片标题 | `por-text-title-t8`（20px/30px） | `--por-base-font-weight-bold` | 30px |
+| 描述文字 | `por-text-body-t3`（14px/22px） | `--por-base-font-weight-normal` | 22px |
+| 辅助文字 | `por-text-body-t4`（12px/18px） | `--por-base-font-weight-normal` | 18px |
+| [其他] | [映射或自定义值] | | |
+
+PortalUI 文本 class 对照表：
+- 标题系列：`por-text-title-t3`(40px) ~ `por-text-title-t8`(20px)
+- 正文系列：`por-text-body-t1`(18px) ~ `por-text-body-t4`(12px)
 
 ### 7.3 间距规格
 
-[内边距、外边距、卡片间距等]
+[内边距、外边距、卡片间距等，使用项目间距变量 `var(--primitive-space-*)` 表示]
 
-### 7.4 Portal-UI 使用
+### 7.4 Portal-UI 组件与样式类使用
 
-本组件可使用 portal-ui（基于 CSS token 的样式库）的以下类：
+> PortalUI 是华为云官网标准设计体系。**静态样式直接使用 PortalUI 类名/token，动态交互使用 shared/ui 中的 Svelte 封装组件。**
+
+#### 7.4.1 shared/ui 封装组件（动态/交互组件）
+
+[标注本组件需要使用的 shared/ui 组件]
+
+| 组件 | 是否使用 | 用途 |
+|------|---------|------|
+| `Floor`（楼层容器） | ✅ 必须 | 提供 por-section 布局、标题区、间距合并 |
+| `Carousel`（轮播） | [✅/⬜] | [用途说明] |
+
+#### 7.4.2 PortalUI 纯样式类（直接在 HTML 中使用）
 
 | 类名 | 用途 |
 |------|------|
 | `por-btn-primary` | 主要按钮样式 |
 | `por-btn-secondary` | 次要按钮样式 |
 | `por-btn-dark` | 深色按钮样式 |
-| [其他类名] | [用途] |
+| `por-text-title-t*` | 标题文本排版 |
+| `por-text-body-t*` | 正文文本排版 |
+| `por-icon por-icon-*` | 字体图标 |
+| `por-carousel-slide` | 轮播幻灯片（配合 Carousel 组件使用） |
+| [其他] | [用途] |
 
-> ⚠️ portal-ui 仅用于**纯样式**类（按钮、排版、图标等），不使用其 jQuery 交互插件
+#### 7.4.3 PortalUI CSS Token（在 Less 中使用 `var()` 引用）
+
+| Token | 用途 |
+|-------|------|
+| `--por-color-text-primary` | 主要文本颜色 |
+| `--por-color-text-secondary` | 次要文本颜色 |
+| `--por-color-text-button` | 链接/按钮文本颜色 |
+| `--por-base-font-weight-bold` | 标题字重 |
+| [其他用到的 token] | [用途] |
+
+> ⚠️ PortalUI 的 jQuery 交互插件一律不使用，改用 shared/ui 中的 Svelte 封装组件
 
 ---
 
@@ -434,3 +502,5 @@ description: 从设计稿转换的HTML中分析组件需求，生成详细的组
 3. **关注移动端差异**：设计稿通常会有明显的 PC/移动端布局差异，务必分别描述
 4. **Props 命名遵循项目约定**：camelCase、与 schema.json 字段一一对应
 5. **增量更新**：若 spec.md 已存在，不要覆盖用户已有的内容，只补充缺失部分
+6. **样式必须映射到 PortalUI**：颜色、字号、字重全部映射到 PortalUI token/class，不使用硬编码值；设计稿中的颜色值转换为最接近的 PortalUI token
+7. **组件优先使用 shared/ui**：楼层容器用 `Floor`、轮播用 `Carousel`，按钮用 PortalUI 按钮类名
