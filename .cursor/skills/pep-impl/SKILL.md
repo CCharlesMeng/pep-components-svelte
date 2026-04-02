@@ -58,9 +58,9 @@ Trait 是本项目对组件"通用能力"的抽象，每个 Trait 对应一组 P
 
 | Trait | 作用 | 用法 |
 |-------|------|------|
-| `header` | 楼层标题区域（title、subtitle、more 链接） | `pickTrait(props, "header")` 传给 `FloorHeader` |
-| `spacing` | 上下间距合并控制 | 控制根元素的 `merge-top` / `merge-bottom` class |
-| `visibility` | 移动端显隐 | 控制根元素的 `hide-mb` class |
+| `header` | 楼层标题区域（title、subtitle、more 链接） | `pickTrait(props, "header")` 传给 `Floor` 的 title/subtitle/titleLink props |
+| `spacing` | 上下间距合并控制 | `pickTrait(props, "spacing")` 传给 `Floor` 的 mergeTopSpacing/mergeBottomSpacing props |
+| `visibility` | 移动端显隐（特殊场景，极少使用） | `pickTrait(props, "visibility")` 获取 `isShowMb`，仅在 CMS 要求整层隐藏时使用 |
 
 Trait 分拣只在根组件处理，子组件只接收处理后的值，不直接调用 `pickTrait`。
 
@@ -286,7 +286,7 @@ Carousel Props：`transition`（slide/fade）、`initialSlide`、`preview`（同
 Traits 使用：
   ✅ header — 楼层标题
   ✅ spacing — 上下间距
-  ✅ visibility — 移动端显隐
+  ⚠️ visibility — 移动端显隐（极少使用，仅当 spec 要求整层隐藏时才启用）
 
 共享组件复用（shared/ui 封装组件）：
   ✅ Floor — 楼层容器（por-section 封装）
@@ -303,7 +303,7 @@ Portal-UI Token 使用：
 
 响应式策略（纯 CSS 实现）：
   PC（≥768px）：[布局描述]
-  移动端（<768px）：[布局描述]
+  移动端（≤767px）：[布局描述]
   设备差异由 CSS media query 控制，不使用 JS 判断
 
 交互状态：
@@ -344,11 +344,11 @@ Portal-UI Token 使用：
   import { type Snippet } from "svelte";
   import type { <ComponentName>Props } from "./types";
 
-  // 共享 UI 组件（按需导入）
+  // 共享 UI 组件
   import Floor from "@pep/shared/ui/floor/Floor.svelte";
   import { pickTrait } from "@pep/shared/ui/traits";
 
-  // 本地子组件
+  // 本地子组件（按需导入）
   import CardItem from "./components/CardItem.svelte";
 
   // ② Props 定义（严格对应 types.ts 中的最终类型）
@@ -362,10 +362,13 @@ Portal-UI Token 使用：
     // ... 其他有默认值的业务字段
   } = props;
 
-  // ④ Trait 分拣（Explicit Forwarder 模式，有什么 Trait 就分拣什么）
+  // ④ Trait 分拣（Explicit Forwarder 模式）
+  //    header → 传给 Floor 的 title/subtitle/titleLink
+  //    spacing → 传给 Floor 的 mergeTopSpacing/mergeBottomSpacing
   const headerProps = $derived(pickTrait(props, "header"));
   const spacingProps = $derived(pickTrait(props, "spacing"));
-  const visibilityProps = $derived(pickTrait(props, "visibility"));
+  // 若 spec 要求整层移动端隐藏（罕见），才需要 visibility Trait：
+  // const visibilityProps = $derived(pickTrait(props, "visibility"));
 
   // ⑤ 响应式状态（只声明确实需要响应式的状态）
   let activeTabIndex = $state(0);
@@ -378,39 +381,42 @@ Portal-UI Token 使用：
 
 #### 3.2 template 块
 
-```svelte
-<div
-  class="<component-name>"
-  class:theme-grey={theme === "grey"}
-  class:theme-white={theme === "white"}
-  class:merge-top={spacingProps.isMergeTopSpacing ?? true}
-  class:merge-bottom={spacingProps.isMergeBottomSpacing ?? true}
-  class:hide-mb={visibilityProps.isShowMb === false}
+> **核心模式**：`<Floor>` 组件作为楼层根容器（封装标题区 + 容器 + 间距）→ 内容区。
 >
-  <div class="<component-name>__container">
-    <FloorHeader {...headerProps} />
+> 不再使用独立的 FloorHeader 组件，不再手写 `por-section` / `por-container` 类名。
 
-    <div class="<component-name>__content">
-      {#if displayItems.length > 0}
-        <div class="<component-name>__grid">
-          {#each displayItems as item}
-            <CardItem {item} />
-          {/each}
-        </div>
-      {/if}
-
-      {@render props.children?.()}
+```svelte
+<Floor
+  bg={theme === "grey" ? "grey" : "white"}
+  title={headerProps.title}
+  subtitle={headerProps.subtitle}
+  titleLink={headerProps.more?.text
+    ? { text: headerProps.more.text, href: headerProps.more.href }
+    : undefined}
+  mergeTopSpacing={spacingProps.isMergeTopSpacing}
+  mergeBottomSpacing={spacingProps.isMergeBottomSpacing}
+>
+  <!-- Floor 内部：楼层主体内容 -->
+  {#if displayItems.length > 0}
+    <div class="<component-name>__grid">
+      {#each displayItems as item}
+        <CardItem {item} />
+      {/each}
     </div>
-  </div>
-</div>
+  {/if}
+
+  {@render props.children?.()}
+</Floor>
+
+<!-- Floor 外部：可选的独立区域（如轮播等），不受 Floor 容器约束 -->
 ```
 
 **Template 编写规则**：
-- 根元素使用 kebab-case 的组件名作为 class（如 `pep-common-card`）
-- 内部元素使用 BEM 命名：`<组件名>__<元素>` 或 `<组件名>--<修饰符>`
+- `<Floor>` 作为楼层根容器，接收 header/spacing Trait 字段，自动渲染标题区和 por-section 布局
+- Floor 内部的内容元素使用 BEM 命名：`<组件名>__<元素>` 或 `<组件名>--<修饰符>`
 - class 绑定使用 Svelte 的 `class:xxx={condition}` 语法
 - 条件渲染用 `{#if}...{/if}`，列表渲染用 `{#each}`
-- 富文本字段用 `{@html filterXSS(text)}` 渲染
+- 富文本字段用 `{@html filterXSS(text)}` 渲染（filterXSS 从 `@pep/shared/utils` 导入，若项目中不存在则直接用 `{@html text}`）
 - 事件绑定用 `onclick={handler}`（不用 on:click，Svelte 5 规范）
 
 #### 3.3 style 块（完整样式规范）
@@ -425,90 +431,27 @@ Portal-UI Token 使用：
 - **媒体查询按断点分组，集中写在组件根块末尾**，不分散在每个元素内部；多个断点时从大到小依次排列
 - 样式结构不固定，根据组件实际需求灵活组织，无需套用固定模板
 
-##### CSS-first：所有设备差异通过 CSS 控制
+##### 响应式分级策略（CSS-first，禁止 JS 判断设备类型）
 
 PC/移动端的所有差异——无论是**样式差异**还是**结构差异**——都必须通过 CSS 解决，**不使用 JS 判断设备类型**（原因见阶段 4 的 SSR 说明）。
 
-**同一元素，不同断点的样式不同** — 断点集中写在组件块底部：
+根据差异的粒度，从最小 DOM 开销的方案向上选择，**永远优先低 Level**：
 
-```less
-.component {
-  &__grid { grid-template-columns: repeat(4, 1fr); } // 默认 PC
+###### 前置: PortalUI 组件豁免
 
-  @media (max-width: 1024px) {
-    &__grid { grid-template-columns: repeat(2, 1fr); }
-  }
+以下元素 **已由 PortalUI 内置响应式适配**，无需编写任何 `@media` 规则：
 
-  @media (max-width: 767px) {
-    &__grid { grid-template-columns: 1fr; }
-  }
-}
-```
+- `<Floor>` 组件 — 楼层容器（`por-section` / `por-container`）自动处理容器宽度和内边距
+- `<Carousel>` 组件 — 轮播交互和布局
+- `por-btn-*` 按钮类 — 按钮尺寸和间距
+- `por-text-title-t*` / `por-text-body-t*` 文本类 — 字号和行高
+- `por-section-head` 标题区 — 标题排版
 
-**PC/移动端显示不同图片** — 两张图都渲染，CSS 控制显隐（不要根据屏幕宽度决定渲染哪张）：
+**只有组件自身的业务内容区域（Floor 的 children 部分）才需要按 Level 0-4 处理响应式。**
 
-```svelte
-<img class="icon icon--pc" src={item.icon} alt="" />
-<img class="icon icon--mb" src={item.iconMb || item.icon} alt="" />
-```
+###### Level 0: 纯 CSS 适配（零 DOM 开销）
 
-```less
-.component {
-  .icon--mb { display: none; }
-
-  @media (max-width: 767px) {
-    .icon--pc { display: none; }
-    .icon--mb { display: block; }
-  }
-}
-```
-
-**PC/移动端结构差异较大** — 两套结构都渲染，CSS 控制显隐：
-
-```svelte
-<div class="layout-pc"> ... PC 端结构 ... </div>
-<div class="layout-mb"> ... 移动端结构 ... </div>
-```
-
-```less
-.component {
-  .layout-mb { display: none; }
-
-  @media (max-width: 767px) {
-    .layout-pc { display: none; }
-    .layout-mb { display: block; }
-  }
-}
-```
-
-**Props 驱动的布局变化**（如 `layoutMb` 字段）— class 绑定 + 媒体查询组合：
-
-```svelte
-<div class="item" class:layout-updown={layoutMb === 'upDownLayout'}>
-  ...
-</div>
-```
-
-```less
-.component {
-  .item { display: flex; flex-direction: row; } // 默认横向
-
-  @media (max-width: 767px) {
-    .item.layout-updown { flex-direction: column; } // 移动端纵向
-  }
-}
-```
-
-##### CSS 变量传递动态 Props
-
-通过 `style` 属性将 Props 值传入 CSS 变量，让 CSS 自己处理响应式（不要用 JS 计算后写 inline style）：
-
-```svelte
-<div
-  class="component__grid"
-  style="--col-count: {cardColumn};"
->
-```
+**适用场景**：同一 HTML、同一数据，仅视觉属性不同——栅格列数、字号/间距、flex 方向等。
 
 ```less
 .component {
@@ -518,35 +461,175 @@ PC/移动端的所有差异——无论是**样式差异**还是**结构差异**
     gap: 24px;
   }
 
+  @media (max-width: 1024px) {
+    &__grid { grid-template-columns: repeat(2, 1fr); }
+  }
   @media (max-width: 767px) {
-    &__grid {
-      grid-template-columns: 1fr; // 移动端固定单列，忽略 CSS 变量
-      gap: 12px;
-    }
+    &__grid { grid-template-columns: 1fr; gap: 12px; }
   }
 }
 ```
+
+Props 驱动的响应式也属于 Level 0——通过 CSS 变量注入，让 CSS 自己处理：
+
+```svelte
+<div class="component__grid" style="--col-count: {cardColumn};">
+```
+
+Props 驱动的移动端布局变体同属 Level 0：
+
+```svelte
+<div class="item" class:layout-mb-ud={layoutMb === 'upDownLayout'}>
+```
+
+```less
+@media (max-width: 767px) {
+  .item.layout-mb-ud { flex-direction: column; }
+}
+```
+
+###### Level 1: CSS 变量驱动的内容切换（零额外 DOM）
+
+**适用场景**：PC/移动端使用不同的 **可由 CSS 属性承载的值**，如背景图。无需额外 DOM 元素。
+
+```svelte
+<div
+  class="banner"
+  style="--bg-pc: url({bgImage}); --bg-mb: url({bgImageMb || bgImage});"
+/>
+```
+
+```less
+.banner {
+  background-image: var(--bg-pc);
+  @media (max-width: 767px) {
+    background-image: var(--bg-mb);
+  }
+}
+```
+
+###### Level 2: 配对元素切换（少量 DOM 冗余）
+
+**适用场景**：单个元素（图片、标题文字等）在 PC 和移动端 **内容不同**，且 CSS 属性无法承载（如 `<img src>` / 文本内容）。
+
+渲染两个元素，用 `.pc-only` / `.mb-only` 切换：
+
+```svelte
+<img src={item.icon} class="pc-only" alt="" />
+<img src={item.iconMb || item.icon} class="mb-only" alt="" />
+```
+
+```less
+.mb-only { display: none; }
+@media (max-width: 767px) {
+  .pc-only { display: none; }
+  .mb-only { display: block; }
+}
+```
+
+**数据约定**：需要 Level 2 的字段，在 `default.json` 中创建 `*Mb` 后缀字段（如 `iconMb`）。`types.ts` 中声明为可选字段，模板中用 `fieldMb || field` 做 fallback。
+
+###### Level 3: 区块级模板切换（中等 DOM 冗余）
+
+**适用场景**：一个区域的 HTML 结构在 PC 和移动端 **完全不同**（不只是样式差异），如卡片列表变轮播、侧边栏变底部抽屉。
+
+渲染两套 DOM，复用 `.pc-only` / `.mb-only` 切换：
+
+```svelte
+<div class="pc-only">
+  <div class="card-grid">...</div>
+</div>
+<div class="mb-only">
+  <Carousel>...</Carousel>
+</div>
+```
+
+**使用 Level 3 前必须确认**：
+1. CSS flex/grid 的方向/换行/排序确实无法实现目标布局？（否则降为 Level 0）
+2. 两套模板使用的是同一份数据（只是渲染方式不同）？
+3. 如果两套模板的数据也不同，是否应该拆成两个独立子组件？
+
+###### Level 4: 整层显隐（特殊场景，极少使用）
+
+> 这是一个罕见的特殊场景——在实际项目中，很少需要将整个组件在移动端完全隐藏。更常见的做法是对组件内的**某个元素**使用 Level 2/3 控制显隐。**仅当 CMS 配置明确要求整层移动端不展示时才使用。**
+
+**适用场景**：整个楼层/组件在移动端不展示。通过 `isShowMb` Trait 控制。
+
+```svelte
+<div class="my-component" class:my-component--mobile-hidden={visibilityProps.isShowMb === false}>
+  <Floor ...>...</Floor>
+</div>
+```
+
+```less
+@media (max-width: 767px) {
+  .my-component--mobile-hidden { display: none; }
+}
+```
+
+###### Level 选择决策流程
+
+```
+该元素是否使用了 PortalUI 组件/类名？
+├── 是 → 无需处理，PortalUI 自带适配
+└── 否 → 差异是否涉及不同的数据内容？
+    ├── 否 → 仅视觉属性变化？
+    │   ├── 是 → Level 0 (纯 CSS)
+    │   └── 否 → CSS flex/grid 可解决重排？
+    │       ├── 是 → Level 0
+    │       └── 否 → Level 3 (区块切换)
+    └── 是 → 数据差异可用 CSS 属性表达？(如 background-image)
+        ├── 是 → Level 1 (CSS 变量)
+        └── 否 → 差异范围？
+            ├── 单个元素 → Level 2 (配对切换)
+            └── 整个区块 → Level 3 (区块切换)
+
+特殊：CMS 要求整个楼层在移动端不展示？→ Level 4 (isShowMb，极少使用)
+```
+
+##### 断点统一规范
+
+**统一用 `max-width: 767px` 作为移动端断点，不用 768px**。
+
+| 断点 | 媒体查询 | 适用场景 |
+|------|---------|---------|
+| 默认 | 无 | PC 最宽态 |
+| 小屏 PC | `@media (max-width: 1280px)` | 可选，按 spec 需要 |
+| 平板 | `@media (max-width: 1024px)` | 栅格降列等 |
+| 移动端 | `@media (max-width: 767px)` | **统一移动端断点** |
+| 小屏手机 | `@media (max-width: 480px)` | 可选，按 spec 需要 |
+
+断点 **从大到小排列**，集中写在组件根块末尾。
+
+##### 类名统一规范
+
+| 类名 | 用途 | 适用 Level |
+|------|------|-----------|
+| `.pc-only` | PC 端显示，移动端隐藏 | Level 2, 3 |
+| `.mb-only` | 移动端显示，PC 端隐藏 | Level 2, 3 |
+| `.layout-mb-*` | Props 驱动的移动端布局变体 | Level 0 |
+
+Level 4 的整层显隐类名 **不作统一规定**，由各组件自行命名（如 `mobile-hidden`、`<组件名>--hidden-mb` 等）。
+
+> 废弃 `icon--pc` / `icon--mb` 双划线命名（与 BEM modifier 语义冲突），统一使用 `.pc-only` / `.mb-only`。
 
 ##### 从设计稿 HTML 提取视觉意图（映射到 PortalUI Token）
 
 分析设计稿 HTML 时，**不要直接翻译 tailwind 类名到 CSS**，而是理解其背后的视觉意图，**优先映射到 PortalUI token 或 class**，然后用 Less 重新实现：
 
 - `grid grid-cols-3` → 理解为"三列等宽网格"，用 `grid-template-columns: repeat(3, 1fr)` 实现
-- `text-xl font-bold text-gray-900` → 理解为"大标题，粗体，主色文字"，映射到 `font-size: 20px; font-weight: var(--por-base-font-weight-bold); color: var(--por-color-text-primary)`，或直接使用 `por-text-title-t8` class
+- `text-xl font-bold text-gray-900` → 映射到 `por-text-title-t8` class 或 `font-weight: var(--por-base-font-weight-bold); color: var(--por-color-text-primary)`
 - `text-sm text-gray-500` → 映射到 `por-text-body-t3` + `color: var(--por-color-text-secondary)`
-- `hidden md:block` → 理解为"移动端隐藏，PC 端显示"，用 CSS media query 控制 `display`
-- `p-4 md:p-6` → 理解为"移动端 16px 内边距，PC 端 24px"，用 `var(--primitive-space-4)` / `var(--primitive-space-6)`
+- `hidden md:block` → Level 2/3："移动端隐藏，PC 端显示"，用 `.pc-only` 类
+- `p-4 md:p-6` → Level 0："移动端 16px，PC 端 24px"，用 `var(--primitive-space-4)` / `var(--primitive-space-6)`
 
-目标是写出**使用 PortalUI token** 的清晰、可维护的 Less 代码，而不是机械翻译或使用硬编码色值。
+##### 样式示例
 
-##### Less 样式示例
+> `<style lang="less">` 或 `<style>` 均可。简单组件可用纯 CSS，复杂组件建议用 Less 嵌套。
 
 ```svelte
 <style lang="less">
   .pep-your-component {
-    // 由于楼层容器已由 <Floor> 组件提供 por-section + por-container，
-    // 这里只写内容区自身的样式
-
     &__grid {
       display: grid;
       grid-template-columns: repeat(var(--col-count, 3), 1fr);
@@ -564,31 +647,35 @@ PC/移动端的所有差异——无论是**样式差异**还是**结构差异**
       line-height: 22px;
     }
 
-    &__link {
-      color: var(--por-color-text-button);
-    }
+    // Level 2: 配对元素切换
+    .mb-only { display: none; }
 
-    // 移动端隐藏（Trait 控制）
-    &.hide-mb { display: none; }
-
-    // 断点从大到小集中声明，不分散在每个元素内部
+    // 断点从大到小集中声明
     @media (max-width: 1024px) {
-      &__grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
+      &__grid { grid-template-columns: repeat(2, 1fr); }
     }
 
     @media (max-width: 767px) {
-      &__grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-      }
+      &__grid { grid-template-columns: 1fr; gap: 12px; }
+
+      // Level 2: 配对元素切换
+      .pc-only { display: none; }
+      .mb-only { display: block; }
     }
+  }
+
+  // Level 4: Trait 驱动整层隐藏（类名由组件自行命名）
+  @media (max-width: 767px) {
+    .my-component.mobile-hidden { display: none; }
   }
 </style>
 ```
 
-> 这只是一个结构示例。注意：楼层容器布局（`por-section`、`por-container`、间距合并等）已由 `<Floor>` 组件封装，组件样式只需关注内容区自身。颜色、字重等优先使用 PortalUI token。
+> **关键提醒**：
+> - Level 4 的隐藏类名由组件自行决定，在移动端媒体查询中 `display: none`
+> - `merge-top` / `merge-bottom` 由 `<Floor>` 的 props 处理，不手写 CSS
+> - 楼层容器（`por-section`、`por-container`）已由 `<Floor>` 封装，PortalUI 自带适配
+> - 只对 Floor children 内的业务 DOM 编写响应式规则
 
 ---
 
@@ -642,19 +729,21 @@ PC/移动端的所有差异——无论是**样式差异**还是**结构差异**
 #### 5.1 组件导入参考
 
 ```typescript
-// 楼层容器（封装了 por-section / por-container / por-section-head 等 PortalUI 布局类）
+// 楼层容器（封装 por-section + 标题区 + 间距合并，替代原 FloorHeader）
 import Floor from "@pep/shared/ui/floor/Floor.svelte";
 
-// 轮播（封装了 por-carousel 系列 PortalUI 类）
+// 轮播（封装 por-carousel 系列 PortalUI 类）
 import Carousel from "@pep/shared/ui/carousel/Carousel.svelte";
 
 // Trait 分拣工具
 import { pickTrait } from "@pep/shared/ui/traits";
 ```
 
-#### 5.2 Floor 组件使用（取代手写 por-section）
+> ⚠️ **FloorHeader 和 FloorTabs 已废弃**，不要导入。标题区通过 Floor 的 props 渲染，Tab 切换用 Svelte 状态自行实现。
 
-**所有楼层组件必须使用 `Floor` 作为根容器**，不要手写 `por-section`、`por-container` 等类名：
+#### 5.2 Floor 组件使用（唯一楼层容器，替代 FloorHeader + 手写 por-section）
+
+**所有楼层组件必须使用 `Floor` 作为根容器**。Floor 内部自动生成 `por-section` + `por-container` + 标题区（`por-section-head`），不要手动编写这些类名。
 
 ```svelte
 const headerProps = $derived(pickTrait(props, "header"));
@@ -668,9 +757,22 @@ const spacingProps = $derived(pickTrait(props, "spacing"));
   mergeTopSpacing={spacingProps.isMergeTopSpacing}
   mergeBottomSpacing={spacingProps.isMergeBottomSpacing}
 >
-  <!-- 楼层内容放在 Floor 内部 -->
+  <!-- 楼层内容放在 Floor 内部的 por-section-body 中 -->
 </Floor>
 ```
+
+Floor Props 完整列表：
+
+| Prop | 类型 | 说明 |
+|------|------|------|
+| `bg` | `'white' \| 'light' \| 'grey' \| 'dark' \| 'transBlack' \| 'transWhite'` | 楼层背景色 |
+| `theme` | `'dark' \| 'light'` | 标题区颜色主题 |
+| `title` | `string` | 主标题（支持 HTML） |
+| `subtitle` | `string` | 副标题（支持 HTML） |
+| `titleLink` | `{ text: string; href?: string }` | "查看更多"链接 |
+| `titleLeft` | `boolean` | 标题居左 |
+| `mergeTopSpacing` | `boolean` | 合并上方间距 |
+| `mergeBottomSpacing` | `boolean` | 合并下方间距 |
 
 #### 5.3 Carousel 使用方式
 
@@ -767,10 +869,19 @@ const spacingProps = $derived(pickTrait(props, "spacing"));
   □ 字重使用 PortalUI token（--por-base-font-weight-bold 等）
   □ 文本排版优先使用 PortalUI class（por-text-title-t7、por-text-body-t3 等）
   □ 间距使用项目 CSS 变量（var(--primitive-space-*)）
-  □ merge-top / merge-bottom / hide-mb 响应 Trait
+  □ 若 spec 要求整层隐藏：isShowMb === false 时，移动端通过 CSS 隐藏（Level 4，罕见）
+  □ merge-top / merge-bottom 由 Floor 的 mergeTopSpacing / mergeBottomSpacing 处理（不手写 CSS）
+
+响应式分级合规：
+  □ PortalUI 组件/类名的部分未重复编写响应式规则（PortalUI 自带适配）
+  □ 每处 PC/移动端差异都选择了最低可行 Level（0→1→2→3→4）
+  □ 移动端断点统一使用 767px（不用 768px）
+  □ 设备切换类名使用 .pc-only / .mb-only（不用 --pc / --mb 双划线）
+  □ *Mb 后缀数据字段仅在 Level 2 场景使用，模板中有 fieldMb || field fallback
+  □ Level 3 区块切换前已确认 CSS flex/grid 无法实现
 
 PortalUI 合规：
-  □ 楼层容器使用 <Floor> 组件，不手写 por-section / por-container
+  □ 楼层容器使用 <Floor> 组件，不手写 por-section / por-container / FloorHeader
   □ 轮播使用 <Carousel> 组件，幻灯片加 por-carousel-slide class
   □ 按钮使用 PortalUI 按钮类（por-btn-primary / por-btn-secondary / por-btn-dark）
   □ 图标使用 PortalUI 图标类（por-icon por-icon-xxx）
@@ -800,7 +911,7 @@ SSR 水合安全：
 - **基础渲染类 AC**：对应数据字段在模板中是否有渲染逻辑？空值情况是否处理？
 - **交互类 AC**：对应的事件处理函数是否实现？状态变化是否正确驱动视图？
 - **响应式类 AC**：Less 中是否有 `@media (max-width: 767px)` 对应的样式规则？
-- **移动端隐藏 AC**：`class:hide-mb={visibilityProps.isShowMb === false}` 是否存在？
+- **移动端隐藏 AC**（仅当 spec 要求整层隐藏时检查）：`isShowMb === false` 时是否有对应的 CSS 隐藏逻辑？
 - **边界情况 AC**：空数组/缺字段时的条件判断是否有兜底处理？
 
 向用户展示核查报告：
@@ -833,7 +944,7 @@ SSR 水合安全：
 快速验证：
   1. 运行 `npm run dev` 查看效果
   2. 检查控制台是否有类型报错
-  3. 调整浏览器宽度验证 768px 断点
+  3. 调整浏览器宽度验证 767px 断点
   4. 无水合警告（SSR 结构与客户端一致）
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -934,9 +1045,32 @@ var(--container-max-width)  // 1200px（Floor 组件内部已处理，无需手�
 
 ---
 
+## 参考实现
+
+> **`pep-common-card-v2`** 是当前项目中最具代表性的标杆组件，遇到不确定的实现模式时，优先参考它。
+
+在生成代码前，建议读取以下文件作为模式参考：
+
+| 文件 | 用途 |
+|------|------|
+| `components/pep-common-card-v2/src/index.svelte` | Floor 使用模式、Trait 分拣、元素级显隐 |
+| `components/pep-common-card-v2/src/types.ts` | UseTraits 类型组合、嵌套数据结构 |
+| `components/pep-common-card-v2/mocks/props/default.json` | 标准 mock 数据格式 |
+| `components/pep-common-card-v2/schema.json` | CMS schema 格式参考 |
+
+**该组件展示的关键模式**：
+
+1. **Floor 模式**：`<Floor ...>` 作为楼层根容器 → 内容
+2. **Trait 分拣**：`pickTrait(props, "header")` / `"spacing"` 分别传给 Floor props（visibility 是该组件的特例，大部分组件不需要）
+3. **Floor 外内容**：`<CarouselSection />` 放在 Floor 外部，不受楼层容器约束
+4. **简洁的 style 块**：仅必要的布局样式和元素级响应式规则，其余样式委托给子组件
+
+---
+
 ## 注意事项
 
 1. **设计稿 HTML 只是视觉参考**：从中提取颜色值、字号、间距等视觉意图，根据 spec.md 重新设计 HTML 结构，不照搬原始嵌套
 2. **保守使用 $effect**：大多数场景用 `$derived` 即可，`$effect` 只用于真正的副作用（定时器、事件监听、第三方 JS 库初始化）
 3. **不要写无用注释**：不要写"// 导入组件"、"// 定义 Props"这类纯描述性注释
 4. **BEM 命名不要太深**：最多三层（`block__element--modifier`），超过则考虑拆子组件
+5. **FloorHeader / FloorTabs 已废弃**：不要导入或引用，标题区通过 Floor props 渲染，Tab 切换自行实现

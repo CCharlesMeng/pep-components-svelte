@@ -62,15 +62,20 @@ description: 基于组件 spec.md 生成 mock/props/default.json 数据和 src/t
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📦 数据结构方案
 
-顶层字段（来自 Traits + 业务 Props）：
+顶层字段（来自 Traits + CMS 数据层 + 业务 Props）：
   • _id: string — 实例唯一 ID（固定格式：<组件名>_<时间戳>）
+  ─ Trait 字段（Svelte pickTrait 提取）：
   • title: string — 楼层标题（HTML 富文本格式）
   • subtitle: string — 副标题（可选）
   • more: { href, text } — 查看更多链接（可选）
-  • theme: 'white' | 'grey' — 背景主题
   • isMergeTopSpacing: boolean — 合并上间距
   • isMergeBottomSpacing: boolean — 合并下间距
-  • isShowMb: boolean — 移动端是否显示
+  • isShowMb: boolean — 移动端是否显示（极少使用，仅当 CMS 要求整层隐藏时才需要）
+  ─ CMS 数据层字段（schema/default 必须有，但不在 FloorTraits 中）：
+  • titleMb: string — 移动端楼层标题
+  • subtitleMb: string — 移动端副标题
+  ─ 业务字段：
+  • theme: 'white' | 'grey' — 背景主题
   • [组件特有字段...]
 
 列表/嵌套字段：
@@ -103,10 +108,24 @@ description: 基于组件 spec.md 生成 mock/props/default.json 数据和 src/t
 2. **字段冗余**：当前规划了某个字段，但 spec.md 中没有任何功能需要它
    - 这类字段应该删除，避免污染数据结构
 
-3. **移动端专属字段缺失**：组件在移动端有不同的展示内容（如移动端专用图片、移动端专用标题），需要对应的 `*Mb` 后缀字段
-   - 例：PC 端用 `icon`，移动端用 `iconMb`（不同图片资源）
-   - 例：PC 端用 `title`，移动端用 `titleMb`（不同文案或 Trait 已覆盖）
-   - 注意区分：如果 PC/移动端只是样式不同（同样的内容），不需要单独字段，CSS 控制即可
+3. **移动端专属字段审查（基于响应式 Level 判断）**：
+
+   只有 spec.md 中标注为 **Level 2（配对元素切换）** 的差异点才需要 `*Mb` 后缀字段。其他 Level 不需要：
+
+   | spec 中的响应式 Level | 是否需要 `*Mb` 字段 | 原因 |
+   |-----------------------|-------------------|------|
+   | PortalUI 豁免 | 否 | PortalUI 自带适配 |
+   | Level 0 (纯 CSS) | 否 | 同一数据，仅样式不同 |
+   | Level 1 (CSS 变量) | 是（如 `bgImageMb`） | 不同值注入 CSS 变量 |
+   | Level 2 (配对切换) | 是（如 `iconMb`、`titleMb`） | 渲染两个元素，内容不同 |
+   | Level 3 (区块切换) | 视情况 | 如果两套模板用同一数据则不需要 |
+   | Level 4 (大范围显隐) | 否 | 用 .pc-only/.mb-only 控制对应区域（极少出现） |
+
+   - 例（Level 2）：PC 端用 `icon`，移动端用 `iconMb`（不同图片资源）→ 需要 `iconMb` 字段
+   - 例（Level 0）：PC/移动端只是栅格列数不同 → 不需要任何 `*Mb` 字段
+   - 例（Level 1）：PC/移动端背景图不同 → 需要 `bgImageMb` 字段
+
+   > **常驻 CMS 字段**：`titleMb` 和 `subtitleMb` 是 CMS 平台级字段，无论组件是否有 Level 2 标题差异，`default.json` 和 `schema.json` 中都应包含。
 
 向用户展示审查结论：
 
@@ -188,37 +207,39 @@ export interface [NestedType] {
 
 **default.json 规范**：
 
-```json
+下方示意用 `//` 注释说明字段分类，**实际生成的 JSON 不能包含注释**：
+
+```jsonc
 {
   "_id": "<component-name>_<timestamp>",
-  // Trait 字段（标题区 → 传递给 Floor 组件）
+
+  // ── Trait 字段（Svelte pickTrait 提取，传递给 Floor 组件）──
   "title": "<p>楼层标题文字</p>",
-  "titleMb": "<p>楼层标题文字（移动端，可与PC相同）</p>",
   "subtitle": "",
-  "subtitleMb": "",
-  "more": {
-    "href": "",
-    "text": ""
-  },
-  // 显示控制
-  "isShowMb": true,
+  "more": { "href": "", "text": "" },
   "isMergeTopSpacing": false,
   "isMergeBottomSpacing": true,
-  // 主题（映射到 Floor 的 bg prop → PortalUI por-section[data-bg]）
+  // "isShowMb": true,  // 极少使用，仅当 CMS 要求整层隐藏时才加此字段
+
+  // ── CMS 数据层字段（不在 FloorTraits 中，但 schema/default 必须有）──
+  "titleMb": "<p>楼层标题文字（移动端，可与PC相同）</p>",
+  "subtitleMb": "",
+
+  // ── 主题（映射到 Floor 的 bg prop → PortalUI por-section[data-bg]）──
   // 可选值: "white" | "light" | "grey" | "dark"
   "theme": "white",
-  // 业务字段
+
+  // ── 业务字段 ──
   "[propName]": "[value]",
-  // 按钮类型必须使用 PortalUI 类名
-  // 示例: "btnType": "por-btn-primary" | "por-btn-secondary" | "por-btn-dark"
-  // 列表数据（含 3-6 条真实有意义的示例数据）
+
+  // ── 列表数据（含 3-6 条真实有意义的示例数据）──
   "[listField]": [
-    {
-      "[field]": "[真实示例值，非占位符]"
-    }
+    { "[field]": "[真实示例值，非占位符]" }
   ]
 }
 ```
+
+> ⚠️ **实际输出的 `default.json` 必须是合法 JSON，不能包含 `//` 注释。** 上方仅为说明。
 
 **数据质量要求**：
 - 标题文字：使用真实语义文字，如 "精选云产品推荐" 而非 "标题文字"
@@ -308,26 +329,35 @@ export interface [NestedType] {
 
 ## 类型系统参考
 
-### UseTraits 通用 Trait 字段
+### UseTraits 通用 Trait 字段（Svelte 组件 pickTrait 提取）
 
 ```typescript
-// header trait 字段
+// header trait 字段（pickTrait(props, "header") 提取以下字段）
 title?: string;        // 楼层标题（支持富文本 <p> 标签）
-titleMb?: string;      // 移动端标题（可与 title 不同）
 subtitle?: string;     // 副标题
-subtitleMb?: string;   // 移动端副标题
 more?: {
   href?: string;       // "查看更多"链接
   text?: string;       // "查看更多"文字
 };
 
-// spacing trait 字段
+// spacing trait 字段（pickTrait(props, "spacing") 提取以下字段）
 isMergeTopSpacing?: boolean;    // true = 移除上方间距
 isMergeBottomSpacing?: boolean; // true = 移除下方间距
 
-// visibility trait 字段
-isShowMb?: boolean;  // false = 在移动端隐藏整个楼层
+// visibility trait 字段（极少使用，仅当 CMS 要求整层隐藏时才需要）
+// isShowMb?: boolean;  // false = 在移动端隐藏整个楼层
 ```
+
+### CMS 数据层字段（存在于 schema.json / default.json，但不在 FloorTraits 中）
+
+以下字段由 CMS 渲染平台消费，Svelte 组件的 `pickTrait` 不会提取它们，但 **default.json 和 schema.json 中必须包含**：
+
+```typescript
+titleMb?: string;      // 移动端楼层标题（CMS 平台使用，可与 title 不同）
+subtitleMb?: string;   // 移动端楼层副标题（CMS 平台使用）
+```
+
+> ⚠️ 注意：`titleMb`/`subtitleMb` 不在 `types.ts` 的 `UseTraits` 中定义，但在 `default.json` 中需要填充、在 `schema.json` 中需要声明。
 
 ### 常见业务字段命名惯例
 

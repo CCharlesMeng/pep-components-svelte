@@ -53,11 +53,17 @@ description: 从设计稿转换的HTML中分析组件需求，生成详细的组
   - 链接字段（跳转地址）
   - 状态字段（是否显示、激活态、禁用态等）
 
-响应式层面（tailwind 断点转换参考）：
-  - sm: (≥640px) / md: (≥768px) → 移动端边界（本项目以 768px 为 PC/移动端分界）
+响应式层面（tailwind 断点转换 + 响应式 Level 标注）：
+  - sm: (≥640px) / md: (≥768px) → 移动端边界（本项目统一以 **767px** 为 PC/移动端分界）
   - lg: (≥1024px) / xl: (≥1280px) → PC 端内部差异
   - 前缀无断点 → 移动端基础样式
-  - 注意：同一元素在不同断点下可能完全不同（如移动端隐藏、PC 端展示）
+  - 对每处 PC/移动端差异，标注其**响应式 Level**：
+    - **PortalUI 豁免**：使用 PortalUI 组件/类名的部分无需处理（如 Floor、por-btn-*、por-text-*）
+    - **Level 0**：仅样式不同（字号/间距/列数/flex方向）→ 纯 CSS
+    - **Level 1**：背景图等可用 CSS 属性表达的内容差异 → CSS 变量 + 媒体查询
+    - **Level 2**：单个元素内容不同（图片/文字）→ 配对元素 + .pc-only/.mb-only，需 *Mb 数据字段
+    - **Level 3**：整个区块结构不同 → 两套 DOM + .pc-only/.mb-only
+    - **Level 4**：整个楼层/某大区域在某端不展示 → 对应元素加 .pc-only/.mb-only（极少需要整层级别）
 
 交互层面：
   - 点击/悬浮响应
@@ -66,9 +72,9 @@ description: 从设计稿转换的HTML中分析组件需求，生成详细的组
   - 倒计时等动态效果
 
 PortalUI 组件/Token 映射层面（必须识别）：
-  - 楼层容器 → Floor 组件（shared/ui），自动提供 por-section 布局
+  -   楼层容器 → Floor 组件（shared/ui），封装 por-section + 标题区 + 间距合并
   - 轮播 → Carousel 组件（shared/ui），使用 por-carousel-slide class
-  - Tab 切换 → Svelte 状态 + 自定义实现
+  - Tab 切换 → Svelte 状态 + 自定义实现（FloorTabs 已废弃）
   - 按钮样式 → por-btn-primary / por-btn-secondary / por-btn-dark
   - 文本排版 → por-text-title-t* / por-text-body-t* class
   - 图标 → por-icon 系列
@@ -94,12 +100,16 @@ PortalUI 组件/Token 映射层面（必须识别）：
   🔴 需确认：[某区域用途不明]
   🟡 推断：[这个区域可能是"查看更多"入口]
 
-响应式：
-  PC：[描述 PC 端布局]
-  移动端：[描述移动端布局]
+响应式差异（按 Level 分类）：
+  PortalUI 豁免：[列举使用 PortalUI 组件/类名的部分，无需额外处理]
+  L0 纯 CSS：[列举仅样式不同的差异，如栅格列数、间距]
+  L1 CSS 变量：[列举背景图等可用 CSS 属性表达的差异]
+  L2 配对切换：[列举单个元素内容不同的差异，如 icon/iconMb]
+  L3 区块切换：[列举结构完全不同的差异]
+  L4 大范围显隐：[列举在某端完全不展示的大区域，极少出现]
 
 PortalUI 组件/Token 映射：
-  shared/ui 组件：[Floor（必须）、Carousel（如有轮播）]
+  shared/ui 组件：[Floor（必须，封装标题区+容器+间距）、Carousel（如有轮播）]
   PortalUI 样式类：[por-btn-primary、por-text-title-t7 等]
   PortalUI 颜色 token：[--por-color-text-primary 等]
 
@@ -191,13 +201,13 @@ PortalUI 组件/Token 映射：
 
 ## 3. 界面结构
 
-### 3.1 PC 端（≥768px）
+### 3.1 PC 端（≥768px，断点以 767px 为界）
 
 [描述 PC 端的整体布局，使用 ASCII 或文字说明区域划分]
 
 ```
 +------------------------------------------+
-| 楼层标题区（FloorHeader）                  |
+| Floor 标题区（title / subtitle / more）    |
 +------------------------------------------+
 | Tab 区（如有）                             |
 +------------------------------------------+
@@ -208,11 +218,15 @@ PortalUI 组件/Token 映射：
 +------------------------------------------+
 | 底部操作区（如有）                         |
 +------------------------------------------+
+| （Floor 外部：可选的独立区域，如轮播）      |
++------------------------------------------+
 ```
+
+> 标题区由 `<Floor>` 组件内部渲染（通过 title / subtitle / titleLink props），不再使用独立的 FloorHeader 组件。部分内容（如独立轮播区）可放在 Floor 外部。
 
 [补充说明：最大宽度、内边距、卡片间距等]
 
-### 3.2 移动端（<768px）
+### 3.2 移动端（≤767px）
 
 [描述移动端布局差异]
 
@@ -234,7 +248,7 @@ PortalUI 组件/Token 映射：
 |-------|------|
 | `header` | 楼层标题：title、subtitle、more 链接等 |
 | `spacing` | 上下间距合并：isMergeTopSpacing、isMergeBottomSpacing |
-| `visibility` | 显示控制：isShowMb（是否在移动端显示）|
+| `visibility` | 显示控制：isShowMb（极少使用，仅当 CMS 要求整层隐藏时才需要）|
 
 ### 4.2 业务 Props
 
@@ -248,13 +262,32 @@ PortalUI 组件/Token 映射：
 
 ## 5. 响应式规格
 
-| 断点 | 范围 | 变化说明 |
-|------|------|---------|
-| PC 端 | ≥768px | [描述] |
-| 移动端 | <768px | [描述] |
+### 5.1 断点定义
 
-**关键响应式行为**：
-- [具体说明]
+| 断点 | 媒体查询 | 变化说明 |
+|------|---------|---------|
+| PC 默认 | 无 | [描述] |
+| 平板 | `max-width: 1024px` | [描述，如栅格降列，可选] |
+| 移动端 | `max-width: 767px` | [描述] |
+
+### 5.2 响应式差异清单
+
+> 逐项列出 PC 与移动端的差异，并标注响应式 Level（参见 pep-impl 响应式分级策略）。
+> PortalUI 组件/类名（Floor、por-btn-\*、por-text-\*等）自带适配，无需列出。
+
+| 差异点 | PC 端表现 | 移动端表现 | Level | 说明 |
+|--------|----------|-----------|-------|------|
+| [示例] 卡片栅格列数 | 3 列 | 1 列 | **L0** | 纯 CSS grid 适配 |
+| [示例] 卡片图标 | `icon` 字段 | `iconMb` 字段（不同尺寸） | **L2** | 需 `*Mb` 数据字段 |
+| [示例] 内容区结构 | 卡片网格 | 轮播 | **L3** | 两套 DOM 切换 |
+| [示例] 某大区域显隐 | 显示 | 不显示 | **L4** | 对应元素 .pc-only（极少出现） |
+
+**Level 参考**：
+- **L0**: 纯 CSS 适配（样式/布局属性变化）
+- **L1**: CSS 变量驱动（background-image 等）
+- **L2**: 配对元素切换（.pc-only / .mb-only），需 `*Mb` 数据字段
+- **L3**: 区块级 DOM 切换（结构完全不同）
+- **L4**: 大范围显隐（.pc-only / .mb-only 控制大区域，极少出现）
 
 ---
 
@@ -315,7 +348,7 @@ PortalUI 文本 class 对照表：
 
 | 组件 | 是否使用 | 用途 |
 |------|---------|------|
-| `Floor`（楼层容器） | ✅ 必须 | 提供 por-section 布局、标题区、间距合并 |
+| `Floor`（楼层容器） | ✅ 必须 | 封装 por-section 布局 + 标题区（title/subtitle/titleLink）+ 间距合并，替代原 FloorHeader |
 | `Carousel`（轮播） | [✅/⬜] | [用途说明] |
 
 #### 7.4.2 PortalUI 纯样式类（直接在 HTML 中使用）
@@ -384,7 +417,7 @@ PortalUI 文本 class 对照表：
 | 核心功能 | spec 中每个功能点至少一条 AC |
 | 交互行为 | spec 中每个交互至少一条 AC（Tab 切换、展开/收起等）|
 | 响应式 | PC 端布局 + 移动端（≤767px）布局各一条 |
-| 移动端隐藏 | `isShowMb=false` 时整体不渲染 |
+| 移动端隐藏（如有 L4 需求） | 对应区域在移动端不展示 |
 | 边界情况 | 空数据、缺字段、超长文本等，spec 列出的每种情况一条 |
 
 **acceptance.md 模板**：

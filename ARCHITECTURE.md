@@ -202,9 +202,16 @@ export type YourComponentProps = CardBusinessProps & UseTraits<'header' | 'spaci
   const { cardType } = props;
 </script>
 
-<div class:merge-top={spacingProps.isMergeTopSpacing}>
-  <FloorHeader {...headerProps} />
-  <CardGrid type={cardType} />
+<div class:hide-mb={visibilityProps.isShowMb === false}>
+  <Floor
+    bg="white"
+    title={headerProps.title}
+    subtitle={headerProps.subtitle}
+    mergeTopSpacing={spacingProps.isMergeTopSpacing}
+    mergeBottomSpacing={spacingProps.isMergeBottomSpacing}
+  >
+    <CardGrid type={cardType} />
+  </Floor>
 </div>
 ```
 
