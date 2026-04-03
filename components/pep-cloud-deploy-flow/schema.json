@@ -350,6 +350,9 @@
       "title": "部署引导页配置",
       "description": "用户点击「开始部署」前看到的引导页内容。云产品快捷入口请在「快捷入口配置 shortcuts.deployPage」中统一配置",
       "type": "object",
+      "ui:options": {
+        "hidden": "child-component"
+      },
       "required": [
         "title",
         "notice",

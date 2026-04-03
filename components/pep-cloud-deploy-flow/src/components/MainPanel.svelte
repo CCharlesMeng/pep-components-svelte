@@ -33,6 +33,9 @@
 <main
   class="pep-cloud-deploy-flow-main"
   bi_parent_name="MainPanel"
+  data-mod-id="mainContent"
+  data-mode-name="child-component"
+  data-partial-refresh="false"
   style={backgroundImage
     ? `background-image: url('${backgroundImage}'); background-size: cover; background-position: center;`
     : undefined}
