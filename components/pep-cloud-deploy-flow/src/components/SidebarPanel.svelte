@@ -339,9 +339,6 @@
   class="pep-cloud-deploy-flow-sidebar"
   class:is-floating={isFloating}
   bi_parent_name="SidebarPanel"
-  data-mod-id="sidebar"
-  data-mode-name="child-component"
-  data-partial-refresh="false"
 >
   <div class="pep-cloud-deploy-flow-sidebar__header">
     <div class="pep-cloud-deploy-flow-sidebar__tabs">

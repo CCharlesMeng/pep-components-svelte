@@ -83,7 +83,10 @@
       </DeployFlowButton>
     </section>
 
-    <label class="pep-cloud-deploy-flow-main__agreement-row" bi_name="MainPanelAgreementCheckbox">
+    <label
+      class="pep-cloud-deploy-flow-main__agreement-row"
+      bi_name="MainPanelAgreementCheckbox"
+    >
       <input type="checkbox" bind:checked={isAgreementChecked} />
       <span class="pep-cloud-deploy-flow-main__agreement rich-text">
         {@html mainContent.agreement.contentHtml}

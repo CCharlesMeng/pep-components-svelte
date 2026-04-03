@@ -189,9 +189,6 @@
       "title": "侧边栏配置",
       "description": "侧边栏的标签页、步骤内容和底部翻页按钮。图标和文案配置请在「主题配置 theme」中统一管理",
       "type": "object",
-      "ui:options": {
-        "hidden": "child-component"
-      },
       "required": ["tabs", "footer"],
       "properties": {
         "tabs": {
