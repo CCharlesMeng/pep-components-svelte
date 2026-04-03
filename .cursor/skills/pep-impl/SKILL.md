@@ -424,23 +424,15 @@ Portal-UI Token 使用：
 
 ## 参考实现
 
-> **`pep-common-card-v2`** 是当前项目中最具代表性的标杆组件，遇到不确定的实现模式时，优先参考它。
+> **`pep-common-card-v2`** 是最具代表性的标杆组件，遇到不确定的实现模式时，优先参考它。
+> 精简后的源码位于 `examples/pep-common-card-v2/`，可直接读取。
 
-在生成代码前，建议读取以下文件作为模式参考：
+在生成代码前，建议读取以下示例文件作为模式参考：
 
-| 文件 | 用途 |
-|------|------|
-| `components/pep-common-card-v2/src/index.svelte` | Floor 使用模式、Trait 分拣、元素级显隐 |
-| `components/pep-common-card-v2/src/types.ts` | UseTraits 类型组合、嵌套数据结构 |
-| `components/pep-common-card-v2/mocks/props/default.json` | 标准 mock 数据格式 |
-| `components/pep-common-card-v2/schema.json` | CMS schema 格式参考 |
-
-**该组件展示的关键模式**：
-
-1. **Floor 模式**：`<Floor ...>` 作为楼层根容器 → 内容
-2. **Trait 分拣**：`pickTrait(props, "header")` / `"spacing"` 分别传给 Floor props（visibility 是该组件的特例，大部分组件不需要）
-3. **Floor 外内容**：`<CarouselSection />` 放在 Floor 外部，不受楼层容器约束
-4. **简洁的 style 块**：仅必要的布局样式和元素级响应式规则，其余样式委托给子组件
+| 文件 | 展示的关键模式 |
+|------|--------------|
+| `examples/pep-common-card-v2/types.ts` | `UseTraits` 类型组合、`*Mb` 后缀字段约定 |
+| `examples/pep-common-card-v2/index.svelte` | Floor 根容器 + Trait 分拣 + CSS 变量驱动栅格 |
 
 ---
 

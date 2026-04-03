@@ -75,6 +75,47 @@ const spacingProps = $derived(pickTrait(props, "spacing"));
 
 ## Carousel 组件
 
+封装 PortalUI `por-carousel` 系列类名，提供 Svelte 5 声明式轮播。
+
+### Carousel Props 完整列表
+
+| Prop | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `transition` | `'slide' \| 'fade'` | `'slide'` | 过渡效果。`slide` 为水平滑动，`fade` 为淡入淡出 |
+| `initialSlide` | `number` | `0` | 初始显示的 slide 索引 |
+| `preview` | `number` | `1` | 同屏显示的 slide 数量。>1 时每个 slide 宽度自动计算为 `100% / preview` |
+| `speed` | `number` | `400` | 过渡动画时长（ms） |
+| `loop` | `boolean` | `false` | 是否循环播放。开启后首尾无缝衔接（内部通过克隆 slide 实现） |
+| `autoplay` | `boolean \| AutoplayOptions` | `false` | 自动播放。传 `true` 使用默认 5000ms 间隔；传对象可自定义间隔 |
+| `pagination` | `boolean` | `false` | 是否显示分页圆点 |
+| `navigation` | `boolean` | `false` | 是否显示前进/后退箭头按钮 |
+| `simulateTouch` | `boolean` | `false` | 是否允许鼠标拖拽切换（默认仅触屏可拖拽） |
+| `dark` | `boolean` | `false` | 深色模式（箭头、圆点配色反转） |
+| `class` | `string` | `''` | 额外 CSS class |
+
+#### AutoplayOptions
+
+当 `autoplay` 传对象时：
+
+| 字段 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `delay` | `number` | `5000` | 自动播放间隔（ms） |
+| `waitForTransition` | `boolean` | — | 是否等待过渡结束后再计时 |
+
+### 公开方法（通过 `bind:this` 调用）
+
+| 方法 | 签名 | 说明 |
+|------|------|------|
+| `prev()` | `() => void` | 切换到上一张 |
+| `next()` | `() => void` | 切换到下一张 |
+| `slideTo()` | `(index: number, dur?: number) => void` | 跳转到指定索引。`dur=0` 无动画跳转 |
+| `play()` | `() => void` | 启动自动播放 |
+| `pause()` | `() => void` | 暂停自动播放 |
+
+### 使用示例
+
+**基础用法**：
+
 ```svelte
 <Carousel loop autoplay pagination navigation>
   {#each items as item}
@@ -85,9 +126,55 @@ const spacingProps = $derived(pickTrait(props, "spacing"));
 </Carousel>
 ```
 
-### Carousel Props
+**自定义自动播放间隔**：
 
-`transition`（slide/fade）、`initialSlide`、`preview`（同屏数量）、`speed`、`loop`、`autoplay`、`pagination`、`navigation`、`simulateTouch`、`dark`
+```svelte
+<Carousel loop autoplay={{ delay: 3000 }} pagination>
+  {#each items as item}
+    <div class="por-carousel-slide">...</div>
+  {/each}
+</Carousel>
+```
+
+**多图同屏预览**：
+
+```svelte
+<Carousel preview={3} loop navigation pagination>
+  {#each items as item}
+    <div class="por-carousel-slide">...</div>
+  {/each}
+</Carousel>
+```
+
+**淡入淡出 + 慢速切换**：
+
+```svelte
+<Carousel transition="fade" speed={1200} loop autoplay pagination>
+  {#each items as item}
+    <div class="por-carousel-slide">...</div>
+  {/each}
+</Carousel>
+```
+
+**通过 ref 手动控制**：
+
+```svelte
+<script lang="ts">
+  import Carousel from "@pep/shared/ui/carousel/Carousel.svelte";
+  let carousel: Carousel;
+</script>
+
+<button onclick={() => carousel.prev()}>上一张</button>
+<button onclick={() => carousel.next()}>下一张</button>
+
+<Carousel bind:this={carousel} loop>
+  {#each items as item}
+    <div class="por-carousel-slide">...</div>
+  {/each}
+</Carousel>
+```
+
+> **注意**：每个幻灯片的根元素 **必须** 包含 `por-carousel-slide` class，否则组件无法识别和管理 slide。
 
 ---
 
