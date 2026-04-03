@@ -58,6 +58,9 @@
   let tabIdSeed = 0;
   let tabLimitWarningVisible = $state(false);
   let tabLimitWarningTimer: ReturnType<typeof setTimeout> | null = null;
+  let tabTitleOverflowMap = $state<Record<string, true>>({});
+  let tabTitleElements: Record<string, HTMLSpanElement> = {};
+  let tabTitleMeasureRafId = 0;
 
   const LEFT_ARROW_ICON =
     "https://res-static.hc-cdn.cn/cloudbu-site/intl/zh-cn/pep-component-svelte/pep-cloud-deploy-flow/browserIcon/leftArrowIcon.svg";
@@ -87,6 +90,68 @@
     const marginLeft = Number.parseFloat(styles.marginLeft || "0") || 0;
     const marginRight = Number.parseFloat(styles.marginRight || "0") || 0;
     return element.offsetWidth + marginLeft + marginRight;
+  }
+
+  function isTabTitleOverflowing(tabId: string): boolean {
+    return Boolean(tabTitleOverflowMap[tabId]);
+  }
+
+  function bindTabTitleElement(
+    tabId: string,
+    element: HTMLSpanElement | null,
+  ): void {
+    if (element) {
+      tabTitleElements[tabId] = element;
+      return;
+    }
+    delete tabTitleElements[tabId];
+    if (tabTitleOverflowMap[tabId]) {
+      const { [tabId]: _ignoredOverflow, ...restOverflowMap } = tabTitleOverflowMap;
+      tabTitleOverflowMap = restOverflowMap;
+    }
+  }
+
+  function tabTitleOverflowAction(node: HTMLSpanElement, tabId: string) {
+    bindTabTitleElement(tabId, node);
+    scheduleTabTitleOverflowMeasure();
+    return {
+      update(nextTabId: string) {
+        if (nextTabId === tabId) {
+          scheduleTabTitleOverflowMeasure();
+          return;
+        }
+        bindTabTitleElement(tabId, null);
+        tabId = nextTabId;
+        bindTabTitleElement(tabId, node);
+        scheduleTabTitleOverflowMeasure();
+      },
+      destroy() {
+        bindTabTitleElement(tabId, null);
+      },
+    };
+  }
+
+  function scheduleTabTitleOverflowMeasure(): void {
+    if (typeof window === "undefined") {
+      return;
+    }
+    if (tabTitleMeasureRafId) {
+      window.cancelAnimationFrame(tabTitleMeasureRafId);
+    }
+    tabTitleMeasureRafId = window.requestAnimationFrame(() => {
+      tabTitleMeasureRafId = 0;
+      const nextOverflowMap: Record<string, true> = {};
+      for (const tab of tabs) {
+        const tabTitleElement = tabTitleElements[tab.id];
+        if (!tabTitleElement) {
+          continue;
+        }
+        if (tabTitleElement.scrollWidth - tabTitleElement.clientWidth > 1) {
+          nextOverflowMap[tab.id] = true;
+        }
+      }
+      tabTitleOverflowMap = nextOverflowMap;
+    });
   }
 
   function scheduleTabLayoutRecompute(): void {
@@ -539,11 +604,19 @@
   $effect(() => {
     tabs.length;
     scheduleTabLayoutRecompute();
+    scheduleTabTitleOverflowMeasure();
   });
 
   $effect(() => {
     useTabScrollControls;
     scheduleTabLayoutRecompute();
+    scheduleTabTitleOverflowMeasure();
+  });
+
+  $effect(() => {
+    tabs;
+    computedTabWidth;
+    scheduleTabTitleOverflowMeasure();
   });
 
   $effect(() => {
@@ -604,6 +677,9 @@
       if (activeTabScrollRafId) {
         window.cancelAnimationFrame(activeTabScrollRafId);
       }
+      if (tabTitleMeasureRafId) {
+        window.cancelAnimationFrame(tabTitleMeasureRafId);
+      }
       window.removeEventListener("resize", scheduleTabLayoutRecompute);
       resizeObserver?.disconnect();
       resizeObserver = null;
@@ -618,6 +694,9 @@
     }
     if (activeTabScrollRafId && typeof window !== "undefined") {
       window.cancelAnimationFrame(activeTabScrollRafId);
+    }
+    if (tabTitleMeasureRafId && typeof window !== "undefined") {
+      window.cancelAnimationFrame(tabTitleMeasureRafId);
     }
     clearTabLimitWarningTimer();
   });
@@ -682,11 +761,13 @@
               }}
             >
               <Tooltip
-                content={tab.title}
+                content={isTabTitleOverflowing(tab.id) ? tab.title : ""}
                 placement="bottom"
                 positioning={{ offset: 16 }}
               >
-                <span class="pep-cloud-deploy-flow-browser__tab-title"
+                <span
+                  class="pep-cloud-deploy-flow-browser__tab-title"
+                  use:tabTitleOverflowAction={tab.id}
                   >{tab.title}</span
                 >
               </Tooltip>
