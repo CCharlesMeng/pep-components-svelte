@@ -19,7 +19,7 @@
   import DeployFlowButton from "./DeployFlowButton.svelte";
   import Tooltip from "./Tooltip.svelte";
   import StepStatusDot from "./StepStatusDot.svelte";
-  import { onCustomEvent } from "@pep/shared/utils/onCustomEvent";
+  import { onCustomEvent } from "@pep/shared";
   interface Props {
     sidebar: SidebarConfig;
     onOpenExternal?: (url: string, title: string) => void;

@@ -1,0 +1,1 @@
+export {onCustomEvent} from "./utils/onCustomEvent";

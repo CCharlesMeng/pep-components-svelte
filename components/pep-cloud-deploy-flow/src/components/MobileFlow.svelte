@@ -14,7 +14,7 @@
   import "../styles/markdown-content.css";
   import DeployFlowButton from "./DeployFlowButton.svelte";
   import StepStatusDot from "./StepStatusDot.svelte";
-  import { onCustomEvent } from "@pep/shared/utils/onCustomEvent";
+  import { onCustomEvent } from "@pep/shared";
 
   interface Props {
     mobile: ResolvedMobileConfig;
@@ -316,7 +316,6 @@
       clearCopyTipTimers();
     };
   });
-
 </script>
 
 <section class="pep-cloud-deploy-flow-mobile" bi_parent_name="MobileFlow">
@@ -341,7 +340,9 @@
         <span class="pep-cloud-deploy-flow-mobile__logo-separator">/</span>
       {/if}
       {#each mobile.navbar.breadcrumbs as breadcrumb, index}
-        <a href={breadcrumb.url || "#"} bi_name="MobileBreadcrumb">{breadcrumb.text}</a>
+        <a href={breadcrumb.url || "#"} bi_name="MobileBreadcrumb"
+          >{breadcrumb.text}</a
+        >
         {#if index < mobile.navbar.breadcrumbs.length - 1}
           <span class="pep-cloud-deploy-flow-mobile__logo-separator">/</span>
         {/if}
@@ -353,7 +354,11 @@
     <ol class="pep-cloud-deploy-flow-mobile__steps">
       {#each mobile.steps as step, index (`${step.title}-${index}`)}
         <li class:active={index === activeStepIndex}>
-          <button type="button" bi_name="MobileStepBtn" onclick={() => (activeStepIndex = index)}>
+          <button
+            type="button"
+            bi_name="MobileStepBtn"
+            onclick={() => (activeStepIndex = index)}
+          >
             <StepStatusDot
               completed={index < activeStepIndex}
               {index}
@@ -445,7 +450,6 @@
       {mobile.linkImage.copyTip ?? "已复制"}
     </div>
   {/if}
-
 </section>
 
 <style>
