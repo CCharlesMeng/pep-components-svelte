@@ -6,7 +6,7 @@
 
   // 共享 UI 组件
   import Floor from "@pep/shared/ui/floor/Floor.svelte";
-  import FloorTabs from "@pep/shared/ui/FloorTabs.svelte";
+  // import FloorTabs from "@pep/shared/ui/FloorTabs.svelte";
 
   // 本地业务组件
   import CardGrid from "./components/CardGrid.svelte";
@@ -51,7 +51,7 @@
     mergeTopSpacing={spacingProps.isMergeTopSpacing}
     mergeBottomSpacing={spacingProps.isMergeBottomSpacing}
   >
-    <FloorTabs {tabList} bind:activeTabIndex />
+    <!-- <FloorTabs {tabList} bind:activeTabIndex /> -->
 
     {#if activeTab}
       <CardGrid

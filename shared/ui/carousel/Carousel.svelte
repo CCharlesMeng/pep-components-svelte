@@ -5,6 +5,23 @@
     // ─────────────────────────────────────────────
     // Types
     // ─────────────────────────────────────────────
+
+    /** 事件回调中传递的轮播状态快照 */
+    export interface CarouselEventState {
+        /** 当前 slide 索引（loop 模式含克隆偏移） */
+        currentIndex: number;
+        /** 切换前的 currentIndex，首次为 undefined */
+        oldIndex: number | undefined;
+        /** 当前真实索引（loop 模式不含克隆） */
+        realIndex: number;
+        /** 切换前的 realIndex，首次为 undefined */
+        oldRealIndex: number | undefined;
+        /** slide 总数（loop 模式含克隆） */
+        slideQuantity: number;
+        /** 真实 slide 数量（不含克隆） */
+        realQuantity: number;
+    }
+
     interface AutoplayOptions {
         /** 播放间隔(ms)，默认 5000 */
         delay?: number;
@@ -12,7 +29,7 @@
     }
 
     interface Props {
-        /** 过渡效果，默认 slide（对应 PortalUI effect 选项） */
+        /** 过渡效果，默认 slide */
         transition?: "slide" | "fade";
         /** 初始显示的 slide 索引，默认 0 */
         initialSlide?: number;
@@ -36,6 +53,32 @@
         class?: string;
         /** 轮播内容（por-carousel-slide 元素） */
         children?: Snippet;
+
+        // ── 生命周期事件 ──
+        /** 初始化前 */
+        onbeforeInit?: (state: CarouselEventState) => void;
+        /** 初始化完成后 */
+        oninit?: (state: CarouselEventState) => void;
+
+        // ── slide 变化事件 ──
+        /** 当前 slide 的真实索引发生变化时（过渡开始前触发） */
+        onslideChange?: (state: CarouselEventState) => void;
+
+        // ── 过渡事件 ──
+        /** 过渡开始前 */
+        onbeforeTransition?: (state: CarouselEventState) => void;
+        /** 过渡开始后（动画已启动） */
+        onbeginTransition?: (state: CarouselEventState) => void;
+        /** 过渡结束 */
+        ontransitioned?: (state: CarouselEventState) => void;
+
+        // ── slide 切换过渡事件（仅 slide 发生变化时触发） ──
+        /** slide 切换过渡开始前 */
+        onbeforeSlideChangeTransition?: (state: CarouselEventState) => void;
+        /** slide 切换过渡开始后 */
+        onbeginSlideChangeTransition?: (state: CarouselEventState) => void;
+        /** slide 切换过渡结束 */
+        onslideChangeTransitioned?: (state: CarouselEventState) => void;
     }
 
     // ─────────────────────────────────────────────
@@ -54,6 +97,15 @@
         dark = false,
         class: className = "",
         children,
+        onbeforeInit,
+        oninit,
+        onslideChange,
+        onbeforeTransition,
+        onbeginTransition,
+        ontransitioned,
+        onbeforeSlideChangeTransition,
+        onbeginSlideChangeTransition,
+        onslideChangeTransitioned,
     }: Props = $props();
 
     const autoplayDelay = $derived(
@@ -71,7 +123,9 @@
     // ─────────────────────────────────────────────
     let realSlides: HTMLElement[] = $state([]);    // 真实 slides（不含克隆）
     let currentIndex = $state(0);                  // 当前索引（loop 模式含克隆偏移）
+    let oldIndex: number | undefined = $state(undefined); // 切换前的 currentIndex
     let realIndex = $state(0);                     // 当前真实索引（0 ~ realCount-1）
+    let oldRealIndex: number | undefined = $state(undefined); // 切换前的 realIndex
     let isTransitioning = $state(false);
     let transitionTimer: ReturnType<typeof setTimeout> | null = null;
     let autoplayTimer: ReturnType<typeof setInterval> | null = null;
@@ -85,14 +139,31 @@
     const atEnd = $derived(!loop && currentIndex >= realCount - previewCount);
 
     // ─────────────────────────────────────────────
+    // 获取当前状态快照（用于事件回调）
+    // ─────────────────────────────────────────────
+    function getCarouselState(): CarouselEventState {
+        return {
+            currentIndex,
+            oldIndex,
+            realIndex,
+            oldRealIndex,
+            slideQuantity: wrapperEl
+                ? wrapperEl.querySelectorAll(".por-carousel-slide").length
+                : allCount,
+            realQuantity: realCount,
+        };
+    }
+
+    // ─────────────────────────────────────────────
     // 初始化：DOM ready 后读取 slides，建立循环克隆
     // ─────────────────────────────────────────────
     $effect(() => {
-        // 只追踪 DOM ref 变化（挂载/卸载），其余初始化逻辑用 untrack 隔离，
-        // 防止 currentIndex / containerWidth 等导航状态变更时触发重新初始化
         if (!wrapperEl || !carouselEl) return;
 
         return untrack(() => {
+            // ── beforeInit ──
+            onbeforeInit?.(getCarouselState());
+
             // 读取真实 slides
             const els = Array.from(
                 wrapperEl!.querySelectorAll<HTMLElement>(
@@ -112,14 +183,12 @@
 
             // loop 模式：前后各插入克隆
             if (loop) {
-                // 前面插入末尾的 previewCount 个克隆
                 for (let i = previewCount - 1; i >= 0; i--) {
                     const clone = els[((els.length - 1 - i) % els.length + els.length) % els.length]
                         .cloneNode(true) as HTMLElement;
                     clone.classList.add("por-carousel-slide-duplicate");
                     wrapperEl!.prepend(clone);
                 }
-                // 后面插入开头的 previewCount * 2 - 1 个克隆
                 for (let i = 0; i < previewCount * 2 - 1; i++) {
                     const clone = els[i % els.length].cloneNode(true) as HTMLElement;
                     clone.classList.add("por-carousel-slide-duplicate");
@@ -139,12 +208,14 @@
             // 启动自动播放
             if (autoplay) startAutoplay();
 
+            // ── init ──
+            oninit?.(getCarouselState());
+
             return () => {
                 stopAutoplay();
                 wrapperEl
                     ?.querySelectorAll(".por-carousel-slide-duplicate")
                     .forEach((el) => el.remove());
-                // 清理 fade 样式
                 realSlides.forEach((s) => {
                     s.style.opacity = "";
                     s.style.position = "";
@@ -194,10 +265,7 @@
     function initFade() {
         if (!wrapperEl) return;
         const slides = getAllSlides();
-
-        // 先测量第一个 slide 的自然高度，作为 wrapper 高度
         const firstH = slides[0]?.offsetHeight ?? 0;
-
         slides.forEach((s, i) => {
             s.style.position = "absolute";
             s.style.left = "0";
@@ -244,7 +312,7 @@
         realIndex = loop ? (idx - previewCount + realCount) % realCount : idx;
     }
 
-    /** 无动画跳转 */
+    /** 无动画跳转（不触发事件） */
     function jumpTo(idx: number) {
         currentIndex = idx;
         syncRealIndex(idx);
@@ -256,15 +324,45 @@
         updateActiveClasses(idx);
     }
 
-    /** 带动画过渡 */
+    /**
+     * 带动画过渡
+     *
+     * 事件触发顺序（与原始 JS 实现对齐）：
+     *   slideChange → updateActiveClasses
+     *   → beforeTransition → beforeSlideChangeTransition
+     *   → [动画启动]
+     *   → beginTransition → beginSlideChangeTransition
+     *   → [动画结束]
+     *   → transitioned → slideChangeTransitioned
+     */
     function transitionTo(idx: number) {
         if (isTransitioning) return;
         if (!loop && (idx < 0 || idx > realCount - previewCount)) return;
 
         const changed = idx !== currentIndex;
+
+        // 记录旧 currentIndex
+        if (changed) {
+            oldIndex = currentIndex;
+        }
+
         isTransitioning = true;
         currentIndex = idx;
+
+        // 同步 realIndex，并在真实索引变化时触发 slideChange
+        const prevRealIndex = realIndex;
         syncRealIndex(idx);
+        if (realIndex !== prevRealIndex) {
+            oldRealIndex = prevRealIndex;
+            onslideChange?.(getCarouselState());
+        }
+
+        // 更新 CSS 类（对齐 JS 实现：在事件触发前更新）
+        updateActiveClasses(idx);
+
+        // ── beforeTransition ──
+        onbeforeTransition?.(getCarouselState());
+        if (changed) onbeforeSlideChangeTransition?.(getCarouselState());
 
         const onTransitionDone = () => {
             transitionTimer = null;
@@ -276,15 +374,24 @@
                 }
             }
             isTransitioning = false;
+
+            // ── transitioned ──
+            ontransitioned?.(getCarouselState());
+            if (changed) onslideChangeTransitioned?.(getCarouselState());
+
             if (changed) restartAutoplay();
         };
 
         if (transType === "fade") {
             setFade(idx, transSpeed);
+
+            // ── beginTransition（动画已启动后触发）──
+            onbeginTransition?.(getCarouselState());
+            if (changed) onbeginSlideChangeTransition?.(getCarouselState());
+
             if (transSpeed === 0) {
                 onTransitionDone();
             } else {
-                // fade 模式：监听 slide 的 transitionend
                 const slides = getAllSlides();
                 let triggered = false;
                 const handler = () => {
@@ -300,6 +407,11 @@
             }
         } else {
             setTransform(transSpeed);
+
+            // ── beginTransition（动画已启动后触发）──
+            onbeginTransition?.(getCarouselState());
+            if (changed) onbeginSlideChangeTransition?.(getCarouselState());
+
             if (transSpeed === 0) {
                 onTransitionDone();
             } else {
@@ -320,8 +432,6 @@
                 }, transSpeed + 50);
             }
         }
-
-        updateActiveClasses(idx);
     }
 
     // ─────────────────────────────────────────────
@@ -362,6 +472,124 @@
 
     export function pause() {
         stopAutoplay();
+    }
+
+    /** 获取当前实例状态（可通过 bind:this 调用后读取） */
+    export function getState(): CarouselEventState {
+        return getCarouselState();
+    }
+
+    /**
+     * 追加新的 slide 到轮播结尾
+     *
+     * @param slides 可以是单个 HTMLElement / HTML 字符串，或它们组成的数组
+     *
+     * @example
+     * carousel.appendSlide('<div class="por-carousel-slide">new</div>');
+     * carousel.appendSlide([slide1, slide2]);
+     */
+    export function appendSlide(
+        slides: HTMLElement | HTMLElement[] | string | string[],
+    ) {
+        if (!wrapperEl) return;
+
+        // 先移除 loop 克隆，避免干扰 DOM 结构
+        if (loop) {
+            wrapperEl
+                .querySelectorAll(".por-carousel-slide-duplicate")
+                .forEach((el) => el.remove());
+        }
+
+        // 追加新 slides
+        const slideArr = Array.isArray(slides) ? slides : [slides];
+        slideArr.forEach((slide) => {
+            if (typeof slide === "string") {
+                const temp = document.createElement("div");
+                temp.innerHTML = slide;
+                Array.from(temp.children).forEach((el) =>
+                    wrapperEl!.appendChild(el),
+                );
+            } else {
+                wrapperEl!.appendChild(slide as HTMLElement);
+            }
+        });
+
+        // 重新读取真实 slides
+        const els = Array.from(
+            wrapperEl.querySelectorAll<HTMLElement>(
+                ":scope > .por-carousel-slide:not(.por-carousel-slide-duplicate)",
+            ),
+        );
+        realSlides = els;
+
+        // 重置宽度
+        if (previewCount > 1) {
+            els.forEach((s) => (s.style.width = `${100 / previewCount}%`));
+        }
+
+        // 重建 loop 克隆
+        // 注意：轮播图克隆管理必须直接操作 DOM，Svelte 模板无法描述此动态克隆逻辑
+        if (loop) {
+            for (let i = previewCount - 1; i >= 0; i--) {
+                const clone = els[
+                    ((els.length - 1 - i) % els.length + els.length) % els.length
+                ].cloneNode(true) as HTMLElement;
+                clone.classList.add("por-carousel-slide-duplicate");
+                // eslint-disable-next-line svelte/no-dom-manipulation
+                wrapperEl.prepend(clone);
+            }
+            for (let i = 0; i < previewCount * 2 - 1; i++) {
+                const clone = els[i % els.length].cloneNode(true) as HTMLElement;
+                clone.classList.add("por-carousel-slide-duplicate");
+                // eslint-disable-next-line svelte/no-dom-manipulation
+                wrapperEl.appendChild(clone);
+            }
+        }
+
+        // fade 模式重新初始化布局
+        if (transType === "fade") {
+            initFade();
+        }
+
+        // 跳回当前 realIndex（不触发事件）
+        const target = loop ? realIndex + previewCount : realIndex;
+        jumpTo(target);
+    }
+
+    /**
+     * 销毁轮播图实例（停止自动播放、移除克隆、重置样式）
+     * 注意：组件本身不会从 DOM 移除，若需完全卸载请销毁父组件
+     */
+    export function destroy() {
+        stopAutoplay();
+
+        if (transitionTimer !== null) {
+            clearTimeout(transitionTimer);
+            transitionTimer = null;
+        }
+        isTransitioning = false;
+
+        // 移除 loop 克隆
+        wrapperEl
+            ?.querySelectorAll(".por-carousel-slide-duplicate")
+            .forEach((el) => el.remove());
+
+        // 重置 slide 样式
+        realSlides.forEach((s) => {
+            s.style.opacity = "";
+            s.style.position = "";
+            s.style.left = "";
+            s.style.top = "";
+            s.style.width = "";
+        });
+
+        // 重置 wrapper 样式
+        if (wrapperEl) {
+            wrapperEl.style.height = "";
+            wrapperEl.style.position = "";
+            wrapperEl.style.transition = "none";
+            wrapperEl.style.transform = "";
+        }
     }
 
     // ─────────────────────────────────────────────
@@ -429,7 +657,7 @@
     let dragStartTranslate = 0;
     let wasPlayingBeforeDrag = false;
 
-    // 速度检测：对齐 PortalUI，追踪最近 5 个坐标点
+    // 速度检测：追踪最近 5 个坐标点
     const COORS_MAX_LENGTH = 5;
     const TRIGGER_SPEED = 0.2; // px/ms
     const RESISTANCE_RATIO = 0.5;
@@ -455,7 +683,6 @@
         if (!isDragging) return;
         const totalDx = ptrLastX - ptrStartX;
         const endSpeed = getMoveXSpeed();
-        // 对齐 PortalUI：速度方向与位移方向相同且超过阈值
         const isSpeedValid =
             totalDx !== 0 &&
             totalDx * endSpeed > 0 &&
@@ -528,7 +755,7 @@
         ptrLastY = e.clientY;
 
         if (transType !== "fade" && wrapperEl) {
-            // loop 模式拖拽中边界跳转：对齐 PortalUI
+            // loop 模式拖拽中边界跳转
             if (loop) {
                 const slideW = containerWidth / previewCount;
                 const currentTx = dragStartTranslate + dx;
@@ -544,7 +771,7 @@
 
             let tx = dragStartTranslate + dx;
 
-            // 非 loop 边界阻力：对齐 PortalUI RESISTANCE_RATIO
+            // 非 loop 边界阻力
             if (!loop) {
                 const minTx = getTranslateX(realCount - previewCount);
                 const maxTx = 0;
@@ -566,13 +793,11 @@
     }
 
     // 鼠标 simulateTouch：在 document 监听 pointerup
-    // 对齐 PortalUI 对非 touch 设备将 mouseup 绑定到 document 的做法
-    // 确保鼠标拖出 carousel 范围后松开也能正常结束拖拽
     $effect(() => {
         if (!simulateTouch) return;
 
         function onDocPointerUp(e: PointerEvent) {
-            if (e.pointerType === "touch") return; // touch 已由元素事件处理
+            if (e.pointerType === "touch") return;
             endDrag();
         }
 
@@ -597,6 +822,8 @@
 <div
     class={["por-carousel", transType === "fade" ? "por-carousel-fade" : "", className].filter(Boolean).join(" ")}
     data-bg={dark ? "dark" : undefined}
+    role="region"
+    aria-label="轮播图"
     bind:this={carouselEl}
     onpointerdown={onPointerDown}
     onpointermove={onPointerMove}
@@ -611,7 +838,7 @@
     <!-- 分页圆点 -->
     {#if pagination}
         <div class="por-carousel-pagination" data-pagination="carousel">
-            {#each paginationItems as _, i}
+            {#each paginationItems as i (i)}
                 <div
                     class="por-carousel-bullet"
                     class:active={realIndex === i}
