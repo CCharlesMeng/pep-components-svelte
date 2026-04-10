@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { Snippet } from "svelte";
+    import { filterXSS } from "../../utils/xss";
 
     type Bg = "white" | "light" | "grey" | "dark" | "transBlack" | "transWhite";
     type Theme = "dark" | "light";
@@ -13,6 +14,10 @@
         title?: string;
         /** 副标题，支持 HTML */
         subtitle?: string;
+        /** 移动端主标题（未传时与 PC 共用 `title`），支持 HTML */
+        titleMb?: string;
+        /** 移动端副标题（未传时与 PC 共用 `subtitle`），支持 HTML */
+        subtitleMb?: string;
         /** 更多链接 */
         titleLink?: { text: string; href?: string };
         /** 标题居左，添加 por-section-title-left */
@@ -40,6 +45,8 @@
         theme = "dark",
         title,
         subtitle,
+        titleMb,
+        subtitleMb,
         titleLink,
         titleLeft = false,
         mergeTopSpacing = true,
@@ -74,17 +81,27 @@
     style:--floor-bg-mb={transBgImage ? cssBgValue(transBgImage.mb) : undefined}
 >
     <div class="por-container">
-        {#if title || subtitle}
+        {#if title || subtitle || titleMb !== undefined || subtitleMb !== undefined}
             <div class="por-section-head" data-theme={theme}>
-                {#if title}
-                    <h2 class="por-section-title">{@html title}</h2>
-                {/if}
-                {#if subtitle}
-                    <p class="por-section-subtitle">{@html subtitle}</p>
-                {/if}
+                <div class="floor-head-pc-only">
+                    {#if title}
+                        <h2 class="por-section-title">{@html filterXSS(title)}</h2>
+                    {/if}
+                    {#if subtitle}
+                        <p class="por-section-subtitle">{@html filterXSS(subtitle ?? "")}</p>
+                    {/if}
+                </div>
+                <div class="floor-head-mb-only">
+                    {#if titleMb ?? title}
+                        <h2 class="por-section-title">{@html filterXSS(titleMb ?? title ?? "")}</h2>
+                    {/if}
+                    {#if subtitleMb ?? subtitle}
+                        <p class="por-section-subtitle">{@html filterXSS(subtitleMb ?? subtitle ?? "")}</p>
+                    {/if}
+                </div>
                 {#if titleLink?.text}
                     <a href={titleLink.href} class="por-section-title-link">
-                        {titleLink.text}
+                        {filterXSS(titleLink.text)}
                     </a>
                 {/if}
             </div>
@@ -103,10 +120,20 @@
         background-position: center center;
         background-size: cover;
     }
-
+    .floor-head-mb-only {
+        display: none;
+    }
     @media (max-width: 768px) {
         .por-section.floor-trans-bg-image {
             background-image: var(--floor-bg-mb);
+        }
+
+        .floor-head-pc-only {
+            display: none;
+        }
+
+        .floor-head-mb-only {
+            display: block;
         }
     }
 </style>
