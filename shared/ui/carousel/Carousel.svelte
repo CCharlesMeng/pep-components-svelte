@@ -360,13 +360,17 @@
     /**
      * 带动画过渡
      *
-     * 事件触发顺序（与原始 JS 实现对齐）：
-     *   slideChange → updateActiveClasses
-     *   → beforeTransition → beforeSlideChangeTransition
-     *   → [动画启动]
-     *   → beginTransition → beginSlideChangeTransition
-     *   → [动画结束]
-     *   → transitioned → slideChangeTransitioned
+     * 与 theme-token.js `_transitionTo` 一致：
+     *   _setProgressByIndex → _setIndex（可能 trigger slideChange）
+     *   → _updateClasses（若 changed）
+     *   → beforeTransition → beforeSlideChangeTransition（若 changed）
+     *   → transitioning=true → _setTranslateAndTransition
+     *   → beginTransition → beginSlideChangeTransition（若 changed）
+     *   → transitionend / speed===0 → transitioned → slideChangeTransitioned
+     *
+     * jQuery 在 `slideChange.por.carousel.play` 里 pause+play：在 **slideChange 时**（过渡刚开始）
+     * 重置 setInterval，而非 transition 结束后。waitForTransition 为 true 时参考 bundle 未建 interval，
+     * 本组件在过渡结束后 scheduleAutoplayDelay 以对齐「间隔在动画之后」的语义。
      */
     function transitionTo(idx: number, dur?: number): boolean {
         const speed = dur ?? transSpeed;
@@ -390,9 +394,14 @@
         if (realIndex !== prevRealIndex) {
             oldRealIndex = prevRealIndex;
             onslideChange?.(getCarouselState());
+            // 与 jQuery `slideChange.por.carousel.play` → pause+play 一致：非 waitForTransition 时在
+            // slideChange 时刻重开 interval，而非 transitioned 之后。
+            if (autoplayPlaying && !autoplayWaitForTransition) {
+                restartAutoplay();
+            }
         }
 
-        // 更新 CSS 类（对齐 JS 实现：在事件触发前更新）
+        // 与 _updateClasses 一致：在 slideChange 之后、beforeTransition 之前
         updateActiveClasses(idx);
 
         // ── beforeTransition ──
@@ -414,12 +423,8 @@
             ontransitioned?.(getCarouselState());
             if (changed) onslideChangeTransitioned?.(getCarouselState());
 
-            if (changed && autoplayPlaying) {
-                if (autoplayWaitForTransition) {
-                    scheduleAutoplayDelay();
-                } else {
-                    restartAutoplay();
-                }
+            if (changed && autoplayPlaying && autoplayWaitForTransition) {
+                scheduleAutoplayDelay();
             }
         };
 
@@ -657,8 +662,10 @@
     }
 
     function autoplayTick() {
+        // 与 cnpm-baseui theme-token.js 一致：非 loop 播完最后一屏后 slideTo(0)（默认 speed），
+        // 走 transitionTo → 触发 onslideChange。勿用 slideTo(0,0)：那会 jumpTo，不触发 slideChange。
         if (!loop && currentIndex >= realCount - previewNum) {
-            slideTo(0, 0);
+            slideTo(0);
             if (autoplayPlaying && autoplayWaitForTransition) {
                 scheduleAutoplayDelay();
             }
