@@ -117,13 +117,6 @@
         typeof autoplay === "object" && autoplay.waitForTransition === true,
     );
 
-    /** 与 cnpm-baseui Carousel 一致：preview 取整且不超过真实 slide 数 */
-    const previewNum = $derived.by(() => {
-        const p = Math.round(previewCount);
-        if (realCount === 0) return Math.max(1, p);
-        return Math.min(Math.max(1, p), realCount);
-    });
-
     // ─────────────────────────────────────────────
     // DOM refs
     // ─────────────────────────────────────────────
@@ -155,6 +148,14 @@
     let containerWidth = $state(0);
 
     const realCount = $derived(realSlides.length);
+
+    /** 与 cnpm-baseui Carousel 一致：preview 取整且不超过真实 slide 数 */
+    const previewNum = $derived.by(() => {
+        const p = Math.round(previewCount);
+        if (realCount === 0) return Math.max(1, p);
+        return Math.min(Math.max(1, p), realCount);
+    });
+
     const allCount = $derived(loop ? realCount + previewNum * 2 : realCount);
 
     /** 与参考实现一致：LTR/RTL 下「上一页」「下一页」按钮的禁用边界不同 */
