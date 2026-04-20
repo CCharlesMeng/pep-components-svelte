@@ -266,6 +266,44 @@
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════
+     场景九：事件监听示例（onslideChange / ontransitioned）
+══════════════════════════════════════════════ -->
+<div class="por-section" data-bg="light">
+  <div class="por-container">
+    <div class="por-section-head" data-theme="dark">
+      <h2 class="por-section-title">场景九：事件监听示例</h2>
+      <p class="por-section-subtitle">
+        onslideChange → console.log(realIndex) &nbsp;·&nbsp;
+        ontransitioned → console.log(oldIndex)
+      </p>
+    </div>
+    <div class="por-section-body">
+      <Carousel
+        loop
+        navigation
+        pagination
+        onslideChange={(state) => {
+          console.log("[onslideChange] realIndex =", state.realIndex);
+        }}
+        ontransitioned={(state) => {
+          console.log("[ontransitioned] oldIndex =", state.oldIndex);
+        }}
+      >
+        {#each banners as b}
+          <div class="por-carousel-slide s-banner">
+            <img src={b.img} alt={b.title} class="s-img" />
+            <div class="s-caption">
+              <h3 class="s-title">{b.title}</h3>
+              <p class="s-desc">{b.desc}</p>
+            </div>
+          </div>
+        {/each}
+      </Carousel>
+    </div>
+  </div>
+</div>
+
 <style>
   /* ── Banner 幻灯片 ── */
   .s-banner {
