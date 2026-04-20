@@ -261,14 +261,7 @@
     activeStepIndex = index;
   }
 
-  function handleStepButtonClick(event: MouseEvent, index: number): void {
-    const target = event.target as HTMLElement | null;
-    if (
-      !isCompactSteps &&
-      target?.closest(".pep-cloud-deploy-flow-sidebar__step-dot-hitbox")
-    ) {
-      return;
-    }
+  function handleStepButtonClick(index: number): void {
     handleStepClick(index);
   }
 
@@ -487,7 +480,7 @@
             <button
               type="button"
               bi_name="SidebarStepBtn"
-              onclick={(event) => handleStepButtonClick(event, index)}
+              onclick={() => handleStepButtonClick(index)}
             >
               <span class="pep-cloud-deploy-flow-sidebar__step-dot-hitbox">
                 <Tooltip content={step.title}>
