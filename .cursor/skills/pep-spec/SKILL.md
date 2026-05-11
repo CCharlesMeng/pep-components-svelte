@@ -73,7 +73,8 @@ description: 从设计稿转换的HTML中分析组件需求，生成详细的组
 
 PortalUI 组件/Token 映射层面（必须识别）：
   -   楼层容器 → Floor 组件（shared/ui），封装 por-section + 标题区 + 间距合并
-  - 轮播 → Carousel 组件（shared/ui），使用 por-carousel-slide class
+  - 轮播 → Carousel 组件（shared/ui），使用 por-carousel-slide class；**若在 HTML/需求中出现轮播，必须在澄清或分析结论中列出「轮播种类」并请用户选定**：`layout`（preview 等宽 / free 自定宽度滑道）、`transition`（slide / fade）、以及是否 `preview>1`、`loop`、`autoplay`、`pagination`、`navigation`。未选定前不得在 spec 中写死某一种类。详细选项表见 pep-impl 的 `reference/shared-components.md`「轮播种类」。
+  - 若外部组件需业务补样式（如轮播 gap、外层露出宽度），必须在 spec 写清“样式契约”：业务容器 class、`:global(...)` 命中选择器、CSS 变量/覆盖值；`layout="free"` 默认写入 `--por-carousel-slide-gap: 24px`，并要求外层容器 `overflow: hidden`（通常为 `por-section`，也可按需使用其他容器）
   - Tab 切换 → Svelte 状态 + 自定义实现（FloorTabs 已废弃）
   - 按钮样式 → por-btn-primary / por-btn-secondary / por-btn-dark
   - 文本排版 → por-text-title-t* / por-text-body-t* class
@@ -109,7 +110,7 @@ PortalUI 组件/Token 映射层面（必须识别）：
   L4 大范围显隐：[列举在某端完全不展示的大区域，极少出现]
 
 PortalUI 组件/Token 映射：
-  shared/ui 组件：[Floor（必须，封装标题区+容器+间距）、Carousel（如有轮播）]
+  shared/ui 组件：[Floor（必须，封装标题区+容器+间距）、Carousel（如有轮播；须注明已确认的轮播种类：layout / transition / 功能开关）]
   PortalUI 样式类：[por-btn-primary、por-text-title-t7 等]
   PortalUI 颜色 token：[--por-color-text-primary 等]
 
@@ -118,6 +119,10 @@ PortalUI 组件/Token 映射：
 
 交互行为：
   - [描述]（🟢 确定 / 🟡 推断）
+
+轮播（若存在）：
+  - 已向用户确认的 **种类**：layout = preview | free · transition = slide | fade · 功能开关（preview 张数 / loop / autoplay / pagination / navigation / simulateTouch）
+  - 若尚无人选结论：标 🔴，必须在阶段 2 澄清后再写 spec 第 7.4 节
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 以上推断是否准确？有需要补充或纠正的吗？
@@ -144,6 +149,8 @@ PortalUI 组件/Token 映射：
 
 2. [问题描述]
    → 选项：A. [选项] / B. [选项]
+
+（若含轮播且种类未定，必须单独成条）轮播种类：A. layout — 等宽预览 `preview` / 自定宽度 `free`；B. transition — `slide` / `fade`；C. 功能 — 同屏张数 `preview={n}`、循环、自动播放、分页、箭头、`simulateTouch` 等是否开启。
 
 [...所有 🔴 项，一条不能省略...]
 
@@ -349,7 +356,7 @@ PortalUI 文本 class 对照表：
 | 组件 | 是否使用 | 用途 |
 |------|---------|------|
 | `Floor`（楼层容器） | ✅ 必须 | 封装 por-section 布局 + 标题区（title/subtitle/titleLink）+ 间距合并，替代原 FloorHeader |
-| `Carousel`（轮播） | [✅/⬜] | [用途说明] |
+| `Carousel`（轮播） | [✅/⬜] | [用途说明；若使用须写清已与客户确认的 **轮播种类**：layout、transition、preview/loop/autoplay 等 — 见 pep-impl shared-components「轮播种类」；若需业务补样式，还需写明样式契约：默认 `--por-carousel-slide-gap: 24px` + 外层 `overflow: hidden` + 容器 class/:global 选择器] |
 
 #### 7.4.2 PortalUI 纯样式类（直接在 HTML 中使用）
 

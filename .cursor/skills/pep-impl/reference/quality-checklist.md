@@ -47,6 +47,11 @@
 
 - □ 楼层容器使用 `<Floor>` 组件，不手写 por-section / por-container / FloorHeader
 - □ 轮播使用 `<Carousel>` 组件，幻灯片加 por-carousel-slide class
+- □ 轮播 **layout（preview / free）与 transition（slide / fade）** 已与用户/spec 一致；free 与多图 `preview` 未混用错场景
+- □ `layout="free"` 时，业务样式已按标准落地 `--por-carousel-slide-gap: 24px`（除非 spec 明确给出其他值）
+- □ 外部容器已设置 `overflow: hidden`（通常挂在 `por-section`，也允许按业务挂在其他包裹容器）
+- □ 外部组件样式已写明“容器 class + `:global(...)` 命中 + 变量值”，不是口头“按需调整”
+- □ 未为单业务需求直接改 shared/ui 组件源码，优先通过业务侧样式契约覆写
 - □ 按钮使用 PortalUI 按钮类（por-btn-primary / por-btn-secondary / por-btn-dark）
 - □ 图标使用 PortalUI 图标类（por-icon por-icon-xxx）
 - □ 无硬编码颜色值（#191919、#595959 等），全部用 PortalUI token 替代

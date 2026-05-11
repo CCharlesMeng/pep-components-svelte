@@ -121,10 +121,11 @@
 | `por-carousel` | 轮播根元素 |
 | `por-carousel-wrapper` | 滑块容器 |
 | `por-carousel-slide` | 每一张幻灯片（**使用时必须加此 class**） |
+| `por-carousel-free` | **自由宽度布局**（`layout="free"` 时根节点由 Carousel 自动带此 class，可选用其下样式钩子） |
 | `por-carousel-pagination` | 分页圆点容器 |
 | `por-carousel-prev` / `por-carousel-next` | 前进/后退按钮 |
 
-> **注意**：轮播交互由 `<Carousel>` 组件管理，但幻灯片内容必须使用 `por-carousel-slide` class。
+> **注意**：轮播交互由 `<Carousel>` 组件管理，幻灯片内容必须使用 `por-carousel-slide` class。使用前先确认 **轮播种类**（preview / free、slide / fade）：见 pep-impl `reference/shared-components.md`。
 
 ---
 

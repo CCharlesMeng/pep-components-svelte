@@ -31,6 +31,8 @@
     interface Props {
         /** 过渡效果，默认 slide */
         transition?: "slide" | "fade";
+        /** 布局模式：preview 使用等宽预览，free 允许调用方控制 slide 宽度 */
+        layout?: "preview" | "free";
         /** 初始显示的 slide 索引，默认 0 */
         initialSlide?: number;
         /** 同时显示的滑块数量，默认 1 */
@@ -86,6 +88,7 @@
     // ─────────────────────────────────────────────
     let {
         transition: transType = "slide",
+        layout = "preview",
         initialSlide = 0,
         preview: previewCount = 1,
         speed: transSpeed = 400,
@@ -146,8 +149,14 @@
     /** 与参考实现 playing 一致：pause() 后为 false，过渡结束不应再调度自动播放 */
     let autoplayPlaying = $state(false);
     let containerWidth = $state(0);
+    /** free：轨道总长、逻辑视口宽、非 loop 下的「屏」阶梯（与 maxReachable / 分页一致） */
+    let freeContentWidth = $state(0);
+    let freeVisibleWidth = $state(0);
+    let freeSnapSlideIndices = $state<number[]>([0]);
+    let freeMaxSnapSlideIndex = $state(0);
 
     const realCount = $derived(realSlides.length);
+    const isFreeLayout = $derived(layout === "free");
 
     /** 与 cnpm-baseui Carousel 一致：preview 取整且不超过真实 slide 数 */
     const previewNum = $derived.by(() => {
@@ -156,19 +165,39 @@
         return Math.min(Math.max(1, p), realCount);
     });
 
-    const allCount = $derived(loop ? realCount + previewNum * 2 : realCount);
+    /** free + loop 沿用单张切换语义，避免宽度自由时克隆数量依赖 preview。 */
+    const activePreviewNum = $derived(isFreeLayout ? 1 : previewNum);
+    const maxReachableIndex = $derived(
+        realCount === 0
+            ? 0
+            : isFreeLayout
+              ? loop
+                  ? Math.max(0, realCount - 1)
+                  : freeMaxSnapSlideIndex
+              : Math.max(0, realCount - activePreviewNum),
+    );
+
+    const allCount = $derived(loop ? realCount + activePreviewNum * 2 : realCount);
+
+    const freeActivePageIndex = $derived.by(() => {
+        if (!isFreeLayout || loop || freeSnapSlideIndices.length === 0) return 0;
+        for (let p = freeSnapSlideIndices.length - 1; p >= 0; p--) {
+            if (freeSnapSlideIndices[p] <= currentIndex) return p;
+        }
+        return 0;
+    });
 
     /** 与参考实现一致：LTR/RTL 下「上一页」「下一页」按钮的禁用边界不同 */
     const atPrevDisabled = $derived(
         !loop &&
             (dir === "ltr"
                 ? currentIndex === 0
-                : currentIndex >= realCount - previewNum),
+                : currentIndex >= maxReachableIndex),
     );
     const atNextDisabled = $derived(
         !loop &&
             (dir === "ltr"
-                ? currentIndex >= realCount - previewNum
+                ? currentIndex >= maxReachableIndex
                 : currentIndex === 0),
     );
 
@@ -206,16 +235,26 @@
             );
             realSlides = els;
 
-            if (els.length === 0) return;
+            if (els.length === 0) {
+                // 与有 slide 分支一致返回 teardown，避免出现「无 cleanup → 上一轮 autoplay / DOM 残留」边角
+                return () => {
+                    stopAutoplay();
+                };
+            }
 
-            const pv = Math.min(Math.max(1, Math.round(previewCount)), els.length);
+            const pv = isFreeLayout
+                ? 1
+                : Math.min(Math.max(1, Math.round(previewCount)), els.length);
 
             containerWidth = carouselEl!.offsetWidth;
 
             // preview > 1：设置每个 slide 宽度
-            if (pv > 1) {
-                els.forEach((s) => (s.style.width = `${100 / pv}%`));
+            if (!isFreeLayout && pv > 1) {
+                const w = `${100 / pv}%`;
+                els.forEach((s) => s.style.setProperty("width", w));
             }
+
+            updateFreeLayoutMetrics();
 
             // loop 模式：前后各插入克隆
             if (loop) {
@@ -233,7 +272,10 @@
             }
 
             // 跳至初始位置（fade：setFade 设 opacity；位移见 applyFadeSlideTransforms）
-            const startIdx = loop ? initialSlide + pv : initialSlide;
+            const rawStartIdx = loop ? initialSlide + pv : initialSlide;
+            const startIdx = !loop && isFreeLayout
+                ? Math.min(Math.max(0, rawStartIdx), freeMaxSnapSlideIndex)
+                : rawStartIdx;
             jumpTo(startIdx);
             if (transType === "fade") {
                 applyFadeSlideTransforms();
@@ -251,6 +293,9 @@
                     ?.querySelectorAll(".por-carousel-slide-duplicate")
                     .forEach((el) => el.remove());
                 realSlides.forEach((s) => {
+                    if (!isFreeLayout && pv > 1) {
+                        s.style.removeProperty("width");
+                    }
                     s.style.opacity = "";
                     s.style.transform = "";
                 });
@@ -259,28 +304,58 @@
     });
 
     // ─────────────────────────────────────────────
-    // 响应式布局：容器宽度变化时重算位置
+    // 响应式布局（仅浏览器：SSR 无 window / ResizeObserver）
     // ─────────────────────────────────────────────
     $effect(() => {
-        if (!carouselEl) return;
-        const ro = new ResizeObserver(() => {
-            containerWidth = carouselEl!.offsetWidth;
-            if (!isDragging) {
-                if (transType === "fade") {
-                    applyFadeSlideTransforms();
-                } else {
-                    setTransform(0);
+        if (!carouselEl || typeof window === "undefined") return;
+        const el = carouselEl;
+        // 仅订阅「何时重建监听」：DOM 与模式/过渡。测量与写 state 必须在 untrack 中，
+        // 否则 onLayout 会把 containerWidth / currentIndex 等登记为本 effect 依赖 → 同步无限重跑 → 页面卡死白屏。
+        void isFreeLayout;
+        void transType;
+        void loop;
+        void previewCount;
+        void navigation;
+        void wrapperEl;
+        void realCount;
+
+        const onLayout = () => {
+            untrack(() => {
+                containerWidth = el.offsetWidth;
+                updateFreeLayoutMetrics(true);
+                // 切页动画进行中勿重置 transform：setTransform(0) 会把 transition 设为 none，
+                // ResizeObserver/回流 若在此时触发 onLayout，会打断正在进行中的过渡，表现为滑动发涩、跳变。
+                if (!isDragging && !isTransitioning) {
+                    if (transType === "fade") {
+                        applyFadeSlideTransforms();
+                    } else {
+                        setTransform(0);
+                    }
                 }
-            }
-        });
-        ro.observe(carouselEl);
-        return () => ro.disconnect();
+            });
+        };
+        onLayout();
+        const ro = new ResizeObserver(onLayout);
+        ro.observe(el);
+        const trackForRo = el.querySelector<HTMLElement>(".por-carousel-free-track");
+        if (trackForRo) ro.observe(trackForRo);
+        if (wrapperEl) ro.observe(wrapperEl);
+        window.addEventListener("resize", onLayout);
+        return () => {
+            ro.disconnect();
+            window.removeEventListener("resize", onLayout);
+        };
     });
 
     // ─────────────────────────────────────────────
     // 过渡：slide 模式
     // ─────────────────────────────────────────────
     function getTranslateX(index: number): number {
+        if (isFreeLayout) {
+            const off = getSlideOffset(index);
+            if (loop) return -off;
+            return -Math.min(off, freeNonLoopScrollMax());
+        }
         const slideW = containerWidth / previewNum;
         return -slideW * index;
     }
@@ -299,6 +374,118 @@
         return Array.from(
             wrapperEl?.querySelectorAll<HTMLElement>(".por-carousel-slide") ?? [],
         );
+    }
+
+    function getSlideOffset(index: number): number {
+        const slides = getAllSlides();
+        if (slides.length === 0) return 0;
+        const base = slides[0].offsetLeft;
+        const target = slides[Math.max(0, Math.min(index, slides.length - 1))];
+        return target ? target.offsetLeft - base : 0;
+    }
+
+    /** free 非 loop：最大横向滚动距离；loop / 非 free 为 Infinity（不按屏钳位） */
+    function freeNonLoopScrollMax(): number {
+        if (!isFreeLayout || loop) return Number.POSITIVE_INFINITY;
+        return Math.max(0, freeContentWidth - freeVisibleWidth);
+    }
+
+    /** 按 min(offset,maxT) 的阶梯收集「屏」起点 slide 下标 */
+    function buildFreeSnapSlideIndices(
+        slides: HTMLElement[],
+        baseLeft: number,
+        maxT: number,
+    ): number[] {
+        if (maxT <= 0) return [0];
+        const snaps: number[] = [];
+        let prevClamped = -Infinity;
+        for (let i = 0; i < slides.length; i++) {
+            const c = Math.min(slides[i].offsetLeft - baseLeft, maxT);
+            if (i === 0 || c > prevClamped + 0.5) {
+                snaps.push(i);
+                prevClamped = c;
+            }
+        }
+        return snaps.length > 0 ? snaps : [0];
+    }
+
+    /**
+     * 华为云首页 initSpace 同级：视口内容区宽（断点与 1600 居中列一致）。
+     * SSR：无 window 时用根节点 clientWidth，避免布局与 max 计算抛错。
+     */
+    function getFreeVisibleWidth(): number {
+        if (typeof window === "undefined") {
+            return carouselEl?.clientWidth ?? 0;
+        }
+        const vw = window.innerWidth;
+        let contentW: number;
+        if (vw > 1776) {
+            contentW = 1600;
+        } else if (vw > 1024) {
+            contentW = vw - 2 * (0.05 * vw);
+        } else if (vw > 768) {
+            contentW = vw - 2 * (0.03 * vw);
+        } else {
+            contentW = window.innerWidth - 48;
+        }
+        contentW = Math.max(0, contentW);
+        if (carouselEl && carouselEl.clientWidth > 0) {
+            contentW = Math.min(contentW, carouselEl.clientWidth);
+        }
+        return contentW;
+    }
+
+    function updateFreeLayoutMetrics(clampCurrent = false) {
+        if (!isFreeLayout || !carouselEl) return;
+
+        if (realSlides.length === 0) {
+            freeContentWidth = 0;
+            freeVisibleWidth = getFreeVisibleWidth();
+            freeSnapSlideIndices = [0];
+            freeMaxSnapSlideIndex = 0;
+            return;
+        }
+
+        freeVisibleWidth = getFreeVisibleWidth();
+        const base = realSlides[0].offsetLeft;
+        const last = realSlides[realSlides.length - 1];
+        freeContentWidth = last.offsetLeft - base + last.offsetWidth;
+
+        if (loop) {
+            freeSnapSlideIndices = [];
+            freeMaxSnapSlideIndex = Math.max(0, realSlides.length - 1);
+        } else {
+            const maxT = Math.max(0, freeContentWidth - freeVisibleWidth);
+            freeSnapSlideIndices = buildFreeSnapSlideIndices(realSlides, base, maxT);
+            freeMaxSnapSlideIndex = freeSnapSlideIndices[freeSnapSlideIndices.length - 1] ?? 0;
+            if (clampCurrent && currentIndex > freeMaxSnapSlideIndex) {
+                jumpTo(freeMaxSnapSlideIndex);
+            }
+        }
+    }
+
+    function getClosestIndexByTranslate(tx: number): number {
+        const slides = getAllSlides();
+        if (slides.length === 0) return currentIndex;
+        const maxSnap = freeNonLoopScrollMax();
+        const base = slides[0].offsetLeft;
+        let closestIndex = 0;
+        let closestDistance = Infinity;
+        slides.forEach((slide, i) => {
+            const offset = slide.offsetLeft - base;
+            const snapped = Math.min(offset, maxSnap);
+            const distance = Math.abs(snapped + tx);
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestIndex = i;
+            }
+        });
+        return closestIndex;
+    }
+
+    /** 分页圆点目标 slide 下标；free 非 loop 映射各「屏」起点 */
+    function paginationSlideTarget(pageIdx: number): number {
+        return isFreeLayout && !loop ? (freeSnapSlideIndices[pageIdx] ?? pageIdx) : pageIdx;
     }
 
     // ─────────────────────────────────────────────
@@ -343,7 +530,7 @@
     }
 
     function syncRealIndex(idx: number) {
-        realIndex = loop ? (idx - previewNum + realCount) % realCount : idx;
+        realIndex = loop ? (idx - activePreviewNum + realCount) % realCount : idx;
     }
 
     /** 无动画跳转（不触发事件） */
@@ -376,7 +563,7 @@
     function transitionTo(idx: number, dur?: number): boolean {
         const speed = dur ?? transSpeed;
         if (isTransitioning) return false;
-        if (!loop && (idx < 0 || idx > realCount - previewNum)) return false;
+        if (!loop && (idx < 0 || idx > maxReachableIndex)) return false;
         if (idx === currentIndex) return false;
 
         const changed = idx !== currentIndex;
@@ -412,9 +599,9 @@
         const onTransitionDone = () => {
             transitionTimer = null;
             if (loop && transType !== "fade") {
-                if (currentIndex < previewNum) {
+                if (currentIndex < activePreviewNum) {
                     jumpTo(realCount + currentIndex);
-                } else if (currentIndex >= realCount + previewNum) {
+                } else if (currentIndex >= realCount + activePreviewNum) {
                     jumpTo(currentIndex - realCount);
                 }
             }
@@ -488,8 +675,8 @@
     /** LTR 下「上一项」；与 cnpm-baseui 中 prev() 在非 RTL 时语义一致 */
     function corePrev(): boolean {
         if (atPrevDisabled) return false;
-        if (loop && currentIndex < previewNum) {
-            jumpTo(realCount + previewNum - 1);
+        if (loop && currentIndex < activePreviewNum) {
+            jumpTo(realCount + activePreviewNum - 1);
             requestAnimationFrame(() => transitionTo(currentIndex - 1));
             return true;
         }
@@ -499,8 +686,8 @@
     /** LTR 下「下一项」 */
     function coreNext(): boolean {
         if (atNextDisabled) return false;
-        if (loop && currentIndex >= realCount + previewNum) {
-            jumpTo(previewNum);
+        if (loop && currentIndex >= realCount + activePreviewNum) {
+            jumpTo(activePreviewNum);
             requestAnimationFrame(() => transitionTo(currentIndex + 1));
             return true;
         }
@@ -518,7 +705,7 @@
 
     /** 与 slideTo(index, speed) 一致；index 为目标真实下标（loop 时内部加 preview 偏移） */
     export function slideTo(index: number, dur?: number): boolean {
-        const target = loop ? index + previewNum : index;
+        const target = loop ? index + activePreviewNum : index;
         if (target === currentIndex) return false;
         if (dur === 0) {
             jumpTo(target);
@@ -588,14 +775,17 @@
         realSlides = els;
 
         // 重置宽度
-        if (previewNum > 1) {
-            els.forEach((s) => (s.style.width = `${100 / previewNum}%`));
+        if (!isFreeLayout && previewNum > 1) {
+            const w = `${100 / previewNum}%`;
+            els.forEach((s) => s.style.setProperty("width", w));
         }
+
+        updateFreeLayoutMetrics();
 
         // 重建 loop 克隆
         // 注意：轮播图克隆管理必须直接操作 DOM，Svelte 模板无法描述此动态克隆逻辑
         if (loop) {
-            for (let i = previewNum - 1; i >= 0; i--) {
+            for (let i = activePreviewNum - 1; i >= 0; i--) {
                 const clone = els[
                     ((els.length - 1 - i) % els.length + els.length) % els.length
                 ].cloneNode(true) as HTMLElement;
@@ -603,7 +793,7 @@
                 // eslint-disable-next-line svelte/no-dom-manipulation
                 wrapperEl.prepend(clone);
             }
-            for (let i = 0; i < previewNum * 2 - 1; i++) {
+            for (let i = 0; i < activePreviewNum * 2 - 1; i++) {
                 const clone = els[i % els.length].cloneNode(true) as HTMLElement;
                 clone.classList.add("por-carousel-slide-duplicate");
                 // eslint-disable-next-line svelte/no-dom-manipulation
@@ -612,7 +802,10 @@
         }
 
         // 跳回当前 realIndex（不触发事件）
-        const target = loop ? realIndex + previewNum : realIndex;
+        const rawTarget = loop ? realIndex + activePreviewNum : realIndex;
+        const target = !loop && isFreeLayout
+            ? Math.min(Math.max(0, rawTarget), freeMaxSnapSlideIndex)
+            : rawTarget;
         jumpTo(target);
         if (transType === "fade") {
             applyFadeSlideTransforms();
@@ -638,6 +831,9 @@
             .forEach((el) => el.remove());
 
         realSlides.forEach((s) => {
+            if (!isFreeLayout && previewNum > 1) {
+                s.style.removeProperty("width");
+            }
             s.style.opacity = "";
             s.style.transform = "";
         });
@@ -646,6 +842,7 @@
             wrapperEl.style.transition = "none";
             wrapperEl.style.transform = "";
         }
+
     }
 
     // ─────────────────────────────────────────────
@@ -665,7 +862,7 @@
     function autoplayTick() {
         // 与 cnpm-baseui theme-token.js 一致：非 loop 播完最后一屏后 slideTo(0)（默认 speed），
         // 走 transitionTo → 触发 onslideChange。勿用 slideTo(0,0)：那会 jumpTo，不触发 slideChange。
-        if (!loop && currentIndex >= realCount - previewNum) {
+        if (!loop && currentIndex >= maxReachableIndex) {
             slideTo(0);
             if (autoplayPlaying && autoplayWaitForTransition) {
                 scheduleAutoplayDelay();
@@ -726,12 +923,20 @@
             wrapperEl.style.transition = "none";
             wrapperEl.style.transform = `translate3d(${matrix.m41}px, 0, 0)`;
 
-            const slideW = containerWidth / previewNum;
-            if (slideW > 0) {
-                const idx = Math.round(-matrix.m41 / slideW);
-                const clamped = Math.max(0, Math.min(idx, allCount - previewNum));
+            if (isFreeLayout) {
+                const idx = getClosestIndexByTranslate(matrix.m41);
+                const upper = loop ? allCount - activePreviewNum : maxReachableIndex;
+                const clamped = Math.max(0, Math.min(idx, upper));
                 currentIndex = clamped;
                 syncRealIndex(clamped);
+            } else {
+                const slideW = containerWidth / previewNum;
+                if (slideW > 0) {
+                    const idx = Math.round(-matrix.m41 / slideW);
+                    const clamped = Math.max(0, Math.min(idx, allCount - previewNum));
+                    currentIndex = clamped;
+                    syncRealIndex(clamped);
+                }
             }
             return matrix.m41;
         }
@@ -788,7 +993,21 @@
         }
         const threshold = containerWidth * 0.2;
 
-        if (isSpeedValid || Math.abs(totalDx) > threshold) {
+        if (isFreeLayout && transType !== "fade" && wrapperEl) {
+            const matrix = new DOMMatrix(getComputedStyle(wrapperEl).transform);
+            let targetIdx = getClosestIndexByTranslate(matrix.m41);
+            if (isSpeedValid && targetIdx === currentIndex) {
+                const step =
+                    dir === "rtl"
+                        ? (totalDx > 0 ? 1 : -1)
+                        : (totalDx > 0 ? -1 : 1);
+                targetIdx += step;
+            }
+            if (!loop) {
+                targetIdx = Math.max(0, Math.min(targetIdx, maxReachableIndex));
+            }
+            if (!transitionTo(targetIdx)) setTransform(transSpeed);
+        } else if (isSpeedValid || Math.abs(totalDx) > threshold) {
             totalDx > 0 ? prev() : next();
         } else {
             setTransform(transSpeed);
@@ -856,11 +1075,13 @@
         if (transType !== "fade" && wrapperEl) {
             // loop 模式拖拽中边界跳转
             if (loop) {
-                const slideW = containerWidth / previewNum;
                 const currentTx = dragStartTranslate + dx;
-                const inferIdx = slideW > 0 ? Math.round(-currentTx / slideW) : currentIndex;
-                if (inferIdx < previewNum || inferIdx >= realCount + previewNum) {
-                    const targetIdx = (inferIdx - previewNum + realCount) % realCount + previewNum;
+                const slideW = containerWidth / previewNum;
+                const inferIdx = isFreeLayout
+                    ? getClosestIndexByTranslate(currentTx)
+                    : (slideW > 0 ? Math.round(-currentTx / slideW) : currentIndex);
+                if (inferIdx < activePreviewNum || inferIdx >= realCount + activePreviewNum) {
+                    const targetIdx = (inferIdx - activePreviewNum + realCount) % realCount + activePreviewNum;
                     const jumpTx = getTranslateX(targetIdx);
                     dragStartTranslate = jumpTx - dx;
                     currentIndex = targetIdx;
@@ -872,7 +1093,7 @@
 
             // 非 loop 边界阻力
             if (!loop) {
-                const minTx = getTranslateX(realCount - previewNum);
+                const minTx = getTranslateX(maxReachableIndex);
                 const maxTx = 0;
                 if (tx > maxTx) {
                     tx = maxTx + (tx - maxTx) * RESISTANCE_RATIO;
@@ -908,7 +1129,13 @@
     // 分页圆点
     // ─────────────────────────────────────────────
     const paginationCount = $derived(
-        loop ? realCount : Math.max(0, realCount - previewNum + 1),
+        realCount === 0
+            ? 0
+            : loop
+              ? realCount
+              : isFreeLayout
+                ? freeSnapSlideIndices.length
+                : Math.max(0, maxReachableIndex + 1),
     );
     const paginationItems = $derived(
         Array.from({ length: paginationCount }, (_, i) => i),
@@ -919,7 +1146,14 @@
 <!-- Template                        -->
 <!-- ─────────────────────────────── -->
 <div
-    class={["por-carousel", transType === "fade" ? "por-carousel-fade" : "", className].filter(Boolean).join(" ")}
+    class={[
+        "por-carousel",
+        transType === "fade" ? "por-carousel-fade" : "",
+        isFreeLayout ? "por-carousel-free" : "",
+        className,
+    ]
+        .filter(Boolean)
+        .join(" ")}
     data-bg={dark ? "dark" : undefined}
     role="region"
     aria-label="轮播图"
@@ -930,22 +1164,31 @@
     onpointercancel={onPointerUp}
     ondragstart={(e) => e.preventDefault()}
 >
-    <div class="por-carousel-wrapper" bind:this={wrapperEl}>
-        {@render children?.()}
-    </div>
+    {#if isFreeLayout}
+        <div class="por-carousel-free-track">
+            <div class="por-carousel-wrapper" bind:this={wrapperEl}>
+                {@render children?.()}
+            </div>
+        </div>
+    {:else}
+        <div class="por-carousel-wrapper" bind:this={wrapperEl}>
+            {@render children?.()}
+        </div>
+    {/if}
 
     <!-- 分页圆点 -->
     {#if pagination}
         <div class="por-carousel-pagination" data-pagination="carousel">
-            {#each paginationItems as i (i)}
+            {#each paginationItems as pageIdx (pageIdx)}
                 <div
                     class="por-carousel-bullet"
-                    class:active={realIndex === i}
+                    class:active={isFreeLayout && !loop ? freeActivePageIndex === pageIdx : realIndex === pageIdx}
                     role="button"
                     tabindex="0"
-                    aria-label="第 {i + 1} 页"
-                    onclick={() => slideTo(i)}
-                    onkeydown={(e) => e.key === "Enter" && slideTo(i)}
+                    aria-label="第 {pageIdx + 1} 页"
+                    onclick={() => slideTo(paginationSlideTarget(pageIdx))}
+                    onkeydown={(e) =>
+                        e.key === "Enter" && slideTo(paginationSlideTarget(pageIdx))}
                 ></div>
             {/each}
         </div>
@@ -953,25 +1196,161 @@
 
     <!-- 前进/后退按钮 -->
     {#if navigation}
-        <div
-            class="por-carousel-prev"
-            data-prev="carousel"
-            class:disabled={atPrevDisabled}
-            role="button"
-            tabindex="0"
-            aria-label="上一页"
-            onclick={prev}
-            onkeydown={(e) => e.key === "Enter" && prev()}
-        ></div>
-        <div
-            class="por-carousel-next"
-            data-next="carousel"
-            class:disabled={atNextDisabled}
-            role="button"
-            tabindex="0"
-            aria-label="下一页"
-            onclick={next}
-            onkeydown={(e) => e.key === "Enter" && next()}
-        ></div>
+        {#if !isFreeLayout || !atPrevDisabled}
+            <div
+                class="por-carousel-prev"
+                data-prev="carousel"
+                class:disabled={atPrevDisabled}
+                role="button"
+                tabindex="0"
+                aria-label="上一页"
+                onclick={prev}
+                onkeydown={(e) => e.key === "Enter" && prev()}
+            ></div>
+        {/if}
+        {#if !isFreeLayout || !atNextDisabled}
+            <div
+                class="por-carousel-next"
+                data-next="carousel"
+                class:disabled={atNextDisabled}
+                role="button"
+                tabindex="0"
+                aria-label="下一页"
+                onclick={next}
+                onkeydown={(e) => e.key === "Enter" && next()}
+            ></div>
+        {/if}
     {/if}
 </div>
+
+<style>
+    /*
+     * theme-token：根为 display:flex 横向，wrapper 带 transform 会压住同层后面的分页/箭头。
+     * free：纵排 + 轨道层 z-index；导航用 absolute + inset-inline !important，避免业务样式改 position 后跑偏。
+     */
+    :global(.por-carousel.por-carousel-free) {
+        overflow: visible;
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        /* 避免 100vw 含纵向滚动条时比父级更宽，absolute 箭头被裁 */
+        max-width: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    :global(.por-carousel.por-carousel-free .por-carousel-free-track) {
+        overflow: visible;
+        width: 100%;
+        min-width: 0;
+        position: relative;
+        z-index: 0;
+    }
+
+    :global(.por-carousel.por-carousel-free .por-carousel-wrapper) {
+        display: flex;
+        gap: var(--por-carousel-slide-gap, 0px);
+        z-index: 0;
+    }
+
+    :global(.por-carousel.por-carousel-free .por-carousel-slide) {
+        flex: 0 0 auto;
+    }
+
+    :global(.por-carousel.por-carousel-free .por-carousel-pagination) {
+        position: absolute !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        z-index: 4;
+        /* 不参与 flex 占高：根盒子高度≈轨道，箭头 top:50% 对准幻灯片纵向中心 */
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        pointer-events: auto !important;
+    }
+
+    /*
+     * prev/next：相对 .por-carousel-free 含块高度纯 CSS 垂直居中（固定 64px 命中区 → top: 50% − 半高），
+     * 不用 JS、不用 transform，避免与 CDN / 子层 transform 叠出位移错误。
+     */
+    :global(.por-carousel.por-carousel-free .por-carousel-prev),
+    :global(.por-carousel.por-carousel-free .por-carousel-next) {
+        z-index: 5;
+        position: absolute !important;
+        /* 64px 命中区，与注释一致：纵向居中且不依赖 transform */
+        top: calc(50% - 32px) !important;
+        pointer-events: auto;
+        margin: 0 !important;
+        width: 64px !important;
+        height: 64px !important;
+        min-width: 64px !important;
+        min-height: 64px !important;
+        box-sizing: border-box !important;
+        background: transparent none no-repeat !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        transition-property: opacity, color, background-color !important;
+        transition-duration: 0.2s !important;
+        transition-timing-function: ease !important;
+    }
+
+    :global(.por-carousel.por-carousel-free .por-carousel-prev)::after,
+    :global(.por-carousel.por-carousel-free .por-carousel-next)::after {
+        content: none !important;
+        display: none !important;
+    }
+
+    :global(.por-carousel.por-carousel-free .por-carousel-prev)::before,
+    :global(.por-carousel.por-carousel-free .por-carousel-next)::before {
+        content: "" !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        margin: 0 !important;
+        font-family: initial !important;
+        font-size: initial !important;
+        box-sizing: border-box;
+        background-repeat: no-repeat !important;
+        background-position: center !important;
+        background-size: contain !important;
+    }
+
+    :global(.por-carousel.por-carousel-free .por-carousel-prev)::before {
+        background-image: url("./last.svg") !important;
+        transform: none !important;
+    }
+
+    /* 与 prev 同一张 SVG，只在伪元素上水平翻转，避免双资源渲染/亚像素差导致左右不齐 */
+    :global(.por-carousel.por-carousel-free .por-carousel-next)::before {
+        background-image: url("./last.svg") !important;
+        transform: scaleX(-1) !important;
+    }
+
+    /* LTR：箭头外缘距容器左/右各 40px（物理 left/right，避免与遗漏 position 时 inset 失效） */
+    :global(.por-carousel.por-carousel-free .por-carousel-prev) {
+        left: 40px !important;
+        right: auto !important;
+    }
+
+    :global(.por-carousel.por-carousel-free .por-carousel-next) {
+        right: 40px !important;
+        left: auto !important;
+    }
+
+    /* ar-MENA：与历史 jQuery 版一致 — prev 靠右、next 靠左 */
+    :global(html[lang="ar-MENA"] .por-carousel.por-carousel-free .por-carousel-prev) {
+        left: auto !important;
+        right: 40px !important;
+    }
+
+    :global(html[lang="ar-MENA"] .por-carousel.por-carousel-free .por-carousel-next) {
+        right: auto !important;
+        left: 40px !important;
+    }
+</style>

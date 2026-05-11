@@ -129,6 +129,8 @@ Traits 使用：
 共享组件复用（shared/ui 封装组件）：
   ✅ Floor — 楼层容器（por-section 封装）
   [✅ / ⬜] Carousel — 轮播（por-carousel 封装）
+       若勾选 Carousel：**实现前必须与用户确认「轮播种类」**（读取 `reference/shared-components.md` 中「轮播种类」：`layout` preview/free、`transition` slide/fade，及是否 multi-preview / loop / autoplay）；**种类未定不得开工写模板**，禁止默认臆测 free 或不必要的高阶组合。
+       若外部组件需要业务补样式：在方案中必须写出标准样式契约，不得只写“按需调整”。`layout="free"` 默认包含 `--por-carousel-slide-gap: 24px`，且外层容器需 `overflow: hidden`（通常为 `por-section`，也可按业务挂到其他容器）；选择器按“容器 class + :global(...) + 变量值”落地。
 
 Portal-UI 样式类直接使用：
   [列举会用到的 PortalUI 类名，如 por-btn-primary、por-text-title-t7、por-icon por-icon-right]
