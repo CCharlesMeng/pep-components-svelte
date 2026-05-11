@@ -33,15 +33,21 @@ export function createComponentConfig(options: { cwd: string; name: string }) {
     const dataPath =
         mockCandidates.find((p) => fs.existsSync(p)) ?? resolve(cwd, 'mocks/default.json');
 
-        const sharedPath = resolve(__dirname, '../../shared');
-    const commonAliases = {
-        '$lib': resolve(cwd, 'src/lib'),
-        '$component': resolve(cwd, 'src/index.svelte'), // Convention: main component is src/index.svelte
-        '$loader': fs.existsSync(resolve(cwd, 'src/component.server.ts')) ? resolve(cwd, 'src/component.server.ts') : null,
-        '$data': dataPath,
-        '@pep/shared':sharedPath,
-        $mockServer:fs.existsSync(resolve(cwd, 'mocks/api/index.ts')) ?resolve(cwd, 'mocks/api/index.ts') :null
-    };
+    const sharedPath = resolve(__dirname, '../../shared');
+    const loaderPath = resolve(cwd, 'src/component.server.ts');
+    const mockServerPath = resolve(cwd, 'mocks/api/index.ts');
+    const commonAliases = [
+        { find: '$lib', replacement: resolve(cwd, 'src/lib') },
+        { find: '$component', replacement: resolve(cwd, 'src/index.svelte') },
+        { find: '$data', replacement: dataPath },
+        { find: '@pep/shared', replacement: sharedPath },
+        ...(fs.existsSync(loaderPath)
+            ? [{ find: '$loader', replacement: loaderPath }]
+            : []),
+        ...(fs.existsSync(mockServerPath)
+            ? [{ find: '$mockServer', replacement: mockServerPath }]
+            : [])
+    ];
 
     return defineConfig(({ command }) => {
         // Check build mode from command line

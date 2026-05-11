@@ -1,5 +1,7 @@
 // Global type declarations for path aliases used in Vite
 
+import 'svelte/elements';
+
 declare module '$component' {
   const component: any;
   export default component;
@@ -16,4 +18,11 @@ declare module '$loader' {
 
 declare module '$lib' {
   export * from './src/lib';
+}
+
+declare module 'svelte/elements' {
+  interface HTMLAttributes<T extends EventTarget> {
+    bi_name?: string;
+    bi_parent_name?: string;
+  }
 }

@@ -11,6 +11,10 @@
     createTabScrollController,
     type TabScrollDirection,
   } from "../utils/pseudo-browser-tab-scroll";
+  import {
+    appendNewBrowserTab,
+    closeBrowserTab as closeBrowserTabState,
+  } from "../utils/pseudo-browser-tabs";
   import type { IframePagesConfig } from "../types";
   import AlertToast from "./AlertToast.svelte";
   import QuickLinkCard from "./QuickLinkCard.svelte";
@@ -382,25 +386,17 @@
     if (!canAppendTab()) {
       return;
     }
-    const id = createTabId();
-    tabs = tabs
-      .map((item) => ({ ...item, active: false }))
-      .concat([{ id, title: defaultTabTitle, url: "", active: true }]);
+    tabs = appendNewBrowserTab(tabs, defaultTabTitle, createTabId);
     scheduleScrollAfterLayout();
   }
 
   function closeTab(id: string): void {
-    if (tabs.length <= 1) {
-      onClose?.();
-      return;
-    }
-    const closingActive = tabs.find((item) => item.id === id)?.active;
-    const filtered = tabs.filter((item) => item.id !== id);
-    if (closingActive) {
-      filtered[0].active = true;
-    }
-    tabs = filtered;
     clearTabFrameCache(id);
+    const shouldCreateReplacementTab = tabs.length <= 1;
+    tabs = closeBrowserTabState(tabs, id, defaultTabTitle, createTabId);
+    if (shouldCreateReplacementTab) {
+      scheduleScrollAfterLayout();
+    }
   }
 
   function normalizeUrl(raw: string): string {
