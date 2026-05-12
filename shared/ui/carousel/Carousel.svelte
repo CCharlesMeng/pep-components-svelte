@@ -954,6 +954,17 @@
     let isScrolling = false;
     let dragStartTranslate = 0;
     let wasPlayingBeforeDrag = false;
+    /**
+     * 是否处于「已被 onPointerDown 接受」的指针会话。
+     *
+     * 修复 free 非 loop 模式偶现跳变：点击 prev/next/bullet 按钮时，onPointerDown 因命中按钮而早返回，
+     * 但 ptrStartX/Y、dragStartTranslate 等指针交互状态保留旧值（或 0）。若按下→抬起之间出现 pointermove
+     * （鼠标轻微移动即可触发），旧逻辑会以 stale ptrStartX 计算出巨大 dx，把 wrapper 推到屏幕外，
+     * 随后 click 触发的 transitionTo 再缓动回目标位置——视觉上就是「首张卡片瞬间到最右，再滑到目标」。
+     *
+     * 仅当 onPointerDown 真正接受会话时置 true；任意 pointerup/cancel 复位为 false。
+     */
+    let isPointerActive = false;
 
     // 速度检测：追踪最近 5 个坐标点
     const COORS_MAX_LENGTH = 5;
@@ -1022,9 +1033,14 @@
 
         if (e.pointerType !== "touch") {
             const t = e.target as HTMLElement;
-            if (t.closest(".por-carousel-prev, .por-carousel-next, .por-carousel-bullet, .por-carousel-pagination")) return;
+            if (t.closest(".por-carousel-prev, .por-carousel-next, .por-carousel-bullet, .por-carousel-pagination")) {
+                // 命中导航按钮：不开启拖拽会话；显式置 false 以避免后续 pointermove 用旧 ptrStart* 误判为拖动。
+                isPointerActive = false;
+                return;
+            }
         }
 
+        isPointerActive = true;
         ptrStartX = e.clientX;
         ptrStartY = e.clientY;
         ptrLastX = e.clientX;
@@ -1047,8 +1063,14 @@
     }
 
     function onPointerMove(e: PointerEvent) {
+        // 必须先校验：只处理已被 onPointerDown 接受的会话，避免按钮 click 误入拖动分支。
+        if (!isPointerActive) return;
         if (!shouldHandlePointer(e) || isScrolling) return;
-        if (e.pointerType !== "touch" && e.buttons === 0) return;
+        if (e.pointerType !== "touch" && e.buttons === 0) {
+            // 鼠标按键已松开却仍来到这里：说明 pointerup 在 carousel 之外被吞，主动结束会话。
+            isPointerActive = false;
+            return;
+        }
 
         if (e.clientX === ptrLastX && e.clientY === ptrLastY) return;
 
@@ -1108,7 +1130,10 @@
     }
 
     function onPointerUp(e: PointerEvent) {
-        if (!shouldHandlePointer(e) || !isDragging) return;
+        if (!shouldHandlePointer(e)) return;
+        // 无论本轮是否产生拖动，都必须结束指针会话，否则下一轮 pointermove 会用过期 ptrStart*。
+        isPointerActive = false;
+        if (!isDragging) return;
         endDrag();
     }
 
@@ -1118,6 +1143,7 @@
 
         function onDocPointerUp(e: PointerEvent) {
             if (e.pointerType === "touch") return;
+            isPointerActive = false;
             endDrag();
         }
 
