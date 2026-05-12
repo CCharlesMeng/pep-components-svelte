@@ -1379,4 +1379,12 @@
         right: auto !important;
         left: 40px !important;
     }
+
+    /* free：≤768（与布局断点 vw > 768 一致）隐藏左右箭头，保留分页 dots 与触控/模拟滑动 */
+    @media (max-width: 768px) {
+        :global(.por-carousel.por-carousel-free .por-carousel-prev),
+        :global(.por-carousel.por-carousel-free .por-carousel-next) {
+            display: none !important;
+        }
+    }
 </style>
